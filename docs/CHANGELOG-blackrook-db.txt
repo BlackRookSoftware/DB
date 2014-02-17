@@ -1,0 +1,29 @@
+Database Utilities (C) Black Rook Software, All rights reserved.
+
+Changed in 2.1.1
+================
+
+- Added missing documentation. 
+
+Changed in 2.1.0
+================
+
+- Requires: Commons 2.16.0.
+
+- Fixed/Changed: SQLUtil.createObjectFromResultRow() sets Enum values 
+  properly.
+- Applied new copyright headers.
+- Added com.blackrook.db package for general database material.
+- Changed: Source indentation style.
+
+Changed in 2.0.3
+================
+
+- Fixed/Changed: SQLUtil.createObjectFromResultRow() sets blank values on 
+  primitive-typed fields if a column value is null.
+
+Changed in 2.0.1
+================
+
+- Fixed: SQLResult gathering ids for created rows fixed.
+
