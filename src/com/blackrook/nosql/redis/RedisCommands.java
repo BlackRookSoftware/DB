@@ -1,4 +1,4 @@
-package com.blackrook.redis;
+package com.blackrook.nosql.redis;
 
 /**
  * Interface of Redis commands.

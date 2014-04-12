@@ -1,4 +1,4 @@
-package com.blackrook.redis.io;
+package com.blackrook.nosql.redis.io;
 
 import java.io.Closeable;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package com.blackrook.redis.exception;
+package com.blackrook.nosql.redis.exception;
 
 /**
  * An exception thrown during a Redis stream read error.
