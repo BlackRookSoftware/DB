@@ -40,39 +40,6 @@ public class RESPWriter implements Closeable
 	}
 	
 	/**
-	 * Writes a bulk string array.
-	 * @param strings the series of strings.
-	 */
-	public void writeArray(String ...strings)
-	{
-		out.write("*" + strings.length + CRLF);
-		for (String s : strings)
-			writeBulkString(s, true);
-		out.flush();
-	}
-	
-	/**
-	 * Writes an integer array.
-	 * @param numbers the series of numbers.
-	 */
-	public void writeArray(Number ...numbers)
-	{
-		out.write("*" + numbers.length + CRLF);
-		for (Number n : numbers)
-			writeNumber(n, false);
-		out.flush();
-	}
-	
-	/**
-	 * Writes a number to output.
-	 * @param n the number to write.
-	 */
-	public void writeNumber(Number n)
-	{
-		writeNumber(n, true);
-	}
-
-	/**
 	 * Writes a null object.
 	 */
 	public void writeNull()
@@ -90,12 +57,12 @@ public class RESPWriter implements Closeable
 	}
 
 	/**
-	 * Writes a character to output.
-	 * @param c the character.
+	 * Writes a number to output.
+	 * @param n the number to write.
 	 */
-	public void writeChar(char c)
+	public void writeNumber(Number n)
 	{
-		writeSimpleString(String.valueOf(c), true);
+		writeNumber(n, true);
 	}
 
 	/**
@@ -114,6 +81,39 @@ public class RESPWriter implements Closeable
 	public void writeBulkString(String s)
 	{
 		writeBulkString(s, true);
+	}
+
+	/**
+	 * Writes an integer array.
+	 * @param numbers the series of numbers.
+	 */
+	public void writeArray(Number ...numbers)
+	{
+		out.write("*" + numbers.length + CRLF);
+		for (Number n : numbers)
+			writeNumber(n, false);
+		out.flush();
+	}
+
+	/**
+	 * Writes a bulk string array.
+	 * @param strings the series of strings.
+	 */
+	public void writeArray(String ...strings)
+	{
+		out.write("*" + strings.length + CRLF);
+		for (String s : strings)
+			writeBulkString(s, true);
+		out.flush();
+	}
+	
+	/**
+	 * Writes a character to output.
+	 * @param c the character.
+	 */
+	public void writeChar(char c)
+	{
+		writeSimpleString(String.valueOf(c), true);
 	}
 
 	/**

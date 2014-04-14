@@ -5,7 +5,6 @@ import java.io.InputStream;
 
 import com.blackrook.commons.Common;
 import com.blackrook.commons.list.DataList;
-import com.blackrook.nosql.redis.RedisMixed;
 import com.blackrook.nosql.redis.exception.RedisException;
 import com.blackrook.nosql.redis.exception.RedisIOException;
 
@@ -15,6 +14,9 @@ import com.blackrook.nosql.redis.exception.RedisIOException;
  */
 public class RESPReader
 {
+	/** Endline. */
+	private static final String CRLF = "\r\n";
+	
 	private static final int BULK_STRING_LIMIT = 1024 * 1024 * 512;
 	
 	/** The wrapped reader. */
@@ -30,75 +32,6 @@ public class RESPReader
 	{
 		this.in = in;
 		this.buffer = new DataList(1024);
-	}
-	
-	/**
-	 * Reads a response from the stream.
-	 * Will block until it reads an entire structure.
-	 * @return a RedisMixed object containing the response.
-	 */
-	public RedisMixed readMixed()
-	{
-		try {
-			
-			readLine(buffer);
-			String resp = new String(buffer.toByteArray(), "UTF-8"); 
-			
-			// is error?
-			if (resp.startsWith("-"))
-				throw new RedisException(resp.substring(1));
-			// is null
-			else if (resp.equals("$-1"))
-				return null;
-			// is null
-			else if (resp.equals("*-1"))
-				return null;
-			// is integer
-			else if (resp.startsWith(":"))
-				return new RedisMixed(Common.parseLong(resp.substring(1)));
-			// is simple string
-			else if (resp.startsWith("+"))
-				return new RedisMixed(resp.substring(1));
-			// is bulk string
-			else if (resp.startsWith("$"))
-			{
-				String lstr = resp.substring(1);
-				int len = Common.parseInt(lstr);
-				
-				if (len == -1)
-					return null;
-				else if (len > BULK_STRING_LIMIT)
-					throw new RedisIOException("Server attempted to return bulk reply over MAX allowed.");
-				
-				int buf = 0;
-				try {
-					buf = readBulk(buffer, len);
-				} catch (IOException e) {
-					throw new RedisIOException("Malformed response; expected "+len+"-byte string, got "+buf, e);
-				}
-				
-				resp = new String(buffer.toByteArray(), "UTF-8");
-				return new RedisMixed(resp);
-			}
-			// is array
-			else if (resp.startsWith("*"))
-			{
-				int len = Common.parseInt(resp.substring(1));
-				if (len == -1)
-					return null;
-
-				String[] out = new String[len];
-				for (int i = 0; i < len; i++)
-					out[i] = readString();
-
-				return new RedisMixed(out);
-			}
-			else
-				throw new RedisException("Received malformed server response.");
-
-		} catch (IOException e) {
-			throw new RedisIOException("Could not read from stream.", e);
-		}
 	}
 	
 	/**
@@ -225,6 +158,66 @@ public class RESPReader
 			throw new RedisIOException("Could not read from stream.", e);
 		}
 
+	}
+	
+	/**
+	 * Reads until a full request.
+	 * Will block until something is read completely from the stream.
+	 * @return a full string with all breaks and newlines.
+	 * @throws RedisException if the server reports an error.
+	 * @throws RedisIOException if an error occurs during the read.
+	 */
+	public String readRaw()
+	{
+		try {
+			
+			int buf = readLine(buffer);
+			String resp = new String(buffer.toByteArray(), "UTF-8"); 
+			
+			// is error?
+			if (resp.startsWith("-") || resp.startsWith(":") || resp.startsWith("+"))
+				return resp + CRLF;
+			// is bulk string
+			else if (resp.startsWith("$"))
+			{
+				String lstr = resp.substring(1);
+				int len = Common.parseInt(lstr);
+				
+				if (len == -1)
+					return "$-1" + CRLF;
+				else if (len > BULK_STRING_LIMIT)
+					throw new RedisIOException("Server attempted to return bulk reply over MAX allowed.");
+
+				try {
+					buf = readBulk(buffer, len);
+				} catch (IOException e) {
+					throw new RedisIOException("Malformed response; expected "+len+"-byte string, got "+buf, e);
+				}
+				
+				resp = new String(buffer.toByteArray(), "UTF-8");
+				return "$" + len + CRLF + resp + CRLF;
+			}
+			// is array
+			else if (resp.startsWith("*"))
+			{
+				int len = Common.parseInt(resp.substring(1));
+				if (len == -1)
+					return "*-1" + CRLF;
+
+				StringBuffer outb = new StringBuffer("*"+len+CRLF);
+				
+				for (int i = 0; i < len; i++)
+					outb.append(readRaw());
+
+				return outb.toString();
+			}
+			else
+				throw new RedisException("Expected RESP reply.");
+				
+		} catch (IOException e) {
+			throw new RedisIOException("Could not read from stream.", e);
+		}
+		
 	}
 	
 	/**

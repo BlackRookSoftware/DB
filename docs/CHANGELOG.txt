@@ -3,7 +3,8 @@ Database Utilities (C) Black Rook Software, All rights reserved.
 Slated for 2.2.0
 ================
 
-- Added: Redis package for connecting to Redis Key-Value servers.
+- Added: com.blackrook.nosql.redis package for connecting to Redis Key-Value
+  servers.
 
 Changed in 2.1.1
 ================

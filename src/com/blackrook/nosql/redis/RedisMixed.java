@@ -1,5 +1,7 @@
 package com.blackrook.nosql.redis;
 
+import java.util.Arrays;
+
 import com.blackrook.commons.Common;
 
 /**
@@ -72,10 +74,10 @@ public class RedisMixed
 	}
 	
 	/**
-	 * Returns this value as a Long. Can return null.
+	 * Returns this value as a Long integer. Can return null.
 	 * If the internal type is {@link Type#ERROR}, this returns null.
 	 */
-	public Long getLong()
+	public Long getInteger()
 	{
 		switch (type)
 		{
@@ -100,7 +102,7 @@ public class RedisMixed
 		{
 			case INTEGER:
 			case STRING:
-				return value != null ? value : null;
+				return value;
 			case ARRAY:
 				return values != null && values.length > 0 ? values[0] : null;
 			default:
@@ -124,6 +126,40 @@ public class RedisMixed
 				return values;
 			default:
 			case ERROR:
+				return null;
+		}
+	}
+
+	/**
+	 * Returns this value as an error String. Can return null.
+	 * If the internal type is NOT {@link Type#ERROR}, this returns null.
+	 */
+	public String getError()
+	{
+		switch (type)
+		{
+			case INTEGER:
+			case STRING:
+			case ARRAY:
+			default:
+				return null;
+			case ERROR:
+				return value;
+		}
+	}
+	
+	@Override
+	public String toString()
+	{
+		switch (type)
+		{
+			case INTEGER:
+			case STRING:
+			case ERROR:
+				return String.valueOf(value);
+			case ARRAY:
+				return Arrays.toString(values);
+			default:
 				return null;
 		}
 	}
