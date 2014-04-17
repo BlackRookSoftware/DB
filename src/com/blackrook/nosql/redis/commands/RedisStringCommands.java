@@ -3,7 +3,7 @@ package com.blackrook.nosql.redis.commands;
 import com.blackrook.commons.ObjectPair;
 
 /**
- * An interface detailing commands that operate on Redis Strings.
+ * An interface detailing commands that operate on Redis Strings or string values.
  * @author Matthew Tropiano
  * TODO: Proper docs and return types.
  */
