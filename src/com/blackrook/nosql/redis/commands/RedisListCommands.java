@@ -91,7 +91,7 @@ public interface RedisListCommands
 	 * <p><strong>Available since 1.0.0.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(1)</p>
 	 * <p>Removes and returns the first element of the list stored at <code>key</code>.</p>
-	 * @return the value of the first element, or <code>nil</code> when <code>key</code> does not exist.
+	 * @return the value of the first element, or <code>null</code> when <code>key</code> does not exist.
 	 */
 	public String lpop(String key);
 

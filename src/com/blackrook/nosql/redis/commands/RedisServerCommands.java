@@ -3,7 +3,6 @@ package com.blackrook.nosql.redis.commands;
 /**
  * Interface of Redis server commands.
  * @author Matthew Tropiano
- * TODO: Proper docs and return types.
  */
 public interface RedisServerCommands
 {
@@ -48,7 +47,9 @@ public interface RedisServerCommands
 	 * <p>From <a href="http://redis.io/commands/client-getname">http://redis.io/commands/client-getname</a>:</p>
 	 * <p><strong>Available since 2.6.9.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(1)</p>
-	 * <p>The <code>CLIENT GETNAME</code> returns the name of the current connection as set by <code>CLIENT SETNAME</code>. Since every new connection starts without an associated name, if no name was assigned a null bulk reply is returned.</p>
+	 * <p>The <code>CLIENT GETNAME</code> returns the name of the current connection as set by 
+	 * <code>CLIENT SETNAME</code>. Since every new connection starts without an associated 
+	 * name, if no name was assigned a null bulk reply is returned.</p>
 	 * @return the connection name, or null if no name is set.
 	 */
 	public void clientgetname();
@@ -57,7 +58,8 @@ public interface RedisServerCommands
 	 * <p>From <a href="http://redis.io/commands/client-pause">http://redis.io/commands/client-pause</a>:</p>
 	 * <p><strong>Available since 2.9.50.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(1)</p>
-	 * <p><code>CLIENT PAUSE</code> is a connections control command able to suspend all the Redis clients for the specified amount of time (in milliseconds).</p>
+	 * <p><code>CLIENT PAUSE</code> is a connections control command able to suspend all
+	 * the Redis clients for the specified amount of time (in milliseconds).</p>
 	 * @return true if successful, false otherwise.
 	 */
 	public boolean clientpause(long millis);
@@ -96,7 +98,9 @@ public interface RedisServerCommands
 	/**
 	 * <p>From <a href="http://redis.io/commands/config-set">http://redis.io/commands/config-set</a>:</p>
 	 * <p><strong>Available since 2.0.0.</strong></p>
-	 * <p>The <code>CONFIG SET</code> command is used in order to reconfigure the server at run time without the need to restart Redis. You can change both trivial parameters or switch from one to another persistence option using this command.</p>
+	 * <p>The <code>CONFIG SET</code> command is used in order to reconfigure the 
+	 * server at run time without the need to restart Redis. You can change both 
+	 * trivial parameters or switch from one to another persistence option using this command.</p>
 	 * @return true if successful, false otherwise.
 	 */
 	public boolean configset(String parameter, String value);
@@ -121,21 +125,24 @@ public interface RedisServerCommands
 	/**
 	 * <p>From <a href="http://redis.io/commands/debug-object">http://redis.io/commands/debug-object</a>:</p>
 	 * <p><strong>Available since 1.0.0.</strong></p>
-	 * <p><code>DEBUG OBJECT</code> is a debugging command that should not be used by clients. Check the {@link RedisGenericCommands#object(String, String)} command instead.</p>
+	 * <p><code>DEBUG OBJECT</code> is a debugging command that should not be used
+	 * by clients. Check the {@link RedisGenericCommands#object(String, String)} command instead.</p>
 	 */
 	public String debugobject();
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/debug-segfault">http://redis.io/commands/debug-segfault</a>:</p>
 	 * <p><strong>Available since 1.0.0.</strong></p>
-	 * <p><code>DEBUG SEGFAULT</code> performs an invalid memory access that crashes Redis. It is used to simulate bugs during the development.</p>
+	 * <p><code>DEBUG SEGFAULT</code> performs an invalid memory access that 
+	 * crashes Redis. It is used to simulate bugs during the development.</p>
 	 */
 	public void debugsegfault();
 	
 	/**
 	 * <p>From <a href="http://redis.io/commands/flushall">http://redis.io/commands/flushall</a>:</p>
 	 * <p><strong>Available since 1.0.0.</strong></p>
-	 * <p>Delete all the keys of all the existing databases, not just the currently selected one. This command never fails.</p>
+	 * <p>Delete all the keys of all the existing databases, not just the 
+	 * currently selected one. This command never fails.</p>
 	 * @return true if successful, false otherwise.
 	 */
 	public boolean flushall();
@@ -169,36 +176,49 @@ public interface RedisServerCommands
 	public long lastsave();
 
 	/**
-	 * <p>From <a href="http://redis.io/commands/monitor">http://redis.io/commands/monitor</a>:</p>
-	 * <p><strong>Available since 1.0.0.</strong></p>
-	 * <p><a href="/commands/monitor">MONITOR</a> is a debugging command that streams back every command processed by the Redis server. It can help in understanding what is happening to the database. This command can both be used via <code>redis-cli</code> and via <code>telnet</code>.</p>
-	 * @return <strong>Non standard return value</strong>, just dumps the received commands in an infinite flow.
-	 */
-	public void monitor();
-
-	/**
 	 * <p>From <a href="http://redis.io/commands/save">http://redis.io/commands/save</a>:</p>
 	 * <p><strong>Available since 1.0.0.</strong></p>
-	 * <p>The <a href="/commands/save">SAVE</a> commands performs a <strong>synchronous</strong> save of the dataset producing a <em>point in time</em> snapshot of all the data inside the Redis instance, in the form of an RDB file.</p>
-	 * @return <a href="/topics/protocol#simple-string-reply">Simple string reply</a>: The commands returns OK on success.
+	 * <p>The <a href="/commands/save">SAVE</a> commands performs a <strong>synchronous</strong> 
+	 * save of the dataset producing a <em>point in time</em> snapshot of all the data 
+	 * inside the Redis instance, in the form of an RDB file.</p>
+	 * @return true if successful, false otherwise.
 	 */
-	public void save();
+	public boolean save();
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/shutdown">http://redis.io/commands/shutdown</a>:</p>
 	 * <p><strong>Available since 1.0.0.</strong></p>
 	 * <p>The command behavior is the following:</p>
-	 * @return <a href="/topics/protocol#simple-string-reply">Simple string reply</a> on error. On success nothing is returned since the server quits and the connection is closed.
+	 * @return <a href="/topics/protocol#simple-string-reply">Simple string reply</a> 
+	 * on error. On success nothing is returned since the server quits and the connection is closed.
 	 */
 	public void shutdown(boolean save);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/slaveof">http://redis.io/commands/slaveof</a>:</p>
 	 * <p><strong>Available since 1.0.0.</strong></p>
-	 * <p>The <a href="/commands/slaveof">SLAVEOF</a> command can change the replication settings of a slave on the fly. If a Redis server is already acting as slave, the command <a href="/commands/slaveof">SLAVEOF</a> NO ONE will turn off the replication, turning the Redis server into a MASTER. In the proper form <a href="/commands/slaveof">SLAVEOF</a> hostname port will make the server a slave of another server listening at the specified hostname and port.</p>
-	 * @return <a href="/topics/protocol#simple-string-reply">Simple string reply</a>
+	 * <p>The <code>SLAVEOF</code> command can change the replication 
+	 * settings of a slave on the fly. If a Redis server is already acting as slave, the 
+	 * command <code>SLAVEOF</code> NO ONE will turn off the replication, 
+	 * turning the Redis server into a MASTER. In the proper form {@link #slaveof(String, String)}
+	 * hostname port will make the server a slave of another server listening at the specified 
+	 * hostname and port.</p>
+	 * @return true if successful, false if not. 
 	 */
-	public void slaveof(String host, String port);
+	public boolean slaveof(String host, String port);
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/slaveof">http://redis.io/commands/slaveof</a>:</p>
+	 * <p><strong>Available since 1.0.0.</strong></p>
+	 * <p>The <code>SLAVEOF</code> command can change the replication 
+	 * settings of a slave on the fly. If a Redis server is already acting as slave, the 
+	 * command <code>SLAVEOF</code> NO ONE will turn off the replication, 
+	 * turning the Redis server into a MASTER. In the proper form {@link #slaveof(String, String)}
+	 * hostname port will make the server a slave of another server listening at the specified 
+	 * hostname and port.</p>
+	 * @return true if successful, false if not. 
+	 */
+	public boolean slaveofNoOne();
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/slowlog">http://redis.io/commands/slowlog</a>:</p>
@@ -210,7 +230,7 @@ public interface RedisServerCommands
 	/**
 	 * <p>From <a href="http://redis.io/commands/sync">http://redis.io/commands/sync</a>:</p>
 	 * <p><strong>Available since 1.0.0.</strong></p>
-	 * <p>Examples</p>
+	 * Internal sync.
 	 */
 	public void sync();
 
@@ -218,9 +238,12 @@ public interface RedisServerCommands
 	 * <p>From <a href="http://redis.io/commands/time">http://redis.io/commands/time</a>:</p>
 	 * <p><strong>Available since 2.6.0.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(1)</p>
-	 * <p>The <a href="/commands/time">TIME</a> command returns the current server time as a two items lists: a Unix timestamp and the amount of microseconds already elapsed in the current second. Basically the interface is very similar to the one of the <code>gettimeofday</code> system call.</p>
-	 * @return <a href="/topics/protocol#array-reply">Array reply</a>, specifically:
+	 * <p>The <a href="/commands/time">TIME</a> command returns the current server time 
+	 * as a two items lists: a Unix timestamp and the amount of microseconds already 
+	 * elapsed in the current second. Basically the interface is very similar to the 
+	 * one of the <code>gettimeofday</code> system call.</p>
+	 * @return UNIX time in seconds, microseconds.
 	 */
-	public void time();
+	public long[] time();
 
 }

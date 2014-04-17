@@ -261,7 +261,7 @@ public interface RedisGenericCommands
 	 * <p><strong>Available since 1.0.0.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(1)</p>
 	 * <p>Return a random key from the currently selected database.</p>
-	 * @return the random key, or <code>nil</code> when the database is empty.
+	 * @return the random key, or <code>null</code> when the database is empty.
 	 */
 	public String randomkey();
 

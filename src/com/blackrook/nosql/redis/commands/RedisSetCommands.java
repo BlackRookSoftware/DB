@@ -3,117 +3,168 @@ package com.blackrook.nosql.redis.commands;
 /**
  * Interface for Redis commands related to Sets.
  * @author Matthew Tropiano
- * TODO: Proper docs and return types.
  */
 public interface RedisSetCommands
 {
 
-	/** 
-	 *	Add one or more members to a set
-	 *	set
+	/**
+	 * <p>From <a href="http://redis.io/commands/sadd">http://redis.io/commands/sadd</a>:</p>
+	 * <p><strong>Available since 1.0.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(N) where N is the number of members to be added.</p>
+	 * <p>Add the specified members to the set stored at <code>key</code>. Specified members 
+	 * that are already a member of this set are ignored. If <code>key</code> does not exist, 
+	 * a new set is created before adding the specified members.</p>
+	 * @return the number of elements that were added to the set, not including all the elements already present into the set.
 	 */
-	public void sadd(String key, String... members);
-	
-	/** 
-	 *	Get the number of members in a set
-	 *	set
-	 */
-	public void scard(String key);
+	public long sadd(String key, String... members);
 
-	/** 
-	 *	Subtract multiple sets
-	 *	set
+	/**
+	 * <p>From <a href="http://redis.io/commands/scard">http://redis.io/commands/scard</a>:</p>
+	 * <p><strong>Available since 1.0.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(1)</p>
+	 * <p>Returns the set cardinality (number of elements) of the set stored at <code>key</code>.</p>
+	 * @return the cardinality (number of elements) of the set, or <code>0</code> if <code>key</code> does not exist.
 	 */
-	public void sdiff(String... keys);
-	
-	/** 
-	 *	Subtract multiple sets and store the resulting set in a key
-	 *	set
-	 */
-	public void sdiffstore(String destination, String... keys);
-	
-	/** 
-	 *	Intersect multiple sets
-	 *	set
-	 */
-	public void sinter(String... keys);
-	
-	/** 
-	 *	Intersect multiple sets and store the resulting set in a key
-	 *	set
-	 */
-	public void sinterstore(String destination, String... keys);
-	
-	/** 
-	 *	Determine if a given value is a member of a set
-	 *	set
-	 */
-	public void sismember(String key, String member);
+	public long scard(String key);
 
-	/** 
-	 *	Get all the members in a set
-	 *	set
+	/**
+	 * <p>From <a href="http://redis.io/commands/sdiff">http://redis.io/commands/sdiff</a>:</p>
+	 * <p><strong>Available since 1.0.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(N) where N is the total number of elements in all given sets.</p>
+	 * <p>Returns the members of the set resulting from the difference between the first set and all the successive sets.</p>
+	 * @return list with members of the resulting set.
 	 */
-	public void smembers(String key);
+	public String[] sdiff(String... keys);
 
-	/** 
-	 *	Move a member from one set to another
-	 *	set
+	/**
+	 * <p>From <a href="http://redis.io/commands/sdiffstore">http://redis.io/commands/sdiffstore</a>:</p>
+	 * <p><strong>Available since 1.0.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(N) where N is the total number of elements in all given sets.</p>
+	 * <p>This command is equal to <a href="/commands/sdiff">SDIFF</a>, but instead of 
+	 * returning the resulting set, it is stored in <code>destination</code>.</p>
+	 * @return the number of elements in the resulting set.
 	 */
-	public void smove(String source, String destination, String member);
+	public long sdiffstore(String destination, String... keys);
 
-	/** 
-	 *	Remove and return a random member from a set
-	 *	set
+	/**
+	 * <p>From <a href="http://redis.io/commands/sinter">http://redis.io/commands/sinter</a>:</p>
+	 * <p><strong>Available since 1.0.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(N*M) worst case where N is the cardinality 
+	 * of the smallest set and M is the number of sets.</p>
+	 * <p>Returns the members of the set resulting from the intersection of all the given sets.</p>
+	 * @return list with members of the resulting set.
 	 */
-	public void spop(String key);
+	public String[] sinter(String... keys);
 
-	/** 
-	 *	Get one or multiple random members from a set
-	 *	set
+	/**
+	 * <p>From <a href="http://redis.io/commands/sinterstore">http://redis.io/commands/sinterstore</a>:</p>
+	 * <p><strong>Available since 1.0.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(N*M) worst case where N is the cardinality of the smallest set and M is the number of sets.</p>
+	 * <p>This command is equal to <a href="/commands/sinter">SINTER</a>, but instead of 
+	 * returning the resulting set, it is stored in <code>destination</code>.</p>
+	 * @return the number of elements in the resulting set.
 	 */
-	public void srandmember(String key, long count);
-	
-	/** 
-	 *	Remove one or more members from a set
-	 *	set
+	public long sinterstore(String destination, String... keys);
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/sismember">http://redis.io/commands/sismember</a>:</p>
+	 * <p><strong>Available since 1.0.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(1)</p>
+	 * <p>Returns if <code>member</code> is a member of the set stored at <code>key</code>.</p>
+	 * @return true if the member is in the set, or false if not.
 	 */
-	public void srem(String key, String... members);
-	
-	/** 
-	 *	Add multiple sets
-	 *	set
+	public boolean sismember(String key, String member);
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/smembers">http://redis.io/commands/smembers</a>:</p>
+	 * <p><strong>Available since 1.0.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(N) where N is the set cardinality.</p>
+	 * <p>Returns all the members of the set value stored at <code>key</code>.</p>
+	 * @return all elements of the set.
 	 */
-	public void sunion(String... keys);
-	
-	/** 
-	 *	Add multiple sets and store the resulting set in a key
-	 *	set
+	public String[] smembers(String key);
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/smove">http://redis.io/commands/smove</a>:</p>
+	 * <p><strong>Available since 1.0.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(1)</p>
+	 * <p>Move <code>member</code> from the set at <code>source</code> to the set at 
+	 * <code>destination</code>. This operation is atomic. In every given moment the element 
+	 * will appear to be a member of <code>source</code> <strong>or</strong> <code>destination</code> for other clients.</p>
+	 * @return true if the move of the member is successful, or false if the source list did not contain the member to move. 
 	 */
-	public void sunionstore(String destination, String... keys);
-	
-	/** 
-	 *	Incrementally iterate Set elements
-	 *	set
+	public boolean smove(String source, String destination, String member);
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/spop">http://redis.io/commands/spop</a>:</p>
+	 * <p><strong>Available since 1.0.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(1)</p>
+	 * <p>Removes and returns a random element from the set value stored at <code>key</code>.</p>
+	 * @return the removed element, or <code>null</code> when <code>key</code> does not exist.
+	 */
+	public String spop(String key);
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/srandmember">http://redis.io/commands/srandmember</a>:</p>
+	 * <p><strong>Available since 1.0.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(1).</p>
+	 * <p>When called with just the <code>key</code> argument, return a random element 
+	 * from the set value stored at <code>key</code>.</p>
+	 * @return the randomly selected element, or <code>null</code> when <code>key</code> does not exist.
+	 */
+	public String srandmember(String key);
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/srandmember">http://redis.io/commands/srandmember</a>:</p>
+	 * <p><strong>Available since 1.0.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(N) where N is the absolute value of the passed count.</p>
+	 * <p>When called with just the <code>key</code> argument, return a random element 
+	 * from the set value stored at <code>key</code>.</p>
+	 * @return an array of elements, or an empty array when <code>key</code> does not exist.
+	 */
+	public String[] srandmember(String key, long count);
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/srem">http://redis.io/commands/srem</a>:</p>
+	 * <p><strong>Available since 1.0.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(N) where N is the number of members to be removed.</p>
+	 * <p>Remove the specified members from the set stored at <code>key</code>. Specified 
+	 * members that are not a member of this set are ignored. If <code>key</code> does not 
+	 * exist, it is treated as an empty set and this command returns <code>0</code>.</p>
+	 * @return the number of members that were removed from the set, not including non existing members.
+	 */
+	public long srem(String key, String... members);
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/sunion">http://redis.io/commands/sunion</a>:</p>
+	 * <p><strong>Available since 1.0.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(N) where N is the total number of elements in all given sets.</p>
+	 * <p>Returns the members of the set resulting from the union of all the given sets.</p>
+	 * @return list with members of the resulting set.
+	 */
+	public String[] sunion(String... keys);
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/sunionstore">http://redis.io/commands/sunionstore</a>:</p>
+	 * <p><strong>Available since 1.0.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(N) where N is the total number of elements in all given sets.</p>
+	 * <p>This command is equal to <a href="/commands/sunion">SUNION</a>, but instead 
+	 * of returning the resulting set, it is stored in <code>destination</code>.</p>
+	 * @return the number of elements in the resulting set.
+	 */
+	public long sunionstore(String destination, String... keys);
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/sscan">http://redis.io/commands/sscan</a>:</p>
+	 * <p><strong>Available since 2.8.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete 
+	 * iteration, including enough command calls for the cursor to return back to 0. 
+	 * N is the number of elements inside the collection..</p>
+	 * <p>See <a href="/commands/scan">SCAN</a> for <a href="/commands/sscan">SSCAN</a> documentation.</p>
 	 */
 	public void sscan(String key, String cursor);
-	
-	/** 
-	 *	Incrementally iterate Set elements
-	 *	set
-	 */
 	public void sscan(String key, String cursor, long count);
-	
-	/** 
-	 *	Incrementally iterate Set elements
-	 *	set
-	 */
 	public void sscan(String key, String cursor, String pattern);
-	
-	/** 
-	 *	Incrementally iterate Set elements
-	 *	set
-	 */
 	public void sscan(String key, String cursor, String pattern, long count);
 	
 }
