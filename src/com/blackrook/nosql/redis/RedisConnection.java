@@ -152,4 +152,17 @@ public class RedisConnection extends RedisConnectionAbstract
 	 */
 //	public long rpopLong(String key);
 	
+	/** 
+	 *	Set multiple keys to multiple values
+	 *	string
+	 */
+//	public void mset(ObjectPair<String, String>... keyValues);
+
+	/** 
+	 *	Set multiple keys to multiple values, only if none of the keys exist
+	 *	string
+	 */
+//	public void msetnx(ObjectPair<String, String>... pairs);
+
+
 }

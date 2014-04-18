@@ -35,6 +35,35 @@ public class RESPReader
 	}
 	
 	/**
+	 * Reads and expects "OK" from Redis.
+	 * Will block until something is read from the stream.
+	 * Should be used if AND ONLY IF "OK" is expected.
+	 * @return true.
+	 * @throws RedisException if the server reports an error, or isn't OK.
+	 * @throws RedisIOException if an error occurs during the read.
+	 */
+	public boolean readOK()
+	{
+		try {
+			
+			readLine(buffer);
+			String resp = new String(buffer.toByteArray(), "UTF-8");
+			
+			// is error?
+			if (resp.startsWith("-"))
+				throw new RedisException(resp.substring(1));
+			// is OK?
+			else if (resp.equals("+OK"))
+				return true;
+			else
+				throw new RedisException("Expected OK.");
+			
+		} catch (IOException e) {
+			throw new RedisIOException("Could not read from stream.", e);
+		}
+	}
+	
+	/**
 	 * Reads and expects an Integer Reply from Redis.
 	 * Will block until something is read from the stream.
 	 * Should be used if AND ONLY IF an Integer or Null is expected.

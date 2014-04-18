@@ -135,7 +135,8 @@ public class RedisConnectionAbstract implements Closeable
 	 */
 	public String sendRaw(String... arguments)
 	{
-		return sendRaw((Object[])arguments);
+		writer.writeArray(arguments);
+		return reader.readRaw();
 	}
 	
 	/**
@@ -145,11 +146,19 @@ public class RedisConnectionAbstract implements Closeable
 	 */
 	public String sendRaw(Object... arguments)
 	{
-		String[] out = new String[arguments.length];
-		for(int i = 0; i < arguments.length; i++)
-			out[i] = String.valueOf(arguments[i]);
-		writer.writeArray(out);
+		writer.writeArray(toStringArray(arguments));
 		return reader.readRaw();
 	}
 
+	/**
+	 * Turns a series of objects into an array of strings.
+	 */
+	public static String[] toStringArray(Object... objects)
+	{
+		String[] out = new String[objects.length];
+		for(int i = 0; i < objects.length; i++)
+			out[i] = (objects[i] instanceof String) ? (String)objects[i] : String.valueOf(objects[i]);
+		return out;
+	}
+	
 }

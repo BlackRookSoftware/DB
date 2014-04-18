@@ -3,7 +3,6 @@ package com.blackrook.nosql.redis.commands;
 /**
  * An interface detailing commands for Redis transactions.
  * @author Matthew Tropiano
- * TODO: Proper docs and return types.
  */
 public interface RedisTransactionCommands
 {
