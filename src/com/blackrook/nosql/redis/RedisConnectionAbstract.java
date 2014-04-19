@@ -20,10 +20,11 @@ public class RedisConnectionAbstract implements Closeable
 	
 	/** The socket connection. */
 	private Socket redisSocket;
+
 	/** The input wrapper. */
-	private RESPReader reader;
+	protected RESPReader reader;
 	/** The output wrapper. */
-	private RESPWriter writer;
+	protected RESPWriter writer;
 	
 	/**
 	 * Creates an open connection to localhost, port 6379, the default Redis port.
@@ -140,39 +141,11 @@ public class RedisConnectionAbstract implements Closeable
 		this.redisSocket = null;
 	}
 	
-	/**
-	 * Sends a request to a Redis server in the form of a literal command.
-	 * This command is NOT sent verbatim - it is converted to a raw request before send.
-	 * @param arguments the list of arguments to send as a full request.
-	 * @return a {@link RedisObject} representing the response from the server.
-	 */
-	public RedisObject sendRequest(String... arguments)
+	@Override
+	protected void finalize() throws Throwable
 	{
-		writer.writeArray(arguments);
-		return reader.readObject();
-	}
-	
-	/**
-	 * Sends a raw request to a Redis server.
-	 * Each object is converted to a String via {@link String#valueOf(Object)}. 
-	 * @param arguments the list of arguments to send as a full request.
-	 * @return a {@link RedisObject} representing the response from the server.
-	 */
-	public RedisObject sendRequest(Object... arguments)
-	{
-		writer.writeArray(toStringArray(arguments));
-		return reader.readObject();
-	}
-
-	/**
-	 * Turns a series of objects into an array of strings.
-	 */
-	public static String[] toStringArray(Object... objects)
-	{
-		String[] out = new String[objects.length];
-		for(int i = 0; i < objects.length; i++)
-			out[i] = (objects[i] instanceof String) ? (String)objects[i] : String.valueOf(objects[i]);
-		return out;
+		close();
+		super.finalize();
 	}
 	
 }

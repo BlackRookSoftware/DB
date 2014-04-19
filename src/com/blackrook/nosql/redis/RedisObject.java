@@ -346,6 +346,7 @@ public final class RedisObject
 	 * Returns this object as a raw string, sent/received by/from Redis,
 	 * replete with newline characters. The content returned by this
 	 * method can be sent as-is to a Redis server.
+	 * <p>Equivalent to <code>asRaw(false)</code>.</p>
 	 */
 	public String asRaw()
 	{
@@ -356,8 +357,9 @@ public final class RedisObject
 	 * Returns this object as a raw string, sent/received by/from Redis,
 	 * replete with newline characters. The content returned by this
 	 * method can be sent as-is to a Redis server.
+	 * @param alwaysBulk if true, all strings are rendered as "bulk," binary-safe strings.
 	 */
-	private String asRaw(boolean alwaysBulk)
+	public String asRaw(boolean alwaysBulk)
 	{
 		final String CRLF = "\r\n";
 		

@@ -8,6 +8,8 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 
+import com.blackrook.commons.CommonTokenizer;
+import com.blackrook.commons.linkedlist.Queue;
 import com.blackrook.nosql.redis.RedisObject;
 
 /**
@@ -115,7 +117,7 @@ public class RESPWriter implements Closeable
 	 */
 	public void writeObject(RedisObject object)
 	{
-		out.write(object.asRaw());
+		out.write(object.asRaw(true));
 		out.flush();
 	}
 	
@@ -136,6 +138,19 @@ public class RESPWriter implements Closeable
 	{
 		out.write("-" + s + CRLF);
 		out.flush();
+	}
+
+	/**
+	 * Writes a Redis command as though it will be executed from a REPL-like command prompt.
+	 * The full command is sent to the server as a raw request.
+	 * @param commandString the command to send to the server.
+	 */
+	public void writeCommand(String commandString)
+	{
+		Queue<String> q = CommonTokenizer.parse(commandString);
+		String[] cmd = new String[q.size()];
+		q.toArray(cmd);
+		writeArray(cmd);
 	}
 
 	/**

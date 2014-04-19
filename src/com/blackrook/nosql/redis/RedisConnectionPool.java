@@ -7,17 +7,12 @@ import com.blackrook.commons.hash.Hash;
 import com.blackrook.commons.linkedlist.Queue;
 
 /**
- * A connection pool for Redis socket connections because screw using
- * JedisPool and its dumb Apache Pool dependencies.
+ * A connection pool for Redis socket connections.
+ * Connections are fair - released connections are added to the end of an "available" queue.
  * @author Matthew Tropiano
  */
 public class RedisConnectionPool
 {
-	/** Subscription counter. */
-	private static int SUBSCRIPTION_COUNTER = 0;
-	/** Subscription counter mutex. */
-	private static Integer SUBSCRIPTION_COUNTER_MUTEX = new Integer(0);
-
 	/** Available connections. */
 	private Queue<RedisConnection> availableConnections;
 	/** Used connections. */
@@ -82,8 +77,6 @@ public class RedisConnectionPool
 		
 		return out;
 	}
-	
-	
 
 	/**
 	 * Releases a Redis connection.
@@ -120,35 +113,5 @@ public class RedisConnectionPool
 	{
 		return usedConnections.size();
 	}
-
-	/**
-	 * A thread spawned for subscriptions.
-	public class SubcriptionThread extends Thread
-	{
-		private JedisPubSub pubsub;
-		private String[] initChannels;
-		
-		private SubcriptionThread(JedisPubSub pubsub, String[] initChannels)
-		{
-			int t;
-			this.pubsub = pubsub;
-			this.initChannels = initChannels;
-
-			synchronized (SUBSCRIPTION_COUNTER_MUTEX)
-			{
-				t = (++SUBSCRIPTION_COUNTER);
-			}
-			setName("RedisSubscriber-"+t);
-			setDaemon(true);
-		}
-		
-		@Override
-		public void run()
-		{
-			(new Jedis(info)).subscribe(pubsub, initChannels);
-		}
-		
-	}
-	 */
 
 }
