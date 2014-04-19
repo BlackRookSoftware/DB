@@ -9,8 +9,19 @@ import com.blackrook.nosql.redis.exception.RedisException;
  * A single connection to a Redis server.
  * @author Matthew Tropiano
  */
-public class RedisConnection extends RedisConnectionAbstract
+public class RedisConnection extends RedisConnectionAbstract 
 {
+	/**
+	 * Creates an open connection to localhost, port 6379, the default Redis port.
+	 * @throws IOException if an I/O error occurs when creating the socket.
+	 * @throws UnknownHostException if the IP address of the host could not be determined.
+	 * @throws SecurityException if a security manager exists and doesn't allow the connection to be made.
+	 */
+	public RedisConnection() throws IOException
+	{
+		super();
+	}
+
 	/**
 	 * Creates an open connection.
 	 * @param host the server hostname or address.
@@ -19,7 +30,7 @@ public class RedisConnection extends RedisConnectionAbstract
 	 * @throws UnknownHostException if the IP address of the host could not be determined.
 	 * @throws SecurityException if a security manager exists and doesn't allow the connection to be made.
 	 */
-	public RedisConnection(String host, int port) throws UnknownHostException, IOException
+	public RedisConnection(String host, int port) throws IOException
 	{
 		super(new RedisInfo(host, port));
 	}

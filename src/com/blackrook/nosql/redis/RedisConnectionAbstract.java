@@ -26,6 +26,17 @@ public class RedisConnectionAbstract implements Closeable
 	private RESPWriter writer;
 	
 	/**
+	 * Creates an open connection to localhost, port 6379, the default Redis port.
+	 * @throws IOException if an I/O error occurs when creating the socket.
+	 * @throws UnknownHostException if the IP address of the host could not be determined.
+	 * @throws SecurityException if a security manager exists and doesn't allow the connection to be made.
+	 */
+	public RedisConnectionAbstract() throws IOException
+	{
+		this(new RedisInfo("localhost", 6379));
+	}
+
+	/**
 	 * Creates an open connection.
 	 * @param host the server hostname or address.
 	 * @param port the server connection port.
@@ -33,7 +44,7 @@ public class RedisConnectionAbstract implements Closeable
 	 * @throws UnknownHostException if the IP address of the host could not be determined.
 	 * @throws SecurityException if a security manager exists and doesn't allow the connection to be made.
 	 */
-	public RedisConnectionAbstract(String host, int port) throws UnknownHostException, IOException
+	public RedisConnectionAbstract(String host, int port) throws IOException
 	{
 		this(new RedisInfo(host, port));
 	}
@@ -130,24 +141,27 @@ public class RedisConnectionAbstract implements Closeable
 	}
 	
 	/**
-	 * Sends a raw request to a Redis server.
+	 * Sends a request to a Redis server in the form of a literal command.
+	 * This command is NOT sent verbatim - it is converted to a raw request before send.
 	 * @param arguments the list of arguments to send as a full request.
+	 * @return a {@link RedisObject} representing the response from the server.
 	 */
-	public String sendRaw(String... arguments)
+	public RedisObject sendRequest(String... arguments)
 	{
 		writer.writeArray(arguments);
-		return reader.readRaw();
+		return reader.readObject();
 	}
 	
 	/**
 	 * Sends a raw request to a Redis server.
 	 * Each object is converted to a String via {@link String#valueOf(Object)}. 
 	 * @param arguments the list of arguments to send as a full request.
+	 * @return a {@link RedisObject} representing the response from the server.
 	 */
-	public String sendRaw(Object... arguments)
+	public RedisObject sendRequest(Object... arguments)
 	{
 		writer.writeArray(toStringArray(arguments));
-		return reader.readRaw();
+		return reader.readObject();
 	}
 
 	/**

@@ -8,6 +8,8 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 
+import com.blackrook.nosql.redis.RedisObject;
+
 /**
  * Writer class for writing requests to a Redis Socket. 
  * @author Matthew Tropiano
@@ -104,6 +106,16 @@ public class RESPWriter implements Closeable
 		out.write("*" + strings.length + CRLF);
 		for (String s : strings)
 			writeBulkString(s, true);
+		out.flush();
+	}
+	
+	/**
+	 * Writes a full object that represents a Redis request.
+	 * @param strings the series of strings.
+	 */
+	public void writeObject(RedisObject object)
+	{
+		out.write(object.asRaw());
 		out.flush();
 	}
 	
