@@ -1,9 +1,9 @@
-package com.blackrook.nosql.redis;
+package com.blackrook.nosql.redis.event;
 
 import java.io.PrintStream;
 
 /**
- * An adapter class for {@link RedisSubscriptionListener} that print messages to a {@link PrintStream}
+ * An adapter class for {@link RedisSubscriptionListener} that prints messages to a {@link PrintStream}
  * when events are heard.
  * @author Matthew Tropiano
  */

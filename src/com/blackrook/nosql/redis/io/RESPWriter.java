@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 
 import com.blackrook.commons.CommonTokenizer;
 import com.blackrook.commons.linkedlist.Queue;
-import com.blackrook.nosql.redis.RedisObject;
+import com.blackrook.nosql.redis.data.RedisObject;
 
 /**
  * Writer class for writing requests to a Redis Socket. 

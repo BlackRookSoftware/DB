@@ -1,4 +1,4 @@
-package com.blackrook.nosql.redis;
+package com.blackrook.nosql.redis.event;
 
 /**
  * An adapter class for {@link RedisSubscriptionListener}. All methods do nothing on call.

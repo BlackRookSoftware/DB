@@ -1,4 +1,4 @@
-package com.blackrook.nosql.redis;
+package com.blackrook.nosql.redis.data;
 
 import java.util.Arrays;
 import java.util.regex.Pattern;
@@ -104,7 +104,7 @@ public final class RedisObject
 	 * Creates an object of type ARRAY.
 	 * @param value the String[] value.
 	 */
-	public static RedisObject create(String[] value)
+	public static RedisObject create(String... value)
 	{
 		if (value == null)
 			return createNullArray();

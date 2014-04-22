@@ -3,6 +3,7 @@ package com.blackrook.nosql.redis;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
+import com.blackrook.nosql.redis.data.RedisObject;
 import com.blackrook.nosql.redis.exception.RedisException;
 
 /**

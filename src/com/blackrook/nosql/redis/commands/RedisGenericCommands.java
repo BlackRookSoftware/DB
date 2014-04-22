@@ -257,6 +257,16 @@ public interface RedisGenericCommands
 	public long pttl(String key);
 
 	/**
+	 * <p>From <a href="http://redis.io/commands/publish">http://redis.io/commands/publish</a>:</p>
+	 * <p><strong>Available since 2.0.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(N+M) where N is the number of clients subscribed 
+	 * to the receiving channel and M is the total number of subscribed patterns (by any client).</p>
+	 * <p>Posts a message to the given channel.</p>
+	 * @return the number of clients that received the message.
+	 */
+	public long publish(String channel, String message);
+
+	/**
 	 * <p>From <a href="http://redis.io/commands/randomkey">http://redis.io/commands/randomkey</a>:</p>
 	 * <p><strong>Available since 1.0.0.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(1)</p>

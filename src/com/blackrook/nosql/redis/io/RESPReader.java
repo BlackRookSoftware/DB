@@ -5,9 +5,9 @@ import java.io.InputStream;
 
 import com.blackrook.commons.Common;
 import com.blackrook.commons.list.DataList;
-import com.blackrook.nosql.redis.RedisObject;
+import com.blackrook.nosql.redis.data.RedisObject;
 import com.blackrook.nosql.redis.exception.RedisException;
-import com.blackrook.nosql.redis.exception.RedisIOException;
+import com.blackrook.nosql.redis.exception.RedisParseException;
 
 /**
  * Reader class for reading responses from a Redis Socket connection. 
@@ -41,7 +41,7 @@ public class RESPReader
 	 * Should be used if AND ONLY IF "OK" is expected.
 	 * @return true.
 	 * @throws RedisException if the server reports an error, or isn't OK.
-	 * @throws RedisIOException if an error occurs during the read.
+	 * @throws RedisParseException if an error occurs during the read.
 	 */
 	public boolean readOK()
 	{
@@ -60,7 +60,7 @@ public class RESPReader
 				throw new RedisException("Expected OK.");
 			
 		} catch (IOException e) {
-			throw new RedisIOException("Could not read from stream.", e);
+			throw new RedisParseException("Could not read from stream.", e);
 		}
 	}
 	
@@ -70,7 +70,7 @@ public class RESPReader
 	 * Should be used if AND ONLY IF an Integer or Null is expected.
 	 * @return a long or null reply.
 	 * @throws RedisException if the server reports an error.
-	 * @throws RedisIOException if an error occurs during the read.
+	 * @throws RedisParseException if an error occurs during the read.
 	 */
 	public Long readInteger()
 	{
@@ -92,7 +92,7 @@ public class RESPReader
 				throw new RedisException("Expected integer reply.");
 				
 		} catch (IOException e) {
-			throw new RedisIOException("Could not read from stream.", e);
+			throw new RedisParseException("Could not read from stream.", e);
 		}
 		
 	}
@@ -103,7 +103,7 @@ public class RESPReader
 	 * Should be used if AND ONLY IF a non-array or Null is expected. Integers are cast to Strings.
 	 * @return a long or null reply.
 	 * @throws RedisException if the server reports an error.
-	 * @throws RedisIOException if an error occurs during the read.
+	 * @throws RedisParseException if an error occurs during the read.
 	 */
 	public String readString()
 	{
@@ -130,12 +130,12 @@ public class RESPReader
 				if (len == -1)
 					return null;
 				else if (len > BULK_STRING_LIMIT)
-					throw new RedisIOException("Server attempted to return bulk reply over MAX allowed.");
+					throw new RedisParseException("Server attempted to return bulk reply over MAX allowed.");
 
 				try {
 					buf = readBulk(buffer, len);
 				} catch (IOException e) {
-					throw new RedisIOException("Malformed response; expected "+len+"-byte string, got "+buf, e);
+					throw new RedisParseException("Malformed response; expected "+len+"-byte string, got "+buf, e);
 				}
 				
 				resp = new String(buffer.toByteArray(), "UTF-8");
@@ -145,7 +145,7 @@ public class RESPReader
 				throw new RedisException("Expected string reply.");
 				
 		} catch (IOException e) {
-			throw new RedisIOException("Could not read from stream.", e);
+			throw new RedisParseException("Could not read from stream.", e);
 		}
 		
 	}
@@ -156,7 +156,7 @@ public class RESPReader
 	 * Should be used if AND ONLY IF an array or Null is expected. Integers are cast to Strings.
 	 * @return an array or null reply. Arrays may contain null elements!
 	 * @throws RedisException if the server reports an error.
-	 * @throws RedisIOException if an error occurs during the read.
+	 * @throws RedisParseException if an error occurs during the read.
 	 */
 	public String[] readArray()
 	{
@@ -185,7 +185,7 @@ public class RESPReader
 				throw new RedisException("Expected array reply.");
 				
 		} catch (IOException e) {
-			throw new RedisIOException("Could not read from stream.", e);
+			throw new RedisParseException("Could not read from stream.", e);
 		}
 
 	}
@@ -196,7 +196,7 @@ public class RESPReader
 	 * Will block until something is read completely from the stream.
 	 * @return a full string with all breaks and newlines.
 	 * @throws RedisException if the server reports an error.
-	 * @throws RedisIOException if an error occurs during the read.
+	 * @throws RedisParseException if an error occurs during the read.
 	 */
 	public RedisObject readObject()
 	{
@@ -223,12 +223,12 @@ public class RESPReader
 				if (len == -1)
 					return RedisObject.NULL;
 				else if (len > BULK_STRING_LIMIT)
-					throw new RedisIOException("Server attempted to return bulk reply over MAX allowed.");
+					throw new RedisParseException("Server attempted to return bulk reply over MAX allowed.");
 
 				try {
 					buf = readBulk(buffer, len);
 				} catch (IOException e) {
-					throw new RedisIOException("Malformed response; expected "+len+"-byte string, got "+buf, e);
+					throw new RedisParseException("Malformed response; expected "+len+"-byte string, got "+buf, e);
 				}
 				
 				resp = new String(buffer.toByteArray(), "UTF-8");
@@ -252,7 +252,7 @@ public class RESPReader
 				throw new RedisException("Expected RESP reply.");
 				
 		} catch (IOException e) {
-			throw new RedisIOException("Could not read from stream.", e);
+			throw new RedisParseException("Could not read from stream.", e);
 		}
 		
 	}
@@ -262,7 +262,7 @@ public class RESPReader
 	 * Will block until something is read completely from the stream.
 	 * @return a full string with all breaks and newlines.
 	 * @throws RedisException if the server reports an error.
-	 * @throws RedisIOException if an error occurs during the read.
+	 * @throws RedisParseException if an error occurs during the read.
 	 */
 	public String readRaw()
 	{
@@ -283,12 +283,12 @@ public class RESPReader
 				if (len == -1)
 					return "$-1" + CRLF;
 				else if (len > BULK_STRING_LIMIT)
-					throw new RedisIOException("Server attempted to return bulk reply over MAX allowed.");
+					throw new RedisParseException("Server attempted to return bulk reply over MAX allowed.");
 
 				try {
 					buf = readBulk(buffer, len);
 				} catch (IOException e) {
-					throw new RedisIOException("Malformed response; expected "+len+"-byte string, got "+buf, e);
+					throw new RedisParseException("Malformed response; expected "+len+"-byte string, got "+buf, e);
 				}
 				
 				resp = new String(buffer.toByteArray(), "UTF-8");
@@ -312,7 +312,7 @@ public class RESPReader
 				throw new RedisException("Expected RESP reply.");
 				
 		} catch (IOException e) {
-			throw new RedisIOException("Could not read from stream.", e);
+			throw new RedisParseException("Could not read from stream.", e);
 		}
 		
 	}

@@ -1,4 +1,4 @@
-package com.blackrook.nosql.redis;
+package com.blackrook.nosql.redis.event;
 
 /**
  * A listener class that listens on fired events from a Redis channel subscription.  
