@@ -7,6 +7,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.util.Iterator;
 
 import com.blackrook.commons.CommonTokenizer;
 import com.blackrook.commons.linkedlist.Queue;
@@ -88,14 +89,42 @@ public class RESPWriter implements Closeable
 	}
 
 	/**
-	 * Writes an integer array.
-	 * @param numbers the series of numbers.
+	 * Writes a bulk string array.
+	 * @param iterable the objects to write.
 	 */
-	public void writeArray(Number ...numbers)
+	public void writeArray(Iterable<Object> iterable)
 	{
-		out.write("*" + numbers.length + CRLF);
-		for (Number n : numbers)
-			writeNumber(n, false);
+		int len = 0;
+		StringBuilder sb = new StringBuilder();
+		Iterator<Object> it = iterable.iterator();
+		while (it.hasNext())
+		{
+			Object obj = it.next();
+			String s = obj != null ? String.valueOf(obj) : null;
+			if (s == null)
+				sb.append("$-1").append(CRLF);
+			else
+			{
+				sb.append("$").append(s.length()).append(CRLF);
+				sb.append(s).append(CRLF);
+			}
+			len++;
+		}
+			
+		out.write("*" + len + CRLF);
+		out.write(sb.toString());
+		out.flush();
+	}
+
+	/**
+	 * Writes a bulk string array.
+	 * @param objects the objects to write.
+	 */
+	public void writeArray(Object ...objects)
+	{
+		out.write("*" + objects.length + CRLF);
+		for (Object obj : objects)
+			writeBulkString(obj != null ? String.valueOf(obj) : null, true);
 		out.flush();
 	}
 

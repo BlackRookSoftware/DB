@@ -1,5 +1,7 @@
 package com.blackrook.nosql.redis.commands;
 
+import com.blackrook.nosql.redis.data.RedisObject;
+
 /**
  * Interface for generic Redis commands.
  * @author Matthew Tropiano
@@ -10,6 +12,11 @@ public interface RedisGenericCommands
 	public static final boolean SORT_ASCENDING = false;
 	/** Sort constant: descending. */
 	public static final boolean SORT_DESCENDING = true;
+
+	/** PTTL error - no expire. */
+	public static final long TTL_NO_EXPIRE = -1L;
+	/** PTTL error - not exist. */
+	public static final long TTL_NOT_EXIST = -2L;
 	
 	/**
 	 * <p>From <a href="http://redis.io/commands/del">http://redis.io/commands/del</a>:</p>
@@ -73,7 +80,7 @@ public interface RedisGenericCommands
 	 * @param timestamp the timestamp in from-Epoch milliseconds.
 	 * @return true if set, false if not set.
 	 */
-	public void expireat(String key, long timestamp);
+	public boolean expireat(String key, long timestamp);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/keys">http://redis.io/commands/keys</a>:</p>
@@ -102,9 +109,7 @@ public interface RedisGenericCommands
 	 * @param key the key to migrate.
 	 * @param destinationDB the database to target on the server.
 	 * @param timeout the timeout for the connection.
-	 * @param copy if true, the key is copied, not removed from the source.
-	 * @param replace if true, the remote key is replaced.
-	 * @return true on success, false on timeout or other non-success.
+	 * @return always true.
 	 */
 	public boolean migrate(String host, int port, String key, long destinationDB, long timeout);
 
@@ -125,7 +130,7 @@ public interface RedisGenericCommands
 	 * @param timeout the timeout for the connection.
 	 * @param copy if true, the key is copied, not removed from the source.
 	 * @param replace if true, the remote key is replaced.
-	 * @return true on success, false on timeout or other non-success.
+	 * @return always true.
 	 */
 	public boolean migrate(String host, int port, String key, long destinationDB, long timeout, boolean copy, boolean replace);
 
@@ -155,7 +160,7 @@ public interface RedisGenericCommands
 	 * Redis as a Cache.</p>
 	 * <p>This call is here in order to support commands that don't have signatures.</p>
 	 */
-	public long object(String subcommand, String key);
+	public RedisObject object(String subcommand, String key);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/object">http://redis.io/commands/object</a>:</p>
@@ -186,6 +191,7 @@ public interface RedisGenericCommands
 	 * @param the key to inspect.
 	 * @return the kind of internal representation used in order to store the 
 	 * value associated with a key, or null for missing key.
+	 * TODO: Return an enum?
 	 */
 	public String objectEncoding(String key);
 
@@ -287,7 +293,7 @@ public interface RedisGenericCommands
 	 * if {@link #rename} itself is usually a constant-time operation.</p>
 	 * @param key the old name. 
 	 * @param newkey the new name. 
-	 * @return true if successful, false if not.
+	 * @return always true.
 	 */
 	public boolean rename(String key, String newkey);
 
@@ -317,7 +323,7 @@ public interface RedisGenericCommands
 	 * @param key the key to restore.
 	 * @param ttl the time-to-live in milliseconds.
 	 * @param serializedvalue the serialized value (from a {@link #dump()} call). 
-	 * @return true if successful, false if not.
+	 * @return always true.
 	 */
 	public boolean restore(String key, long ttl, String serializedvalue);
 
@@ -428,6 +434,7 @@ public interface RedisGenericCommands
 	 * <code>key</code>. The different types that can be returned are: <code>string</code>, 
 	 * <code>list</code>, <code>set</code>, <code>zset</code> and <code>hash</code>.</p>
 	 * @return the type of <code>key</code>, or <code>none</code> when <code>key</code> does not exist.
+	 * TODO: Return as enum?
 	 */
 	public String type();
 

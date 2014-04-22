@@ -99,11 +99,7 @@ public class RedisUserConnection extends RedisConnectionAbstract
 	 */
 	public RedisObject sendRequest(Object... arguments)
 	{
-		String[] out = new String[arguments.length];
-		for(int i = 0; i < arguments.length; i++)
-			out[i] = (arguments[i] instanceof String) ? (String)arguments[i] : String.valueOf(arguments[i]);
-	
-		writer.writeArray(out);
+		writer.writeArray(arguments);
 		return reader.readObject();
 	}
 	

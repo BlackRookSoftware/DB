@@ -7,17 +7,6 @@ package com.blackrook.nosql.redis.commands;
 public interface RedisConnectionCommands
 {
 	/**
-	 * <p>From <a href="http://redis.io/commands/auth">http://redis.io/commands/auth</a>:</p>
-	 * <p><strong>Available since 1.0.0.</strong></p>
-	 * <p>Request for authentication in a password-protected Redis server. 
-	 * Redis can be instructed to require a password before allowing clients 
-	 * to execute commands. This is done using the <code>requirepass</code> 
-	 * directive in the configuration file.</p>
-	 * @return true if authenticated with the sent password, false otherwise.
-	 */
-	public boolean auth(String password);
-
-	/**
 	 * <p>From <a href="http://redis.io/commands/echo">http://redis.io/commands/echo</a>:</p>
 	 * <p><strong>Available since 1.0.0.</strong></p>
 	 * <p>Returns <code>message</code>.</p>
@@ -37,7 +26,7 @@ public interface RedisConnectionCommands
 	 * <p>From <a href="http://redis.io/commands/quit">http://redis.io/commands/quit</a>:</p>
 	 * <p><strong>Available since 1.0.0.</strong></p>
 	 * <p>Ask the server to close the connection. The connection is closed as soon as all pending replies have been written to the client.</p>
-	 * @return true if server wants to close the connection, false if not.
+	 * @return always true.
 	 */
 	public boolean quit();
 

@@ -1,6 +1,7 @@
 package com.blackrook.nosql.redis.commands;
 
 import com.blackrook.commons.ObjectPair;
+import com.blackrook.nosql.redis.enums.Aggregation;
 
 /**
  * Interface for Redis commands related to Sorted Sets.
@@ -8,10 +9,6 @@ import com.blackrook.commons.ObjectPair;
  */
 public interface RedisSortedSetCommands
 {
-	public static final String AGGREGATE_SUM = "SUM";
-	public static final String AGGREGATE_MIN = "MIN";
-	public static final String AGGREGATE_MAX = "MAX";
-	
 	/**
 	 * <p>From <a href="http://redis.io/commands/zadd">http://redis.io/commands/zadd</a>:</p>
 	 * <p><strong>Available since 1.2.0.</strong></p>
@@ -219,7 +216,7 @@ public interface RedisSortedSetCommands
 	 * input keys and the other (optional) arguments.</p>
 	 * @return the number of elements in the resulting sorted set at <code>destination</code>.
 	 */
-	public long zinterstore(String destination, String[] keys, String[] weights, String aggregate);
+	public long zinterstore(String destination, String[] keys, String[] weights, Aggregation aggregation);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/zunionstore">http://redis.io/commands/zunionstore</a>:</p>
@@ -233,7 +230,7 @@ public interface RedisSortedSetCommands
 	 * keys and the other (optional) arguments.</p>
 	 * @return the number of elements in the resulting sorted set at <code>destination</code>.
 	 */
-	public long zunionstore(String destination, String[] keys, String[] weights, String aggregate);
+	public long zunionstore(String destination, String[] keys, String[] weights, Aggregation aggregation);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/zscan">http://redis.io/commands/zscan</a>:</p>

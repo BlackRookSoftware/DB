@@ -3,14 +3,24 @@ package com.blackrook.nosql.redis;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
+import com.blackrook.commons.Common;
+import com.blackrook.commons.list.List;
+import com.blackrook.nosql.redis.commands.RedisConnectionCommands;
+import com.blackrook.nosql.redis.commands.RedisGenericCommands;
+import com.blackrook.nosql.redis.data.RedisObject;
 import com.blackrook.nosql.redis.exception.RedisException;
 
 /**
  * A single connection to a Redis server.
  * @author Matthew Tropiano
+ * TODO: Add more commands.
  */
-public class RedisConnection extends RedisConnectionAbstract 
+public class RedisConnection extends RedisConnectionAbstract implements 
+	RedisConnectionCommands, RedisGenericCommands
 {
+	
+	private static final String[] COMMAND_DEL = new String[]{"DEL"};
+	
 	/**
 	 * Creates an open connection to localhost, port 6379, the default Redis port.
 	 * @throws IOException if an I/O error occurs when creating the socket.
@@ -61,6 +71,266 @@ public class RedisConnection extends RedisConnectionAbstract
 	public RedisConnection(RedisInfo info) throws IOException
 	{
 		super(info);
+	}
+
+	@Override
+	public String echo(String message)
+	{
+		writer.writeArray("ECHO", message);
+		return reader.readString();
+	}
+
+	@Override
+	public long ping()
+	{
+		long time = System.currentTimeMillis();
+		writer.writeArray("PING");
+		reader.readPong();
+		return System.currentTimeMillis() - time;
+	}
+
+	@Override
+	public boolean quit()
+	{
+		writer.writeArray("QUIT");
+		reader.readOK();
+		try {
+			close();
+		} catch (IOException e) {
+			throw new RedisException(e);
+		}
+		return true;
+	}
+
+	@Override
+	public boolean select(long db)
+	{
+		writer.writeArray("SELECT", db);
+		return reader.readOK();
+	}
+
+	@Override
+	public long del(String... keys)
+	{
+		writer.writeArray(Common.joinArrays(COMMAND_DEL, keys));
+		return reader.readInteger();
+	}
+
+	@Override
+	public String dump(String key)
+	{
+		writer.writeArray("DUMP", key);
+		return reader.readString();
+	}
+
+	@Override
+	public boolean exists(String key)
+	{
+		writer.writeArray("EXISTS", key);
+		return reader.readInteger() != 0;
+	}
+
+	@Override
+	public boolean expire(String key, long seconds)
+	{
+		writer.writeArray("EXPIRE", key, seconds);
+		return reader.readInteger() != 0;
+	}
+
+	@Override
+	public boolean expireat(String key, long timestamp)
+	{
+		writer.writeArray("EXPIREAT", key, timestamp);
+		return reader.readInteger() != 0;
+	}
+
+	@Override
+	public String[] keys(String pattern)
+	{
+		writer.writeArray("KEYS", pattern);
+		return reader.readArray();
+	}
+
+	@Override
+	public boolean migrate(String host, int port, String key, long destinationDB, long timeout)
+	{
+		writer.writeArray("MIGRATE", host, port, key, destinationDB, timeout);
+		return reader.readOK();
+	}
+
+	@Override
+	public boolean migrate(String host, int port, String key, long destinationDB, long timeout, boolean copy, boolean replace)
+	{
+		List<Object> out = new List<Object>(8);
+		out.add("MIGRATE");
+		out.add(host);
+		out.add(port);
+		out.add(key);
+		out.add(destinationDB);
+		out.add(timeout);
+		if (copy)
+			out.add("COPY");
+		if (replace)
+			out.add("REPLACE");
+		writer.writeArray(out);
+		return reader.readOK();
+	}
+
+	@Override
+	public boolean move(String key, long db)
+	{
+		writer.writeArray("MOVE", key, db);
+		return reader.readInteger() != 0;
+	}
+
+	@Override
+	public RedisObject object(String subcommand, String key)
+	{
+		writer.writeArray("OBJECT", subcommand, key);
+		return reader.readObject();
+	}
+
+	@Override
+	public long objectRefcount(String key)
+	{
+		writer.writeArray("OBJECT", "REFCOUNT", key);
+		return reader.readInteger();
+	}
+
+	@Override
+	public String objectEncoding(String key)
+	{
+		writer.writeArray("OBJECT", "ENCODING", key);
+		return reader.readString();
+	}
+
+	@Override
+	public long objectIdletime(String key)
+	{
+		writer.writeArray("OBJECT", "IDLETIME", key);
+		return reader.readInteger();
+	}
+
+	@Override
+	public boolean persist(String key)
+	{
+		writer.writeArray("PERSIST", key);
+		return reader.readInteger() != 0;
+	}
+
+	@Override
+	public boolean pexpire(String key, long milliseconds)
+	{
+		writer.writeArray("PEXPIRE", key, milliseconds);
+		return reader.readInteger() != 0;
+	}
+
+	@Override
+	public boolean pexpireat(String key, long timestamp)
+	{
+		writer.writeArray("PEXPIREAT", key, timestamp);
+		return reader.readInteger() != 0;
+	}
+
+	@Override
+	public long pttl(String key)
+	{
+		writer.writeArray("PTTL", key);
+		return reader.readInteger();
+	}
+
+	@Override
+	public long publish(String channel, String message)
+	{
+		writer.writeArray("PUBLISH", channel, message);
+		return reader.readInteger();
+	}
+
+	@Override
+	public String randomkey()
+	{
+		writer.writeArray("RANDOMKEY");
+		return reader.readString();
+	}
+
+	@Override
+	public boolean rename(String key, String newkey)
+	{
+		writer.writeArray("RENAME", key, newkey);
+		return reader.readOK();
+	}
+
+	@Override
+	public boolean renamenx(String key, String newkey)
+	{
+		writer.writeArray("RENAMENX", key, newkey);
+		return reader.readInteger() != 0;
+	}
+
+	@Override
+	public boolean restore(String key, long ttl, String serializedvalue)
+	{
+		writer.writeArray("RESTORE", key, ttl, serializedvalue);
+		return reader.readOK();
+	}
+
+	@Override
+	public Object scan(String cursor)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Object scan(String cursor, String pattern)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Object scan(String cursor, long count)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Object scan(String cursor, String pattern, long count)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String[] sort(String key, boolean desc, boolean alpha, long offset,
+			long count, String storeKey, String... getPatterns)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String[] sortBy(String key, String pattern, boolean desc,
+			boolean alpha, long offset, long count, String storeKey,
+			String... getPatterns)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public long ttl(String key)
+	{
+		writer.writeArray("TTL", key);
+		return reader.readInteger();
+	}
+
+	@Override
+	public String type()
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
