@@ -1,5 +1,7 @@
 package com.blackrook.nosql.redis.commands;
 
+import com.blackrook.nosql.redis.enums.BitwiseOperation;
+
 /**
  * An interface detailing commands that operate on Redis Strings or string values.
  * @author Matthew Tropiano
@@ -42,7 +44,7 @@ public interface RedisStringCommands
 	 * @return the size of the string stored in the destination key, 
 	 * equal to the size of the longest input string.
 	 */
-	public long bitop(String operation, String destkey, String... keys);
+	public long bitop(BitwiseOperation operation, String destkey, String key, String... keys);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/bitpos">http://redis.io/commands/bitpos</a>:</p>
@@ -51,16 +53,7 @@ public interface RedisStringCommands
 	 * <p>Return the position of the first bit set to 1 or 0 in a string.</p>
 	 * @return the command returns the position of the first bit set to 1 or 0 according to the request.
 	 */
-	public long bitpos(String key, long bit);
-
-	/**
-	 * <p>From <a href="http://redis.io/commands/bitpos">http://redis.io/commands/bitpos</a>:</p>
-	 * <p><strong>Available since 2.8.7.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(N)</p>
-	 * <p>Return the position of the first bit set to 1 or 0 in a string.</p>
-	 * @return the command returns the position of the first bit set to 1 or 0 according to the request.
-	 */
-	public long bitpos(String key, long bit, long start, long end);
+	public long bitpos(String key, long bit, Long start, Long end);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/decr">http://redis.io/commands/decr</a>:</p>
@@ -176,7 +169,7 @@ public interface RedisStringCommands
 	 * this, the operation never fails.</p>
 	 * @return list of values at the specified keys.
 	 */
-	public String[] mget(String... keys);
+	public String[] mget(String key, String... keys);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/mset">http://redis.io/commands/mset</a>:</p>
@@ -187,7 +180,7 @@ public interface RedisStringCommands
 	 * if you don't want to overwrite existing values.</p>
 	 * @return true, always.
 	 */
-	public boolean mset(String... keyValues);
+	public boolean mset(String key, String value, String... keyValues);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/msetnx">http://redis.io/commands/msetnx</a>:</p>
@@ -197,7 +190,7 @@ public interface RedisStringCommands
 	 * perform any operation at all even if just a single key already exists.</p>
 	 * @return true if all of the keys were set, false if no key was set.
 	 */
-	public boolean msetnx(String... keyValues);
+	public boolean msetnx(String key, String value, String... keyValues);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/psetex">http://redis.io/commands/psetex</a>:</p>
@@ -227,7 +220,7 @@ public interface RedisStringCommands
 	 * <p>Sets or clears the bit at <em>offset</em> in the string value stored at <em>key</em>.</p>
 	 * @return the original bit value stored at <em>offset</em>.
 	 */
-	public long setbit(String key, long offset, String value);
+	public long setbit(String key, long offset, long value);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/setex">http://redis.io/commands/setex</a>:</p>

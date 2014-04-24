@@ -1,5 +1,7 @@
 package com.blackrook.nosql.redis.commands;
 
+import com.blackrook.nosql.redis.data.RedisCursor;
+
 /**
  * Interface for Redis commands related to Sets.
  * @author Matthew Tropiano
@@ -162,9 +164,6 @@ public interface RedisSetCommands
 	 * N is the number of elements inside the collection..</p>
 	 * <p>See <a href="/commands/scan">SCAN</a> for <a href="/commands/sscan">SSCAN</a> documentation.</p>
 	 */
-	public void sscan(String key, String cursor);
-	public void sscan(String key, String cursor, long count);
-	public void sscan(String key, String cursor, String pattern);
-	public void sscan(String key, String cursor, String pattern, long count);
+	public RedisCursor sscan(String key, String cursor, String pattern, Long count);
 	
 }

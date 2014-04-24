@@ -1,6 +1,9 @@
 package com.blackrook.nosql.redis.commands;
 
+import com.blackrook.nosql.redis.data.RedisCursor;
 import com.blackrook.nosql.redis.data.RedisObject;
+import com.blackrook.nosql.redis.enums.DataType;
+import com.blackrook.nosql.redis.enums.SortOrder;
 
 /**
  * Interface for generic Redis commands.
@@ -27,10 +30,11 @@ public interface RedisGenericCommands
 	 * in the list, set, sorted set or hash. Removing a single key that holds a 
 	 * string value is O(1).</p>
 	 * <p>Removes the specified keys. A key is ignored if it does not exist.</p>
-	 * @param keys the keys to delete.
+	 * @param key the first key to delete.
+	 * @param keys the additional keys to delete.
 	 * @return The number of keys that were removed.
 	 */
-	public long del(String... keys);
+	public long del(String key, String... keys);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/dump">http://redis.io/commands/dump</a>:</p>
@@ -93,25 +97,6 @@ public interface RedisGenericCommands
 	 * @return a list of keys matching <code>pattern</code>.
 	 */
 	public String[] keys(String pattern);
-
-	/**
-	 * <p>From <a href="http://redis.io/commands/migrate">http://redis.io/commands/migrate</a>:</p>
-	 * <p><strong>Available since 2.6.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> This command actually executes 
-	 * a {@link #dump} and {@link #del} in the source instance, and a {@link #restore} 
-	 * in the target instance. See the pages of these commands for time complexity. 
-	 * Also an O(N) data transfer between the two instances is performed.</p>
-	 * <p>Atomically transfer a key from a source Redis instance to a 
-	 * destination Redis instance. On success the key is deleted from the 
-	 * original instance and is guaranteed to exist in the target instance.</p>
-	 * @param host the hostname/address of the target server.
-	 * @param port the port.
-	 * @param key the key to migrate.
-	 * @param destinationDB the database to target on the server.
-	 * @param timeout the timeout for the connection.
-	 * @return always true.
-	 */
-	public boolean migrate(String host, int port, String key, long destinationDB, long timeout);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/migrate">http://redis.io/commands/migrate</a>:</p>
@@ -331,74 +316,15 @@ public interface RedisGenericCommands
 	 * <p>From <a href="http://redis.io/commands/scan">http://redis.io/commands/scan</a>:</p>
 	 * <p><strong>Available since 2.8.0.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete 
-	 * iteration, including enough command calls for the cursor to return back to 0. 
-	 * N is the number of elements inside the collection..</p>
-	 * <p>Incrementally iterates over a collection of elements.</p>
-	 * @return a two-element multi-bulk reply, where the first element is a string 
-	 * representing an unsigned 64 bit number (the cursor), and the second element 
-	 * is a multi-bulk with an array of elements.
-	 */
-	public Object scan(String cursor);
-
-	/**
-	 * <p>From <a href="http://redis.io/commands/scan">http://redis.io/commands/scan</a>:</p>
-	 * <p><strong>Available since 2.8.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete 
-	 * iteration, including enough command calls for the cursor to return back to 0. 
-	 * N is the number of elements inside the collection..</p>
-	 * <p>Incrementally iterates over a collection of elements.</p>
-	 * @return a two-element multi-bulk reply, where the first element is a string 
-	 * representing an unsigned 64 bit number (the cursor), and the second element 
-	 * is a multi-bulk with an array of elements.
-	 */
-	public Object scan(String cursor, String pattern);
-
-	/**
-	 * <p>From <a href="http://redis.io/commands/scan">http://redis.io/commands/scan</a>:</p>
-	 * <p><strong>Available since 2.8.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a 
-	 * complete iteration, including enough command calls for the cursor to return 
-	 * back to 0. N is the number of elements inside the collection..</p>
-	 * <p>Incrementally iterates over a collection of elements.</p>
-	 * @return a two-element multi-bulk reply, where the first element is a string 
-	 * representing an unsigned 64 bit number (the cursor), and the second element 
-	 * is a multi-bulk with an array of elements.
-	 */
-	public Object scan(String cursor, long count);
-
-	/**
-	 * <p>From <a href="http://redis.io/commands/scan">http://redis.io/commands/scan</a>:</p>
-	 * <p><strong>Available since 2.8.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete 
 	 * iteration, including enough command calls for the cursor to return back to 0.
 	 * N is the number of elements inside the collection..</p>
 	 * <p>Incrementally iterates over a collection of elements.</p>
-	 * @return a two-element multi-bulk reply, where the first element is a string 
-	 * representing an unsigned 64 bit number (the cursor), and the second element 
-	 * is a multi-bulk with an array of elements.
+	 * @param cursor the cursor value.
+	 * @param pattern if not null, return keys that fit a pattern.
+	 * @param count if not null, cap the iterable keys at a limit.
+	 * @return a RedisCursor that represents the result of a SCAN call.
 	 */
-	public Object scan(String cursor, String pattern, long count);
-
-	/**
-	 * <p>From <a href="http://redis.io/commands/sort">http://redis.io/commands/sort</a>:</p>
-	 * <p><strong>Available since 1.0.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(N+M*log(M)) where N is the number of 
-	 * elements in the list or set to sort, and M the number of returned elements. 
-	 * When the elements are not sorted, complexity is currently O(N) as there is 
-	 * a copy step that will be avoided in next releases.</p>
-	 * <p>Returns or stores the elements contained in the list, set, or sorted set 
-	 * at <code>key</code>. By default, sorting is numeric and elements are compared 
-	 * by their value interpreted as double precision floating point number.
-	 * @param key the key to sort the contents of.
-	 * @param desc if true, sort descending. if false, sort ascending.
-	 * @param alpha if true, sort lexicographically, not by a score.
-	 * @param offset the starting offset into the list (0-based).
-	 * @param count the amount of objects from the offset to sort.
-	 * @param storeKey if not null, this is the key to store the result in.
-	 * @param getPatterns the patterns for finding the sort score.
-	 * @return the list of sorted elements.
-	 */
-	public String[] sort(String key, boolean desc, boolean alpha, long offset, long count, String storeKey, String... getPatterns);
+	public RedisCursor scan(long cursor, String pattern, Long count);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/sort">http://redis.io/commands/sort</a>:</p>
@@ -410,9 +336,17 @@ public interface RedisGenericCommands
 	 * <p>Returns or stores the elements contained in the list, set, or sorted set
 	 * at <code>key</code>. By default, sorting is numeric and elements are compared 
 	 * by their value interpreted as double precision floating point number.
+	 * @param key the key to sort the contents of.
+	 * @param pattern if not null, 
+	 * @param sortOrder if true, sort descending. if false or null, sort ascending.
+	 * @param alpha if true, sort lexicographically, not by a score.
+	 * @param limitOffset if not null, the starting offset into the list (0-based).
+	 * @param limitCount if not null, the amount of objects from the offset to sort. else, return all the way to the end.
+	 * @param storeKey if not null, this is the key to store the result in.
+	 * @param getPatterns the patterns for finding the sort score.
 	 * @return the list of sorted elements.
 	 */
-	public String[] sortBy(String key, String pattern, boolean desc, boolean alpha, long offset, long count, String storeKey, String... getPatterns);
+	public String[] sort(String key, String pattern, SortOrder sortOrder, boolean alpha, Long limitOffset, Long limitCount, String storeKey, String... getPatterns);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/ttl">http://redis.io/commands/ttl</a>:</p>
@@ -431,11 +365,9 @@ public interface RedisGenericCommands
 	 * <p><strong>Available since 1.0.0.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(1)</p>
 	 * <p>Returns the string representation of the type of the value stored at 
-	 * <code>key</code>. The different types that can be returned are: <code>string</code>, 
-	 * <code>list</code>, <code>set</code>, <code>zset</code> and <code>hash</code>.</p>
-	 * @return the type of <code>key</code>, or <code>none</code> when <code>key</code> does not exist.
-	 * TODO: Return as enum?
+	 * <code>key</code>.</p>
+	 * @return the type of <code>key</code>, or {@link DataType#NONE} when <code>key</code> does not exist.
 	 */
-	public String type();
+	public DataType type(String key);
 
 }

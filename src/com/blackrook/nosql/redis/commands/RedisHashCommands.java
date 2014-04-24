@@ -1,6 +1,6 @@
 package com.blackrook.nosql.redis.commands;
 
-import com.blackrook.commons.ObjectPair;
+import com.blackrook.nosql.redis.data.RedisCursor;
 
 /**
  * Interface for Redis commands related to Hashes.
@@ -19,7 +19,7 @@ public interface RedisHashCommands
 	 * @return the number of fields that were removed from the hash, not including 
 	 * specified but non existing fields.
 	 */
-	public long hdel(String key, String... fields);
+	public long hdel(String key, String field, String... fields);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/hexists">http://redis.io/commands/hexists</a>:</p>
@@ -102,7 +102,7 @@ public interface RedisHashCommands
 	 * <p>Returns the values associated with the specified <code>fields</code> in the hash stored at <code>key</code>.</p>
 	 * @return a list of values associated with the given fields, in the same order as they are requested.
 	 */
-	public String[] hmget(String key, String... fields);
+	public String[] hmget(String key, String field, String... fields);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/hmset">http://redis.io/commands/hmset</a>:</p>
@@ -112,21 +112,9 @@ public interface RedisHashCommands
 	 * at <code>key</code>. This command overwrites any existing fields in the hash. 
 	 * If <code>key</code> does not exist, a new key holding a hash is created.</p>
 	 * <p>Parameters should alternate between field, value, field, value ...</p>
-	 * @return true if successful, false if not.
+	 * @return always true.
 	 */
-	public boolean hmset(String key, String... fieldvalues);
-
-	/**
-	 * <p>From <a href="http://redis.io/commands/hmset">http://redis.io/commands/hmset</a>:</p>
-	 * <p><strong>Available since 2.0.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(N) where N is the number of fields being set.</p>
-	 * <p>Sets the specified fields to their respective values in the hash stored 
-	 * at <code>key</code>. This command overwrites any existing fields in the hash. 
-	 * If <code>key</code> does not exist, a new key holding a hash is created.</p>
-	 * <p>Parameters should alternate between field, value, field, value ...</p>
-	 * @return true if successful, false if not.
-	 */
-	public boolean hmset(String key, ObjectPair<String, String>... pair);
+	public boolean hmset(String key, String field, String value, String... fieldvalues);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/hset">http://redis.io/commands/hset</a>:</p>
@@ -135,9 +123,9 @@ public interface RedisHashCommands
 	 * <p>Sets <code>field</code> in the hash stored at <code>key</code> to <code>value</code>. 
 	 * If <code>key</code> does not exist, a new key holding a hash is created. If 
 	 * <code>field</code> already exists in the hash, it is overwritten.</p>
-	 * @return true if successful, false if not.
+	 * @return true if a new field, false if set, but not a new field.
 	 */
-	public void hset(String key, String field, String value);
+	public boolean hset(String key, String field, String value);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/hsetnx">http://redis.io/commands/hsetnx</a>:</p>
@@ -147,9 +135,9 @@ public interface RedisHashCommands
 	 * only if <code>field</code> does not yet exist. If <code>key</code> does not exist, a 
 	 * new key holding a hash is created. If <code>field</code> already exists, this 
 	 * operation has no effect.</p>
-	 * @return true if successful, false if not.
+	 * @return true if a new field, false if set, but not a new field.
 	 */
-	public void hsetnx(String key, String field, String value);
+	public boolean hsetnx(String key, String field, String value);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/hvals">http://redis.io/commands/hvals</a>:</p>
@@ -166,46 +154,12 @@ public interface RedisHashCommands
 	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete 
 	 * iteration, including enough command calls for the cursor to return back to 0. 
 	 * N is the number of elements inside the collection..</p>
-	 * @return a two-element multi-bulk reply, where the first element is a string 
-	 * representing an unsigned 64 bit number (the cursor), and the second element 
-	 * is a multi-bulk with an array of elements.
+	 * @param key the key of the hash to scan.
+	 * @param cursor the cursor value.
+	 * @param pattern if not null, return keys that fit a pattern.
+	 * @param count if not null, cap the iterable keys at a limit.
+	 * @return a RedisCursor that represents the result of a SCAN call.
 	 */
-	public Object hscan(String key, String cursor);
-	
-	/**
-	 * <p>From <a href="http://redis.io/commands/hscan">http://redis.io/commands/hscan</a>:</p>
-	 * <p><strong>Available since 2.8.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete 
-	 * iteration, including enough command calls for the cursor to return back to 0. 
-	 * N is the number of elements inside the collection..</p>
-	 * @return a two-element multi-bulk reply, where the first element is a string 
-	 * representing an unsigned 64 bit number (the cursor), and the second element 
-	 * is a multi-bulk with an array of elements.
-	 */
-	public Object hscan(String key, String cursor, String pattern);
-	
-	/**
-	 * <p>From <a href="http://redis.io/commands/hscan">http://redis.io/commands/hscan</a>:</p>
-	 * <p><strong>Available since 2.8.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete 
-	 * iteration, including enough command calls for the cursor to return back to 0. 
-	 * N is the number of elements inside the collection..</p>
-	 * @return a two-element multi-bulk reply, where the first element is a string 
-	 * representing an unsigned 64 bit number (the cursor), and the second element 
-	 * is a multi-bulk with an array of elements.
-	 */
-	public Object hscan(String key, String cursor, long count);
-	
-	/**
-	 * <p>From <a href="http://redis.io/commands/hscan">http://redis.io/commands/hscan</a>:</p>
-	 * <p><strong>Available since 2.8.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete 
-	 * iteration, including enough command calls for the cursor to return back to 0. 
-	 * N is the number of elements inside the collection..</p>
-	 * @return a two-element multi-bulk reply, where the first element is a string
-	 * representing an unsigned 64 bit number (the cursor), and the second element 
-	 * is a multi-bulk with an array of elements.
-	 */
-	public Object hscan(String key, String cursor, String pattern, long count);
+	public RedisCursor hscan(String key, long cursor, String pattern, Long count);
 	
 }

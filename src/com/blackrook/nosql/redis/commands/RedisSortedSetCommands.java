@@ -240,36 +240,6 @@ public interface RedisSortedSetCommands
 	 * elements inside the collection..</p>
 	 * <p>See <a href="/commands/scan">SCAN</a> for <a href="/commands/zscan">ZSCAN</a> documentation.</p>
 	 */
-	public void zscan(String key, String cursor);
-
-	/**
-	 * <p>From <a href="http://redis.io/commands/zscan">http://redis.io/commands/zscan</a>:</p>
-	 * <p><strong>Available since 2.8.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete iteration, 
-	 * including enough command calls for the cursor to return back to 0. N is the number of 
-	 * elements inside the collection..</p>
-	 * <p>See <a href="/commands/scan">SCAN</a> for <a href="/commands/zscan">ZSCAN</a> documentation.</p>
-	 */
-	public void zscan(String key, String cursor, String pattern);
-
-	/**
-	 * <p>From <a href="http://redis.io/commands/zscan">http://redis.io/commands/zscan</a>:</p>
-	 * <p><strong>Available since 2.8.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete iteration, 
-	 * including enough command calls for the cursor to return back to 0. N is the number of 
-	 * elements inside the collection..</p>
-	 * <p>See <a href="/commands/scan">SCAN</a> for <a href="/commands/zscan">ZSCAN</a> documentation.</p>
-	 */
-	public void zscan(String key, String cursor, long count);
-
-	/**
-	 * <p>From <a href="http://redis.io/commands/zscan">http://redis.io/commands/zscan</a>:</p>
-	 * <p><strong>Available since 2.8.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete iteration, 
-	 * including enough command calls for the cursor to return back to 0. N is the number of 
-	 * elements inside the collection..</p>
-	 * <p>See <a href="/commands/scan">SCAN</a> for <a href="/commands/zscan">ZSCAN</a> documentation.</p>
-	 */
-	public void zscan(String key, String cursor, String pattern, long count);
+	public void zscan(String key, String cursor, String pattern, Long count);
 
 }

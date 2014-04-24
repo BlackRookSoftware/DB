@@ -47,6 +47,6 @@ public interface RedisTransactionCommands
 	 * <p>Marks the given keys to be watched for conditional execution of a <a href="/topics/transactions">transaction</a>.</p>
 	 * @return true on completion.
 	 */
-	public boolean watch(String... keys);
+	public boolean watch(String key, String... keys);
 
 }
