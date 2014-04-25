@@ -22,9 +22,11 @@ import com.blackrook.nosql.redis.commands.RedisHyperlogCommands;
 import com.blackrook.nosql.redis.commands.RedisListCommands;
 import com.blackrook.nosql.redis.commands.RedisScriptingCommands;
 import com.blackrook.nosql.redis.commands.RedisSetCommands;
+import com.blackrook.nosql.redis.commands.RedisSortedSetCommands;
 import com.blackrook.nosql.redis.commands.RedisStringCommands;
 import com.blackrook.nosql.redis.data.RedisCursor;
 import com.blackrook.nosql.redis.data.RedisObject;
+import com.blackrook.nosql.redis.enums.Aggregation;
 import com.blackrook.nosql.redis.enums.BitwiseOperation;
 import com.blackrook.nosql.redis.enums.DataType;
 import com.blackrook.nosql.redis.enums.SortOrder;
@@ -37,7 +39,8 @@ import com.blackrook.nosql.redis.exception.RedisException;
  */
 public class RedisConnection extends RedisConnectionAbstract implements 
 	RedisConnectionCommands, RedisGenericCommands, RedisStringCommands, RedisHashCommands,
-	RedisHyperlogCommands, RedisListCommands, RedisScriptingCommands, RedisSetCommands
+	RedisHyperlogCommands, RedisListCommands, RedisScriptingCommands, RedisSetCommands,
+	RedisSortedSetCommands
 {
 	/**
 	 * Creates an open connection to localhost, port 6379, the default Redis port.
@@ -1546,8 +1549,11 @@ public class RedisConnection extends RedisConnectionAbstract implements
 	@Override
 	public long srem(String key, String member, String... members)
 	{
-		// TODO Auto-generated method stub
-		return 0;
+		if (members.length > 0)
+			writer.writeArray(Common.joinArrays(new String[]{"SREM", key, member}, members));
+		else
+			writer.writeArray("SREM", key, member);
+		return reader.readInteger();
 	}
 
 	@Override
@@ -1637,4 +1643,306 @@ public class RedisConnection extends RedisConnectionAbstract implements
 		return RedisCursor.create(reader.readInteger(), reader.readArray());
 	}
 
+	@Override
+	public long zadd(String key, double score, String member)
+	{
+		writer.writeArray("ZADD", score, member);
+		return reader.readInteger();
+	}
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/zadd">http://redis.io/commands/zadd</a>:</p>
+	 * <p><strong>Available since 1.2.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(log(N)) where N is the number of elements in the sorted set.</p>
+	 * <p>Adds all the specified members with the specified scores to the sorted set 
+	 * stored at <code>key</code>. It is possible to specify multiple score/member pairs. 
+	 * If a specified member is already a member of the sorted set, the score is updated 
+	 * and the element reinserted at the right position to ensure the correct ordering. 
+	 * If <code>key</code> does not exist, a new sorted set with the specified members as 
+	 * sole members is created, like if the sorted set was empty. If the key exists but 
+	 * does not hold a sorted set, an error is returned.</p>
+	 * @return the number of elements added to the sorted sets, not including elements 
+	 * already existing for which the score was updated.
+	 */
+	public long zadd(String key, ObjectPair<Double, String>... pairs)
+	{
+		List<Object> out = new List<Object>(2 + (pairs.length * 2));
+		out.add("ZADD");
+		out.add(key);
+		
+		for (ObjectPair<Double, String> p : pairs)
+		{
+			out.add(p.getKey());
+			out.add(p.getValue());
+		}
+		
+		writer.writeArray(out);
+		return reader.readInteger();
+	}
+
+	@Override
+	public long zcard(String key)
+	{
+		writer.writeArray("ZCARD", key);
+		return reader.readInteger();
+	}
+
+	@Override
+	public long zcount(String key, String min, String max)
+	{
+		writer.writeArray("ZCOUNT", key, min, max);
+		return reader.readInteger();
+	}
+
+	/**
+	 * Like {@link #zcount(String, String, String)}, 
+	 * except it accepts doubles for min and max, not strings.
+	 */
+	public long zcount(String key, double min, double max)
+	{
+		return zcount(key, specialDouble(min), specialDouble(max));
+	}
+
+	@Override
+	public double zincrby(String key, double increment, String member)
+	{
+		writer.writeArray("ZINCRBY", key, increment, member);
+		return Common.parseDouble(reader.readString());
+	}
+
+	@Override
+	public String[] zrange(String key, long start, long stop, boolean withScores)
+	{
+		if (withScores)
+			writer.writeArray("ZRANGE", key, start, stop, "WITHSCORES");
+		else
+			writer.writeArray("ZRANGE", key, start, stop);
+		return reader.readArray();
+	}
+
+	@Override
+	public String[] zrangebyscore(String key, String min, String max, boolean withScores, Long limitOffset, Long limitCount)
+	{
+		List<Object> out = new List<Object>(8);
+		out.add("ZRANGEBYSCORE");
+		out.add(key);
+
+		out.add(min);
+		out.add(max);
+		
+		if (withScores)
+			out.add("WITHSCORES");
+
+		if (limitOffset != null && limitCount != null)
+		{
+			out.add("LIMIT");
+			out.add(limitOffset);
+			out.add(limitCount);
+		}
+		
+		writer.writeArray(out);
+		return reader.readArray();
+	}
+
+	/**
+	 * Like {@link #zrangebyscore(String, String, String, boolean)},
+	 * except it accepts doubles for min and max, not strings.
+	 */
+	public String[] zrangebyscore(String key, double min, double max, boolean withScores)
+	{
+		return zrangebyscore(key, specialDouble(min), specialDouble(max), withScores, null, null);
+	}
+
+	/**
+	 * Like {@link #zrangebyscore(String, String, String, boolean, Long, Long)}, except specifies no limit.
+	 */
+	public String[] zrangebyscore(String key, String min, String max, boolean withScores)
+	{
+		return zrangebyscore(key, min, max, withScores, null, null);
+	}
+
+	/**
+	 * Like {@link #zrangebyscore(String, String, String, boolean, Long, Long)}, 
+	 * except it accepts doubles for min and max, not strings.
+	 */
+	public String[] zrangebyscore(String key, double min, double max, boolean withScores, Long limitOffset, Long limitCount)
+	{
+		return zrangebyscore(key, specialDouble(min), specialDouble(max), withScores, limitOffset, limitCount);
+	}
+
+	@Override
+	public Long zrank(String key, String member)
+	{
+		writer.writeArray("ZRANK", key, member);
+		return reader.readInteger();
+	}
+
+	@Override
+	public long zrem(String key, String member, String... members)
+	{
+		if (members.length > 0)
+			writer.writeArray(Common.joinArrays(new String[]{"ZREM", key, member}, members));
+		else
+			writer.writeArray("ZREM", key, member);
+		return reader.readInteger();
+	}
+
+	@Override
+	public long zremrangebyrank(String key, long start, long stop)
+	{
+		writer.writeArray("ZREMRANGEBYRANK", key, start, stop);
+		return reader.readInteger();
+	}
+
+	@Override
+	public long zremrangebyscore(String key, String min, String max)
+	{
+		writer.writeArray("ZREMRANGEBYSCORE", key, min, max);
+		return reader.readInteger();
+	}
+
+	/**
+	 * Like {@link #zremrangebyscore(String, String, String)},
+	 * except it accepts doubles for min and max, not strings.
+	 */
+	public long zremrangebyscore(String key, double min, double max)
+	{
+		return zremrangebyscore(key, specialDouble(min), specialDouble(max));
+	}
+
+	@Override
+	public Long zrevrank(String key, String member)
+	{
+		writer.writeArray("ZREVRANK", key, member);
+		return reader.readInteger();
+	}
+
+	@Override
+	public String[] zrevrange(String key, long start, long stop, boolean withScores)
+	{
+		if (withScores)
+			writer.writeArray("ZREVRANGE", key, start, stop, "WITHSCORES");
+		else
+			writer.writeArray("ZREVRANGE", key, start, stop);
+		return reader.readArray();
+	}
+
+	@Override
+	public String[] zrevrangebyscore(String key, String min, String max, boolean withScores, Long limitOffset, Long limitCount)
+	{
+		List<Object> out = new List<Object>(8);
+		out.add("ZREVRANGEBYSCORE");
+		out.add(key);
+
+		out.add(min);
+		out.add(max);
+		
+		if (withScores)
+			out.add("WITHSCORES");
+
+		if (limitOffset != null && limitCount != null)
+		{
+			out.add("LIMIT");
+			out.add(limitOffset);
+			out.add(limitCount);
+		}
+		
+		writer.writeArray(out);
+		return reader.readArray();
+	}
+	
+	/**
+	 * Like {@link #zrevrangebyscore(String, String, String, boolean)},
+	 * except it accepts doubles for min and max, not strings.
+	 */
+	public String[] zrevrangebyscore(String key, double min, double max, boolean withScores)
+	{
+		return zrevrangebyscore(key, specialDouble(min), specialDouble(max), withScores, null, null);
+	}
+
+	/**
+	 * Like {@link #zrevrangebyscore(String, String, String, boolean, Long, Long)}, except specifies no limit.
+	 */
+	public String[] zrevrangebyscore(String key, String min, String max, boolean withScores)
+	{
+		return zrevrangebyscore(key, min, max, withScores, null, null);
+	}
+
+	/**
+	 * Like {@link #zrevrangebyscore(String, String, String, boolean, Long, Long)}, 
+	 * except it accepts doubles for min and max, not strings.
+	 */
+	public String[] zrevrangebyscore(String key, double min, double max, boolean withScores, Long limitOffset, Long limitCount)
+	{
+		return zrevrangebyscore(key, specialDouble(min), specialDouble(max), withScores, limitOffset, limitCount);
+	}
+
+	@Override
+	public Double zscore(String key, String member)
+	{
+		writer.writeArray("ZSCORE", key, member);
+		String out = reader.readString();
+		return out != null ? Common.parseDouble(out) : null;
+	}
+
+	@Override
+	public long zinterstore(String destination, String[] keys, String[] weights, Aggregation aggregation)
+	{
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public long zunionstore(String destination, String[] keys, String[] weights, Aggregation aggregation)
+	{
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public long zlexcount(String key, String min, String max)
+	{
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public long zrangebylex(String key, String min, String max, Long limitOffset, Long limitCount)
+	{
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public long zremrangebylex(String key, String min, String max)
+	{
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public RedisCursor zscan(String key, long cursor, String pattern, Long count)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * Converts some of Java's primitive doubles to Redis interval values.
+	 * <ul>
+	 * <li>{@link Double#NEGATIVE_INFINITY} converts to "-".</li>
+	 * <li>{@link Double#POSITIVE_INFINITY} converts to "+".</li>
+	 * <li>All others convert to their string representation.</li>
+	 * </ul>
+	 * @param d the input double.
+	 */
+	protected String specialDouble(double d)
+	{
+		if (d == Double.POSITIVE_INFINITY)
+			return "+";
+		else if (d == Double.NEGATIVE_INFINITY)
+			return "-";
+		else
+			return String.valueOf(d);
+	}
 }

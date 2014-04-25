@@ -1,5 +1,6 @@
 package com.blackrook.nosql.redis.commands;
 
+import com.blackrook.nosql.redis.data.RedisCursor;
 import com.blackrook.nosql.redis.enums.Aggregation;
 
 /**
@@ -55,7 +56,7 @@ public interface RedisSortedSetCommands
 	 * the specified <code>member</code> as its sole member is created.</p>
 	 * @return the new score of <code>member</code> (a double precision floating point number).
 	 */
-	public Double zincrby(String key, double increment, String member);
+	public double zincrby(String key, double increment, String member);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/zrange">http://redis.io/commands/zrange</a>:</p>
@@ -75,20 +76,6 @@ public interface RedisSortedSetCommands
 	 * <p><strong>Time complexity:</strong> O(log(N)+M) with N being the number of elements 
 	 * in the sorted set and M the number of elements being returned. If M is constant (e.g. 
 	 * always asking for the first 10 elements with LIMIT), you can consider it O(log(N)).</p>
-	 * <p>Returns all the elements in the sorted set at <code>key</code> with a score between 
-	 * <code>min</code> and <code>max</code> (including elements with score equal to <code>min</code> 
-	 * or <code>max</code>). The elements are considered to be ordered from low to high scores.</p>
-	 * <p>The arguments <code>min</code> and <code>max</code> are Strings so they can accept special ranges.</p>
-	 * @return list of elements in the specified score range (optionally with their scores).
-	 */
-	public String[] zrangebyscore(String key, String min, String max, boolean withScores);
-
-	/**
-	 * <p>From <a href="http://redis.io/commands/zrangebyscore">http://redis.io/commands/zrangebyscore</a>:</p>
-	 * <p><strong>Available since 1.0.5.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(log(N)+M) with N being the number of elements 
-	 * in the sorted set and M the number of elements being returned. If M is constant (e.g. 
-	 * always asking for the first 10 elements with LIMIT), you can consider it O(log(N)).</p>
 	 * <p>Returns all the elements in the sorted set at <code>key</code> with a score 
 	 * between <code>min</code> and <code>max</code> (including elements with score equal 
 	 * to <code>min</code> or <code>max</code>). The elements are considered to be ordered 
@@ -96,7 +83,7 @@ public interface RedisSortedSetCommands
 	 * <p>The arguments <code>min</code> and <code>max</code> are Strings so they can accept special ranges.</p>
 	 * @return list of elements in the specified score range (optionally with their scores).
 	 */
-	public String[] zrangebyscore(String key, String min, String max, Long limitOffset, Long limitCount, boolean withScores);
+	public String[] zrangebyscore(String key, String min, String max, boolean withScores, Long limitOffset, Long limitCount);
 	
 	/**
 	 * <p>From <a href="http://redis.io/commands/zrank">http://redis.io/commands/zrank</a>:</p>
@@ -120,7 +107,7 @@ public interface RedisSortedSetCommands
 	 * Non existing members are ignored.</p>
 	 * @return the number of members removed from the sorted set, not including non existing members.
 	 */
-	public long zrem(String key, String... members);
+	public long zrem(String key, String member, String... members);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/zremrangebyrank">http://redis.io/commands/zremrangebyrank</a>:</p>
@@ -186,7 +173,7 @@ public interface RedisSortedSetCommands
 	 * <p>The arguments <code>min</code> and <code>max</code> are Strings so they can accept special ranges.</p>
 	 * @return list of elements in the specified score range (optionally with their scores).
 	 */
-	public String[] zrevrangebyscore(String key, String min, String max, long offset, long count, boolean withScores);
+	public String[] zrevrangebyscore(String key, String min, String max, boolean withScores, Long limitOffset, Long limitCount);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/zscore">http://redis.io/commands/zscore</a>:</p>
@@ -277,6 +264,6 @@ public interface RedisSortedSetCommands
 	 * @param count if not null, cap the iterable keys at a limit.
 	 * @return a RedisCursor that represents the result of a SCAN call.
 	 */
-	public void zscan(String key, String cursor, String pattern, Long count);
+	public RedisCursor zscan(String key, long cursor, String pattern, Long count);
 
 }
