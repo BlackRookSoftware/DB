@@ -1,6 +1,5 @@
 package com.blackrook.nosql.redis.commands;
 
-import com.blackrook.commons.ObjectPair;
 import com.blackrook.nosql.redis.enums.Aggregation;
 
 /**
@@ -26,22 +25,6 @@ public interface RedisSortedSetCommands
 	public long zadd(String key, double score, String member);
 
 	/**
-	 * <p>From <a href="http://redis.io/commands/zadd">http://redis.io/commands/zadd</a>:</p>
-	 * <p><strong>Available since 1.2.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(log(N)) where N is the number of elements in the sorted set.</p>
-	 * <p>Adds all the specified members with the specified scores to the sorted set 
-	 * stored at <code>key</code>. It is possible to specify multiple score/member pairs. 
-	 * If a specified member is already a member of the sorted set, the score is updated 
-	 * and the element reinserted at the right position to ensure the correct ordering. 
-	 * If <code>key</code> does not exist, a new sorted set with the specified members as 
-	 * sole members is created, like if the sorted set was empty. If the key exists but 
-	 * does not hold a sorted set, an error is returned.</p>
-	 * @return the number of elements added to the sorted sets, not including elements 
-	 * already existing for which the score was updated.
-	 */
-	public long zadd(String key, ObjectPair<Double, String>... pairs);
-
-	/**
 	 * <p>From <a href="http://redis.io/commands/zcard">http://redis.io/commands/zcard</a>:</p>
 	 * <p><strong>Available since 1.2.0.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(1)</p>
@@ -54,16 +37,22 @@ public interface RedisSortedSetCommands
 	 * <p>From <a href="http://redis.io/commands/zcount">http://redis.io/commands/zcount</a>:</p>
 	 * <p><strong>Available since 2.0.0.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(log(N)) with N being the number of elements in the sorted set.</p>
-	 * <p>Returns the number of elements in the sorted set at <code>key</code> with a score between <code>min</code> and <code>max</code>.</p>
+	 * <p>Returns the number of elements in the sorted set at <code>key</code> with 
+	 * a score between <code>min</code> and <code>max</code>.</p>
+	 * <p>The arguments <code>min</code> and <code>max</code> are Strings so they can accept special ranges.</p>
 	 * @return the number of elements in the specified score range.
 	 */
-	public long zcount(String key, double min, double max);
+	public long zcount(String key, String min, String max);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/zincrby">http://redis.io/commands/zincrby</a>:</p>
 	 * <p><strong>Available since 1.2.0.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(log(N)) where N is the number of elements in the sorted set.</p>
-	 * <p>Increments the score of <code>member</code> in the sorted set stored at <code>key</code> by <code>increment</code>. If <code>member</code> does not exist in the sorted set, it is added with <code>increment</code> as its score (as if its previous score was <code>0.0</code>). If <code>key</code> does not exist, a new sorted set with the specified <code>member</code> as its sole member is created.</p>
+	 * <p>Increments the score of <code>member</code> in the sorted set stored at 
+	 * <code>key</code> by <code>increment</code>. If <code>member</code> does not exist in the 
+	 * sorted set, it is added with <code>increment</code> as its score (as if its previous 
+	 * score was <code>0.0</code>). If <code>key</code> does not exist, a new sorted set with 
+	 * the specified <code>member</code> as its sole member is created.</p>
 	 * @return the new score of <code>member</code> (a double precision floating point number).
 	 */
 	public Double zincrby(String key, double increment, String member);
@@ -89,9 +78,10 @@ public interface RedisSortedSetCommands
 	 * <p>Returns all the elements in the sorted set at <code>key</code> with a score between 
 	 * <code>min</code> and <code>max</code> (including elements with score equal to <code>min</code> 
 	 * or <code>max</code>). The elements are considered to be ordered from low to high scores.</p>
+	 * <p>The arguments <code>min</code> and <code>max</code> are Strings so they can accept special ranges.</p>
 	 * @return list of elements in the specified score range (optionally with their scores).
 	 */
-	public String[] zrangebyscore(String key, double min, double max, boolean withScores);
+	public String[] zrangebyscore(String key, String min, String max, boolean withScores);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/zrangebyscore">http://redis.io/commands/zrangebyscore</a>:</p>
@@ -103,9 +93,10 @@ public interface RedisSortedSetCommands
 	 * between <code>min</code> and <code>max</code> (including elements with score equal 
 	 * to <code>min</code> or <code>max</code>). The elements are considered to be ordered 
 	 * from low to high scores.</p>
+	 * <p>The arguments <code>min</code> and <code>max</code> are Strings so they can accept special ranges.</p>
 	 * @return list of elements in the specified score range (optionally with their scores).
 	 */
-	public String[] zrangebyscore(String key, double min, double max, long offset, long count, boolean withScores);
+	public String[] zrangebyscore(String key, String min, String max, Long limitOffset, Long limitCount, boolean withScores);
 	
 	/**
 	 * <p>From <a href="http://redis.io/commands/zrank">http://redis.io/commands/zrank</a>:</p>
@@ -154,9 +145,10 @@ public interface RedisSortedSetCommands
 	 * elements in the sorted set and M the number of elements removed by the operation.</p>
 	 * <p>Removes all elements in the sorted set stored at <code>key</code> with a 
 	 * score between <code>min</code> and <code>max</code> (inclusive).</p>
+	 * <p>The arguments <code>min</code> and <code>max</code> are Strings so they can accept special ranges.</p>
 	 * @return the number of elements removed.
 	 */
-	public long zremrangebyscore(String key, double min, double max);
+	public long zremrangebyscore(String key, String min, String max);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/zrevrank">http://redis.io/commands/zrevrank</a>:</p>
@@ -191,9 +183,10 @@ public interface RedisSortedSetCommands
 	 * <code>max</code> and <code>min</code> (including elements with score equal 
 	 * to max or min). In contrary to the default ordering of sorted sets, for this 
 	 * command the elements are considered to be ordered from high to low scores.</p>
+	 * <p>The arguments <code>min</code> and <code>max</code> are Strings so they can accept special ranges.</p>
 	 * @return list of elements in the specified score range (optionally with their scores).
 	 */
-	public String[] zrevrangebyscore(String key, double min, double max, long offset, long count, boolean withScores);
+	public String[] zrevrangebyscore(String key, String min, String max, long offset, long count, boolean withScores);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/zscore">http://redis.io/commands/zscore</a>:</p>
@@ -232,13 +225,57 @@ public interface RedisSortedSetCommands
 	 */
 	public long zunionstore(String destination, String[] keys, String[] weights, Aggregation aggregation);
 
+	
+	/**
+	 * <p>From <a href="http://redis.io/commands/zlexcount">http://redis.io/commands/zlexcount</a>:</p>
+	 * <p><strong>Available since 2.8.9.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(log(N)) with N being the number of elements in the sorted set.</p>
+	 * <p>When all the elements in a sorted set are inserted with the same score, in 
+	 * order to force lexicographical ordering, this command returns the number of elements 
+	 * in the sorted set at <code>key</code> with a value between <code>min</code> and <code>max</code>.</p>
+	 * <p>The arguments <code>min</code> and <code>max</code> are Strings so they can accept special ranges.</p>
+	 * @return the number of elements in the specified score range.
+	 */
+	public long zlexcount(String key, String min, String max);
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/zrangebylex">http://redis.io/commands/zrangebylex</a>:</p>
+	 * <p><strong>Available since 2.8.9.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(log(N)+M) with N being the number of elements in 
+	 * the sorted set and M the number of elements being returned. If M is constant (e.g. always 
+	 * asking for the first 10 elements with LIMIT), you can consider it O(log(N)).</p>
+	 * <p>When all the elements in a sorted set are inserted with the same score, in order 
+	 * to force lexicographical ordering, this command returns all the elements in the sorted 
+	 * set at <code>key</code> with a value between <code>min</code> and <code>max</code>.</p>
+	 * <p>The arguments <code>min</code> and <code>max</code> are Strings so they can accept special ranges.</p>
+	 * @return list of elements in the specified score range.
+	 */
+	public long zrangebylex(String key, String min, String max, Long limitOffset, Long limitCount);
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/zremrangebylex">http://redis.io/commands/zremrangebylex</a>:</p>
+	 * <p><strong>Available since 2.8.9.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(log(N)+M) with N being the number of elements 
+	 * in the sorted set and M the number of elements removed by the operation.</p>
+	 * <p>When all the elements in a sorted set are inserted with the same score, in order to 
+	 * force lexicographical ordering, this command removes all elements in the sorted set stored 
+	 * at <code>key</code> between the lexicographical range specified by <code>min</code> and <code>max</code>.</p>
+	 * <p>The arguments <code>min</code> and <code>max</code> are Strings so they can accept special ranges.</p>
+	 * @return the number of elements removed.
+	 */
+	public long zremrangebylex(String key, String min, String max);
+
 	/**
 	 * <p>From <a href="http://redis.io/commands/zscan">http://redis.io/commands/zscan</a>:</p>
 	 * <p><strong>Available since 2.8.0.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete iteration, 
 	 * including enough command calls for the cursor to return back to 0. N is the number of 
 	 * elements inside the collection..</p>
-	 * <p>See <a href="/commands/scan">SCAN</a> for <a href="/commands/zscan">ZSCAN</a> documentation.</p>
+	 * @param key the key of the hash to scan.
+	 * @param cursor the cursor value.
+	 * @param pattern if not null, return keys that fit a pattern.
+	 * @param count if not null, cap the iterable keys at a limit.
+	 * @return a RedisCursor that represents the result of a SCAN call.
 	 */
 	public void zscan(String key, String cursor, String pattern, Long count);
 

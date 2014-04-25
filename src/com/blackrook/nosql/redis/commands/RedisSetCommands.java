@@ -18,7 +18,7 @@ public interface RedisSetCommands
 	 * a new set is created before adding the specified members.</p>
 	 * @return the number of elements that were added to the set, not including all the elements already present into the set.
 	 */
-	public long sadd(String key, String... members);
+	public long sadd(String key, String member, String... members);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/scard">http://redis.io/commands/scard</a>:</p>
@@ -36,7 +36,7 @@ public interface RedisSetCommands
 	 * <p>Returns the members of the set resulting from the difference between the first set and all the successive sets.</p>
 	 * @return list with members of the resulting set.
 	 */
-	public String[] sdiff(String... keys);
+	public String[] sdiff(String key, String... keys);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/sdiffstore">http://redis.io/commands/sdiffstore</a>:</p>
@@ -46,7 +46,7 @@ public interface RedisSetCommands
 	 * returning the resulting set, it is stored in <code>destination</code>.</p>
 	 * @return the number of elements in the resulting set.
 	 */
-	public long sdiffstore(String destination, String... keys);
+	public long sdiffstore(String destination, String key, String... keys);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/sinter">http://redis.io/commands/sinter</a>:</p>
@@ -56,7 +56,7 @@ public interface RedisSetCommands
 	 * <p>Returns the members of the set resulting from the intersection of all the given sets.</p>
 	 * @return list with members of the resulting set.
 	 */
-	public String[] sinter(String... keys);
+	public String[] sinter(String key, String... keys);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/sinterstore">http://redis.io/commands/sinterstore</a>:</p>
@@ -66,7 +66,7 @@ public interface RedisSetCommands
 	 * returning the resulting set, it is stored in <code>destination</code>.</p>
 	 * @return the number of elements in the resulting set.
 	 */
-	public long sinterstore(String destination, String... keys);
+	public long sinterstore(String destination, String key, String... keys);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/sismember">http://redis.io/commands/sismember</a>:</p>
@@ -135,7 +135,7 @@ public interface RedisSetCommands
 	 * exist, it is treated as an empty set and this command returns <code>0</code>.</p>
 	 * @return the number of members that were removed from the set, not including non existing members.
 	 */
-	public long srem(String key, String... members);
+	public long srem(String key, String member, String... members);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/sunion">http://redis.io/commands/sunion</a>:</p>
@@ -144,7 +144,7 @@ public interface RedisSetCommands
 	 * <p>Returns the members of the set resulting from the union of all the given sets.</p>
 	 * @return list with members of the resulting set.
 	 */
-	public String[] sunion(String... keys);
+	public String[] sunion(String key, String... keys);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/sunionstore">http://redis.io/commands/sunionstore</a>:</p>
@@ -154,7 +154,7 @@ public interface RedisSetCommands
 	 * of returning the resulting set, it is stored in <code>destination</code>.</p>
 	 * @return the number of elements in the resulting set.
 	 */
-	public long sunionstore(String destination, String... keys);
+	public long sunionstore(String destination, String key, String... keys);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/sscan">http://redis.io/commands/sscan</a>:</p>
@@ -162,7 +162,11 @@ public interface RedisSetCommands
 	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete 
 	 * iteration, including enough command calls for the cursor to return back to 0. 
 	 * N is the number of elements inside the collection..</p>
-	 * <p>See <a href="/commands/scan">SCAN</a> for <a href="/commands/sscan">SSCAN</a> documentation.</p>
+	 * @param key the key of the hash to scan.
+	 * @param cursor the cursor value.
+	 * @param pattern if not null, return keys that fit a pattern.
+	 * @param count if not null, cap the iterable keys at a limit.
+	 * @return a RedisCursor that represents the result of a SCAN call.
 	 */
 	public RedisCursor sscan(String key, String cursor, String pattern, Long count);
 	

@@ -1,5 +1,7 @@
 package com.blackrook.nosql.redis.commands;
 
+import com.blackrook.nosql.redis.data.RedisObject;
+
 /**
  * Interface for Redis commands related to Lua scripting.
  * @author Matthew Tropiano
@@ -15,7 +17,7 @@ public interface RedisScriptingCommands
 	 * be used as a hint for Redis as to what keys are touched during the script call.</p>
 	 * @return the content returned by the script. Can be null.
 	 */
-	public String eval(String scriptContent, String[] keys, String[] args);
+	public RedisObject eval(String scriptContent, String[] keys, String[] args);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/evalsha">http://redis.io/commands/evalsha</a>:</p>
@@ -26,7 +28,7 @@ public interface RedisScriptingCommands
 	 * The command is otherwise identical to {@link #eval(String, String[], String[])}.</p>
 	 * @return the content returned by the script. Can be null.
 	 */
-	public String evalsha(String hash, String[] keys, String[] args);
+	public RedisObject evalsha(String hash, String[] keys, String[] args);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/script-exists">http://redis.io/commands/script-exists</a>:</p>
@@ -38,25 +40,25 @@ public interface RedisScriptingCommands
 	 * SHA1 digest arguments. For every corresponding SHA1 digest of a script that actually 
 	 * exists in the script cache, true is returned, otherwise false is returned.
 	 */
-	public boolean[] scriptexists(String... scripts);
+	public boolean[] scriptExists(String scriptHash, String... scriptHashes);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/script-flush">http://redis.io/commands/script-flush</a>:</p>
 	 * <p><strong>Available since 2.6.0.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(N) with N being the number of scripts in cache</p>
 	 * <p>Flush the Lua scripts cache.</p>
-	 * @return true if successful, false if not. 
+	 * @return always true. 
 	 */
-	public boolean scriptflush();
+	public boolean scriptFlush();
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/script-kill">http://redis.io/commands/script-kill</a>:</p>
 	 * <p><strong>Available since 2.6.0.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(1)</p>
 	 * <p>Kills the currently executing Lua script, assuming no write operation was yet performed by the script.</p>
-	 * @return true if successful, false if not. 
+	 * @return always true. 
 	 */
-	public boolean scriptkill(String hash);
+	public boolean scriptKill(String hash);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/script-load">http://redis.io/commands/script-load</a>:</p>
@@ -67,6 +69,6 @@ public interface RedisScriptingCommands
 	 * with the correct SHA1 digest of the script, exactly like after the first successful invocation of {@link #eval(String, String[], String[])}.</p>
 	 * @return the SHA1 digest of the script added into the script cache.
 	 */
-	public String scriptload(String content);
+	public String scriptLoad(String content);
 
 }

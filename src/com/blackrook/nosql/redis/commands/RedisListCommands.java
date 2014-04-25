@@ -16,10 +16,10 @@ public interface RedisListCommands
 	 * of {@link #lpop(String)} because it blocks the connection when there are no elements 
 	 * to pop from any of the given lists. An element is popped from the head of the first 
 	 * list that is non-empty, with the given keys being checked in the order that they are 
-	 * given.</p>
+	 * given. A <code>timeout</code> of zero can be used to block indefinitely. Timeout is in seconds.</p>
 	 * @return an object pair consisting of popped list key and the value popped, or null on timeout.
 	 */
-	public ObjectPair<String, String> blpop(long timeout, String... keys);
+	public ObjectPair<String, String> blpop(long timeout, String key, String... keys);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/brpop">http://redis.io/commands/brpop</a>:</p>
@@ -29,10 +29,11 @@ public interface RedisListCommands
 	 * version of {@link #rpop()} because it blocks the connection when there are 
 	 * no elements to pop from any of the given lists. An element is popped from 
 	 * the tail of the first list that is non-empty, with the given keys being 
-	 * checked in the order that they are given.</p>
+	 * checked in the order that they are given. A <code>timeout</code> of zero 
+	 * can be used to block indefinitely. Timeout is in seconds.</p>
 	 * @return an object pair consisting of popped list key and the value popped, or null on timeout.
 	 */
-	public ObjectPair<String, String> brpop(long timeout, String... keys);
+	public ObjectPair<String, String> brpop(long timeout, String key, String... keys);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/brpoplpush">http://redis.io/commands/brpoplpush</a>:</p>
@@ -43,7 +44,7 @@ public interface RedisListCommands
 	 * {@link #rpoplpush(String, String)}. When <code>source</code> is empty, 
 	 * Redis will block the connection until another client pushes to it or 
 	 * until <code>timeout</code> is reached. A <code>timeout</code> of zero 
-	 * can be used to block indefinitely.</p>
+	 * can be used to block indefinitely. Timeout is in seconds.</p>
 	 * @return the value popped-then-pushed to destination from source, or null on timeout.
 	 */
 	public String brpoplpush(long timeout, String source, String destination);
@@ -104,7 +105,7 @@ public interface RedisListCommands
 	 * push operations. When <code>key</code> holds a value that is not a list, an error is returned.</p>
 	 * @return the length of the list after the push operations.
 	 */
-	public long lpush(String key, String... values);
+	public long lpush(String key, String value, String... values);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/lpushx">http://redis.io/commands/lpushx</a>:</p>
@@ -138,6 +139,11 @@ public interface RedisListCommands
 	 * <p>Removes the first <code>count</code> occurrences of elements equal to 
 	 * <code>value</code> from the list stored at <code>key</code>. The 
 	 * <code>count</code> argument influences the operation in the following ways:</p>
+	 * <ul>
+	 * <li><code>count &gt; 0</code>: Remove elements equal to <code>value</code> moving from head to tail.</li>
+	 * <li><code>count &lt; 0</code>: Remove elements equal to <code>value</code> moving from tail to head.</li>
+	 * <li><code>count = 0</code>: Remove all elements equal to <code>value</code>.</li>
+	 * </ul>
 	 * @return the number of removed elements.
 	 */
 	public long lrem(String key, long count, String value);
@@ -149,7 +155,7 @@ public interface RedisListCommands
 	 * of the list. Setting either the first or the last element of the list is O(1).</p>
 	 * <p>Sets the list element at <code>index</code> to <code>value</code>. For 
 	 * more information on the <code>index</code> argument, see {@link #lindex(String, long)}.</p>
-	 * @return true if successful, false if not.
+	 * @return always true.
 	 */
 	public boolean lset(String key, long index, String value);
 
@@ -162,7 +168,7 @@ public interface RedisListCommands
 	 * specified range of elements specified. Both <code>start</code> and <code>stop</code> 
 	 * are zero-based indexes, where <code>0</code> is the first element of the list 
 	 * (the head), <code>1</code> the next element and so on.</p>
-	 * @return true if successful, false if not.
+	 * @return always true.
 	 */
 	public boolean ltrim(String key, long start, long stop);
 
@@ -196,7 +202,7 @@ public interface RedisListCommands
 	 * returned.</p>
 	 * @return the length of the list after the push operation.
 	 */
-	public long rpush(String key, String... values);
+	public long rpush(String key, String value, String... values);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/rpushx">http://redis.io/commands/rpushx</a>:</p>

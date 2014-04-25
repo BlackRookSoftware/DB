@@ -1,6 +1,8 @@
 package com.blackrook.nosql.redis;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.UnknownHostException;
@@ -17,6 +19,9 @@ import com.blackrook.nosql.redis.commands.RedisConnectionCommands;
 import com.blackrook.nosql.redis.commands.RedisGenericCommands;
 import com.blackrook.nosql.redis.commands.RedisHashCommands;
 import com.blackrook.nosql.redis.commands.RedisHyperlogCommands;
+import com.blackrook.nosql.redis.commands.RedisListCommands;
+import com.blackrook.nosql.redis.commands.RedisScriptingCommands;
+import com.blackrook.nosql.redis.commands.RedisSetCommands;
 import com.blackrook.nosql.redis.commands.RedisStringCommands;
 import com.blackrook.nosql.redis.data.RedisCursor;
 import com.blackrook.nosql.redis.data.RedisObject;
@@ -32,7 +37,7 @@ import com.blackrook.nosql.redis.exception.RedisException;
  */
 public class RedisConnection extends RedisConnectionAbstract implements 
 	RedisConnectionCommands, RedisGenericCommands, RedisStringCommands, RedisHashCommands,
-	RedisHyperlogCommands
+	RedisHyperlogCommands, RedisListCommands, RedisScriptingCommands, RedisSetCommands
 {
 	/**
 	 * Creates an open connection to localhost, port 6379, the default Redis port.
@@ -787,7 +792,7 @@ public class RedisConnection extends RedisConnectionAbstract implements
 
 	/**
 	 * Just like {@link #hgetall(String)}, except the keys and values are set on 
-	 * a new instance of a Java object via reflection. Fields/Setter Methods annotated with
+	 * an existing instance of a Java object via reflection. Fields/Setter Methods annotated with
 	 * {@link DBIgnore} are ignored.
 	 * @throws RuntimeException if instantiation cannot happen, either due to
 	 * a non-existent constructor or a non-visible constructor.
@@ -795,8 +800,20 @@ public class RedisConnection extends RedisConnectionAbstract implements
 	 */
 	public <T> T hgetallObject(String key, Class<T> type)
 	{
-		TypeProfile<T> profile = TypeProfile.getTypeProfile(type);
-		T out = Reflect.create(type);
+		return hgetallObject(key, Reflect.create(type));
+	}
+
+	/**
+	 * Just like {@link #hgetall(String)}, except the keys and values are set on 
+	 * a new instance of a Java object via reflection. Fields/Setter Methods annotated with
+	 * {@link DBIgnore} are ignored.
+	 * @throws RuntimeException if instantiation cannot happen, either due to
+	 * a non-existent constructor or a non-visible constructor.
+	 * @throws ClassCastException if a incoming type cannot be converted to a field value.
+	 */
+	public <T> T hgetallObject(String key, T object)
+	{
+		TypeProfile<?> profile = TypeProfile.getTypeProfile(object.getClass());
 		
 		String[] keyvals = hgetall(key);
 		for (int i = 0; i < keyvals.length; i += 2)
@@ -808,17 +825,17 @@ public class RedisConnection extends RedisConnectionAbstract implements
 			{
 				Field f = profile.getPublicFields().get(k);
 				if (!f.isAnnotationPresent(DBIgnore.class))
-					Reflect.setField(out, k, Reflect.createForType(k, v, f.getType()));
+					Reflect.setField(object, k, Reflect.createForType(k, v, f.getType()));
 			}
 			else if (profile.getSetterMethods().containsKey(k))
 			{
 				MethodSignature ms = profile.getSetterMethods().get(k);
 				if (!ms.getMethod().isAnnotationPresent(DBIgnore.class))
-					Reflect.invokeBlind(ms.getMethod(), out, Reflect.createForType(k, v, ms.getType()));
+					Reflect.invokeBlind(ms.getMethod(), object, Reflect.createForType(k, v, ms.getType()));
 			}
 		}
 		
-		return out;
+		return object;
 	}
 
 	@Override
@@ -1020,7 +1037,7 @@ public class RedisConnection extends RedisConnectionAbstract implements
 	}
 
 	/**
-	 * <p>From <a href="http://redis.io/commands/hscan">http://redis.io/commands/hscan</a>:</p>
+	 * <p>From <a href="http://redis.io/commands/sscan">http://redis.io/commands/sscan</a>:</p>
 	 * <p><strong>Available since 2.8.0.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete 
 	 * iteration, including enough command calls for the cursor to return back to 0. 
@@ -1035,7 +1052,7 @@ public class RedisConnection extends RedisConnectionAbstract implements
 	}
 	
 	/**
-	 * <p>From <a href="http://redis.io/commands/hscan">http://redis.io/commands/hscan</a>:</p>
+	 * <p>From <a href="http://redis.io/commands/sscan">http://redis.io/commands/sscan</a>:</p>
 	 * <p><strong>Available since 2.8.0.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete 
 	 * iteration, including enough command calls for the cursor to return back to 0. 
@@ -1051,7 +1068,7 @@ public class RedisConnection extends RedisConnectionAbstract implements
 	}
 	
 	/**
-	 * <p>From <a href="http://redis.io/commands/hscan">http://redis.io/commands/hscan</a>:</p>
+	 * <p>From <a href="http://redis.io/commands/sscan">http://redis.io/commands/sscan</a>:</p>
 	 * <p><strong>Available since 2.8.0.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete 
 	 * iteration, including enough command calls for the cursor to return back to 0. 
@@ -1112,76 +1129,512 @@ public class RedisConnection extends RedisConnectionAbstract implements
 		if (sourcekeys.length > 0)
 			writer.writeArray(Common.joinArrays(new String[]{"PFMERGE", destkey, sourcekey}, sourcekeys));
 		else
-			writer.writeArray("PFADD", destkey, sourcekey);
+			writer.writeArray("PFMERGE", destkey, sourcekey);
 		return reader.readOK();
 	}
 
-	/**
-	 * <p>From <a href="http://redis.io/commands/lindex">http://redis.io/commands/lindex</a>:</p>
-	 * <p><strong>Available since 1.0.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(N) where N is the number of elements 
-	 * to traverse to get to the element at index. This makes asking for the first 
-	 * or the last element of the list O(1).</p>
-	 * <p>Returns the element at index <code>index</code> in the list stored at 
-	 * <code>key</code>. The index is zero-based, so <code>0</code> means the first 
-	 * element, <code>1</code> the second element and so on. Negative indices can be 
-	 * used to designate elements starting at the tail of the list. Here, <code>-1</code> 
-	 * means the last element, <code>-2</code> means the penultimate and so forth.</p>
-	 * @return the requested element cast to a long integer, or <code>null</code> when <code>index</code> is out of range.
-	 */
-//	public Long lindexAsLong(String key, long index);
+	@Override
+	public ObjectPair<String, String> blpop(long timeout, String key, String... keys)
+	{
+		if (keys.length > 0)
+			writer.writeArray(Common.joinArrays(new String[]{"BLPOP", key}, keys, new Object[]{timeout}));
+		else
+			writer.writeArray("BLPOP", key, timeout);
+		String[] resp = reader.readArray();
+		return resp != null ? new ObjectPair<String, String>(resp[0], resp[1]) : null;
+	}
 
 	/**
-	 * <p>From <a href="http://redis.io/commands/lindex">http://redis.io/commands/lindex</a>:</p>
-	 * <p><strong>Available since 1.0.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(N) where N is the number of elements 
-	 * to traverse to get to the element at index. This makes asking for the first 
-	 * or the last element of the list O(1).</p>
-	 * <p>Returns the element at index <code>index</code> in the list stored at 
-	 * <code>key</code>. The index is zero-based, so <code>0</code> means the first 
-	 * element, <code>1</code> the second element and so on. Negative indices can be 
-	 * used to designate elements starting at the tail of the list. Here, <code>-1</code> 
-	 * means the last element, <code>-2</code> means the penultimate and so forth.</p>
-	 * @return the requested element cast to a primitive long integer, or <code>0</code> when <code>index</code> is out of range.
+	 * Like {@link #blpop(long, String, String...)}, except it casts the value to a long integer. 
 	 */
-//	public long lindexLong(String key, long index);
+	public ObjectPair<String, Long> blpopLong(long timeout, String key, String... keys)
+	{
+		if (keys.length > 0)
+			writer.writeArray(Common.joinArrays(new String[]{"BLPOP", key}, keys, new Object[]{timeout}));
+		else
+			writer.writeArray("BLPOP", key, timeout);
+		String[] resp = reader.readArray();
+		return resp != null ? new ObjectPair<String, Long>(resp[0], Common.parseLong(resp[1])) : null;
+	}
+
+	@Override
+	public ObjectPair<String, String> brpop(long timeout, String key, String... keys)
+	{
+		if (keys.length > 0)
+			writer.writeArray(Common.joinArrays(new String[]{"BRPOP", key}, keys, new Object[]{timeout}));
+		else
+			writer.writeArray("BRPOP", key, timeout);
+		String[] resp = reader.readArray();
+		return resp != null ? new ObjectPair<String, String>(resp[0], resp[1]) : null;
+	}
 
 	/**
-	 * <p>From <a href="http://redis.io/commands/lpop">http://redis.io/commands/lpop</a>:</p>
-	 * <p><strong>Available since 1.0.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(1)</p>
-	 * <p>Removes and returns the first element of the list stored at <code>key</code>.</p>
-	 * @return the value of the first element cast as a Long, or <code>null</code> when <code>key</code> does not exist.
+	 * Like {@link #brpop(long, String, String...)}, except it casts the value to a long integer. 
 	 */
-//	public Long lpopAsLong(String key);
+	public ObjectPair<String, Long> brpopLong(long timeout, String key, String... keys)
+	{
+		if (keys.length > 0)
+			writer.writeArray(Common.joinArrays(new String[]{"BRPOP", key}, keys, new Object[]{timeout}));
+		else
+			writer.writeArray("BRPOP", key, timeout);
+		String[] resp = reader.readArray();
+		return resp != null ? new ObjectPair<String, Long>(resp[0], Common.parseLong(resp[1])) : null;
+	}
+
+	@Override
+	public String brpoplpush(long timeout, String source, String destination)
+	{
+		writer.writeArray("BRPOPLPUSH", source, destination, timeout);
+		return reader.readString();
+	}
 
 	/**
-	 * <p>From <a href="http://redis.io/commands/lpop">http://redis.io/commands/lpop</a>:</p>
-	 * <p><strong>Available since 1.0.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(1)</p>
-	 * <p>Removes and returns the first element of the list stored at <code>key</code>.</p>
-	 * @return the value of the first element cast as a primitive long integer, or <code>0</code> when <code>key</code> does not exist.
+	 * Like {@link #brpoplpush(long, String, String)}, except it casts the value to a long integer. 
 	 */
-//	public long lpopLong(String key);
+	public Long brpoplpushLong(long timeout, String source, String destination)
+	{
+		String out = brpoplpush(timeout, source, destination);
+		return out != null ? Common.parseLong(out) : null;
+	}
+
+	@Override
+	public String lindex(String key, long index)
+	{
+		writer.writeArray("LINDEX", key, index);
+		return reader.readString();
+	}
 
 	/**
-	 * <p>From <a href="http://redis.io/commands/rpop">http://redis.io/commands/rpop</a>:</p>
-	 * <p><strong>Available since 1.0.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(1)</p>
-	 * <p>Removes and returns the last element of the list stored at <code>key</code>.</p>
-	 * @return the value of the last element cast to a Long, or <code>null</code> when <code>key</code> does not exist.
+	 * Like {@link #lindex(String, long)}, except it casts the value to a long integer.
 	 */
-//	public Long rpopAsLong(String key);
+	public Long lindexLong(String key, long index)
+	{
+		String out = lindex(key, index);
+		return out != null ? Common.parseLong(out) : null;
+	}
+
+	@Override
+	public long linsert(String key, boolean before, String pivot, String value)
+	{
+		writer.writeArray("LINSERT", key, before ? "BEFORE" : "AFTER", pivot, value);
+		return reader.readInteger();
+	}
 
 	/**
-	 * <p>From <a href="http://redis.io/commands/rpop">http://redis.io/commands/rpop</a>:</p>
-	 * <p><strong>Available since 1.0.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(1)</p>
-	 * <p>Removes and returns the last element of the list stored at <code>key</code>.</p>
-	 * @return the value of the last element cast to a primitive long integer, 
-	 * or <code>0</code> when <code>key</code> does not exist.
+	 * <p>From <a href="http://redis.io/commands/linsert">http://redis.io/commands/linsert</a>:</p>
+	 * <p><strong>Available since 2.2.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(N) where N is the number of elements to 
+	 * traverse before seeing the value pivot. This means that inserting somewhere on 
+	 * the left end on the list (head) can be considered O(1) and inserting somewhere 
+	 * on the right end (tail) is O(N).</p>
+	 * <p>Inserts <code>value</code> in the list stored at <code>key</code> either 
+	 * before or after the reference value <code>pivot</code>.</p>
+	 * @return the length of the list after the insert operation, or <code>-1</code> 
+	 * when the value <code>pivot</code> was not found.
 	 */
-//	public long rpopLong(String key);
+	public long linsert(String key, boolean before, String pivot, Number value)
+	{
+		writer.writeArray("LINSERT", key, before ? "BEFORE" : "AFTER", pivot, value);
+		return reader.readInteger();
+	}
+
+	@Override
+	public long llen(String key)
+	{
+		writer.writeArray("LLEN", key);
+		return reader.readInteger();
+	}
+
+	@Override
+	public String lpop(String key)
+	{
+		writer.writeArray("LPOP", key);
+		return reader.readString();
+	}
+
+	/**
+	 * Like {@link #lpop(String)}, except it casts the value to a long integer.
+	 */
+	public Long lpopLong(String key)
+	{
+		String out = lpop(key);
+		return out != null ? Common.parseLong(out) : null;
+	}
+
+	@Override
+	public long lpush(String key, String value, String... values)
+	{
+		if (values.length > 0)
+			writer.writeArray(Common.joinArrays(new String[]{"LPUSH", key, value}, values));
+		else
+			writer.writeArray("LPUSH", key, value);
+		return reader.readInteger();
+	}
+
+	@Override
+	public long lpushx(String key, String value)
+	{
+		writer.writeArray("LPUSHX", key, value);
+		return reader.readInteger();
+	}
+
+	@Override
+	public String[] lrange(String key, long start, long stop)
+	{
+		writer.writeArray("LPUSHX", key, start, stop);
+		return reader.readArray();
+	}
+
+	@Override
+	public long lrem(String key, long count, String value)
+	{
+		writer.writeArray("LREM", key, count, value);
+		return reader.readInteger();
+	}
+
+	@Override
+	public boolean lset(String key, long index, String value)
+	{
+		writer.writeArray("LSET", key, index, value);
+		return reader.readOK();
+	}
+
+	@Override
+	public boolean ltrim(String key, long start, long stop)
+	{
+		writer.writeArray("LTRIM", key, start, stop);
+		return reader.readOK();
+	}
+
+	@Override
+	public String rpop(String key)
+	{
+		writer.writeArray("LPOP", key);
+		return reader.readString();
+	}
+
+	/**
+	 * Like {@link #rpop(String)}, except it casts the value to a long integer. 
+	 */
+	public Long rpopLong(String key)
+	{
+		String out = rpop(key);
+		return out != null ? Common.parseLong(out) : null;
+	}
 	
+	@Override
+	public String rpoplpush(String source, String destination)
+	{
+		writer.writeArray("RPOPLPUSH", source, destination);
+		return reader.readString();
+	}
+
+	/**
+	 * Like {@link #rpoplpush(String, String)}, except it casts the value to a long integer. 
+	 */
+	public Long rpoplpushLong(String source, String destination)
+	{
+		String out = rpoplpush(source, destination);
+		return out != null ? Common.parseLong(out) : null;
+	}
+
+	@Override
+	public long rpush(String key, String value, String... values)
+	{
+		if (values.length > 0)
+			writer.writeArray(Common.joinArrays(new String[]{"RPUSH", key, value}, values));
+		else
+			writer.writeArray("RPUSH", key, value);
+		return reader.readInteger();
+	}
+
+	@Override
+	public long rpushx(String key, String value)
+	{
+		writer.writeArray("RPUSHX", key, value);
+		return reader.readInteger();
+	}
+
+	@Override
+	public RedisObject eval(String scriptContent, String[] keys, String[] args)
+	{
+		writer.writeArray(Common.joinArrays(new Object[]{"EVAL", scriptContent, keys.length}, keys, args));
+		return reader.readObject();
+	}
+
+	@Override
+	public RedisObject evalsha(String hash, String[] keys, String[] args)
+	{
+		writer.writeArray(Common.joinArrays(new Object[]{"EVAL", hash, keys.length}, keys, args));
+		return reader.readObject();
+	}
+
+	@Override
+	public boolean[] scriptExists(String scriptHash, String... scriptHashes)
+	{
+		if (scriptHashes.length > 0)
+			writer.writeArray(Common.joinArrays(new String[]{"SCRIPT", "EXISTS", scriptHash}, scriptHashes));
+		else
+			writer.writeArray("SCRIPT", "EXISTS", scriptHash);
+		String[] ret = reader.readArray();
+		boolean[] out = new boolean[ret.length];
+		for (int i = 0; i < ret.length; i++)
+			out[i] = Common.parseLong(ret[i]) != 0;
+		
+		return out;
+	}
+
+	@Override
+	public boolean scriptFlush()
+	{
+		writer.writeArray("SCRIPT", "FLUSH");
+		return reader.readOK();
+	}
+
+	@Override
+	public boolean scriptKill(String hash)
+	{
+		writer.writeArray("SCRIPT", "KILL", hash);
+		return reader.readOK();
+	}
+
+	@Override
+	public String scriptLoad(String content)
+	{
+		writer.writeArray("SCRIPT", "LOAD", content);
+		return reader.readString();
+	}
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/script-load">http://redis.io/commands/script-load</a>:</p>
+	 * <p><strong>Available since 2.6.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(N) with N being the length in bytes of the script body.</p>
+	 * <p>Load a script into the scripts cache from the specified file without executing it. After the specified 
+	 * command is loaded into the script cache it will be callable using {@link #evalsha(String, String[], String[])} 
+	 * with the correct SHA1 digest of the script, exactly like after the first successful invocation of {@link #eval(String, String[], String[])}.</p>
+	 * @return the SHA1 digest of the script added into the script cache.
+	 */
+	public String scriptLoad(File content) throws IOException
+	{
+		return scriptLoad(Common.getTextualContents(content));
+	}
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/script-load">http://redis.io/commands/script-load</a>:</p>
+	 * <p><strong>Available since 2.6.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(N) with N being the length in bytes of the script body.</p>
+	 * <p>Load a script into the scripts cache from the specified input stream (until the end is reached) without executing it. 
+	 * The stream is not closed after read. After the specified command is loaded into the 
+	 * script cache it will be callable using {@link #evalsha(String, String[], String[])} 
+	 * with the correct SHA1 digest of the script, exactly like after the first 
+	 * successful invocation of {@link #eval(String, String[], String[])}.</p>
+	 * @return the SHA1 digest of the script added into the script cache.
+	 */
+	public String scriptLoad(InputStream content) throws IOException
+	{
+		return scriptLoad(Common.getTextualContents(content));
+	}
+
+	@Override
+	public long sadd(String key, String member, String... members)
+	{
+		if (members.length > 0)
+			writer.writeArray(Common.joinArrays(new String[]{"SADD", key, member}, members));
+		else
+			writer.writeArray("SADD", key, member);
+		return reader.readInteger();
+	}
+
+	@Override
+	public long scard(String key)
+	{
+		writer.writeArray("SCARD", key);
+		return reader.readInteger();
+	}
+
+	@Override
+	public String[] sdiff(String key, String... keys)
+	{
+		if (keys.length > 0)
+			writer.writeArray(Common.joinArrays(new String[]{"SDIFF", key}, keys));
+		else
+			writer.writeArray("SDIFF", key);
+		return reader.readArray();
+	}
+
+	@Override
+	public long sdiffstore(String destination, String key, String... keys)
+	{
+		if (keys.length > 0)
+			writer.writeArray(Common.joinArrays(new String[]{"SDIFFSTORE", destination, key}, keys));
+		else
+			writer.writeArray("SDIFFSTORE", destination, key);
+		return reader.readInteger();
+	}
+
+	@Override
+	public String[] sinter(String key, String... keys)
+	{
+		if (keys.length > 0)
+			writer.writeArray(Common.joinArrays(new String[]{"SINTER", key}, keys));
+		else
+			writer.writeArray("SINTER", key);
+		return reader.readArray();
+	}
+
+	@Override
+	public long sinterstore(String destination, String key, String... keys)
+	{
+		if (keys.length > 0)
+			writer.writeArray(Common.joinArrays(new String[]{"SINTERSTORE", destination, key}, keys));
+		else
+			writer.writeArray("SINTERSTORE", destination, key);
+		return reader.readInteger();
+	}
+
+	@Override
+	public boolean sismember(String key, String member)
+	{
+		writer.writeArray("SISMEMBER", key, member);
+		return reader.readInteger() != 0;
+	}
+
+	@Override
+	public String[] smembers(String key)
+	{
+		writer.writeArray("SMEMBERS", key);
+		return reader.readArray();
+	}
+
+	@Override
+	public boolean smove(String source, String destination, String member)
+	{
+		writer.writeArray("SMOVE", source, destination, member);
+		return reader.readInteger() != 0;
+	}
+
+	@Override
+	public String spop(String key)
+	{
+		writer.writeArray("SPOP", key);
+		return reader.readString();
+	}
+
+	/**
+	 * Like {@link #spop(String)}, except it casts the value to a long integer. 
+	 */
+	public Long spopLong(String key)
+	{
+		String out = spop(key);
+		return out != null ? Common.parseLong(out) : null;
+	}
+
+	@Override
+	public String srandmember(String key)
+	{
+		writer.writeArray("SRANDMEMBER", key);
+		return reader.readString();
+	}
+
+	@Override
+	public String[] srandmember(String key, long count)
+	{
+		writer.writeArray("SRANDMEMBER", key, count);
+		return reader.readArray();
+	}
+
+	@Override
+	public long srem(String key, String member, String... members)
+	{
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public String[] sunion(String key, String... keys)
+	{
+		if (keys.length > 0)
+			writer.writeArray(Common.joinArrays(new String[]{"SUNION", key}, keys));
+		else
+			writer.writeArray("SUNION", key);
+		return reader.readArray();
+	}
+
+	@Override
+	public long sunionstore(String destination, String key, String... keys)
+	{
+		if (keys.length > 0)
+			writer.writeArray(Common.joinArrays(new String[]{"SUNIONSTORE", destination, key}, keys));
+		else
+			writer.writeArray("SUNIONSTORE", destination, key);
+		return reader.readInteger();
+	}
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/hscan">http://redis.io/commands/hscan</a>:</p>
+	 * <p><strong>Available since 2.8.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete 
+	 * iteration, including enough command calls for the cursor to return back to 0. 
+	 * N is the number of elements inside the collection..</p>
+	 * @param key the key of the hash to scan.
+	 * @param cursor the cursor value.
+	 * @return a RedisCursor that represents the result of a SCAN call.
+	 */
+	public RedisCursor sscan(String key, long cursor)
+	{
+		return hscan(key, cursor, null, null);
+	}
+	
+	/**
+	 * <p>From <a href="http://redis.io/commands/hscan">http://redis.io/commands/hscan</a>:</p>
+	 * <p><strong>Available since 2.8.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete 
+	 * iteration, including enough command calls for the cursor to return back to 0. 
+	 * N is the number of elements inside the collection..</p>
+	 * @param key the key of the hash to scan.
+	 * @param cursor the cursor value.
+	 * @param pattern if not null, return keys that fit a pattern.
+	 * @return a RedisCursor that represents the result of a SCAN call.
+	 */
+	public RedisCursor sscan(String key, long cursor, String pattern)
+	{
+		return hscan(key, cursor, pattern, null);
+	}
+	
+	/**
+	 * <p>From <a href="http://redis.io/commands/hscan">http://redis.io/commands/hscan</a>:</p>
+	 * <p><strong>Available since 2.8.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete 
+	 * iteration, including enough command calls for the cursor to return back to 0. 
+	 * N is the number of elements inside the collection..</p>
+	 * @param key the key of the hash to scan.
+	 * @param cursor the cursor value.
+	 * @param count if not null, cap the iterable keys at a limit.
+	 * @return a RedisCursor that represents the result of a SCAN call.
+	 */
+	public RedisCursor sscan(String key, long cursor, long count)
+	{
+		return hscan(key, cursor, null, count);
+	}
+	
+	@Override
+	public RedisCursor sscan(String key, String cursor, String pattern, Long count)
+	{
+		if (pattern == null)
+		{
+			if (count == null)
+				writer.writeArray("SSCAN", key, cursor);
+			else
+				writer.writeArray("SSCAN", key, cursor, "COUNT", count);
+		}
+		else
+		{
+			if (count == null)
+				writer.writeArray("SSCAN", key, cursor, "MATCH", pattern);
+			else
+				writer.writeArray("SSCAN", key, cursor, "MATCH", pattern, "COUNT", count);
+		}
+		return RedisCursor.create(reader.readInteger(), reader.readArray());
+	}
 
 }
