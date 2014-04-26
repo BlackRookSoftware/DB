@@ -46,34 +46,14 @@ public interface RedisServerCommands
 	public String[] clientList();
 
 	/**
-	 * <p>From <a href="http://redis.io/commands/client-getname">http://redis.io/commands/client-getname</a>:</p>
-	 * <p><strong>Available since 2.6.9.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(1)</p>
-	 * <p>The <code>CLIENT GETNAME</code> returns the name of the current connection as set by 
-	 * <code>CLIENT SETNAME</code>. Since every new connection starts without an associated 
-	 * name, if no name was assigned a null bulk reply is returned.</p>
-	 * @return the connection name, or null if no name is set.
-	 */
-	public String clientGetName();
-
-	/**
 	 * <p>From <a href="http://redis.io/commands/client-pause">http://redis.io/commands/client-pause</a>:</p>
 	 * <p><strong>Available since 2.9.50.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(1)</p>
 	 * <p><code>CLIENT PAUSE</code> is a connections control command able to suspend all
 	 * the Redis clients for the specified amount of time (in milliseconds).</p>
-	 * @return true if successful, false otherwise.
+	 * @return always true.
 	 */
 	public boolean clientPause(long millis);
-
-	/**
-	 * <p>From <a href="http://redis.io/commands/client-setname">http://redis.io/commands/client-setname</a>:</p>
-	 * <p><strong>Available since 2.6.9.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(1)</p>
-	 * <p>The <code>CLIENT SETNAME</code> command assigns a name to the current connection.</p>
-	 * @return true if successful, false otherwise.
-	 */
-	public boolean clientSetName(String name);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/config-get">http://redis.io/commands/config-get</a>:</p>
@@ -93,7 +73,7 @@ public interface RedisServerCommands
 	 * file the server was started with, applying the minimal changes needed to make 
 	 * it reflecting the configuration currently used by the server, that may be 
 	 * different compared to the original one because of the use of the {@link #configset(String, String)} command.</p>
-	 * @return true if successful, false otherwise.
+	 * @return always true.
 	 */
 	public boolean configRewrite();
 
@@ -103,7 +83,7 @@ public interface RedisServerCommands
 	 * <p>The <code>CONFIG SET</code> command is used in order to reconfigure the 
 	 * server at run time without the need to restart Redis. You can change both 
 	 * trivial parameters or switch from one to another persistence option using this command.</p>
-	 * @return true if successful, false otherwise.
+	 * @return always true.
 	 */
 	public boolean configSet(String parameter, String value);
 
@@ -112,7 +92,7 @@ public interface RedisServerCommands
 	 * <p><strong>Available since 2.0.0.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(1)</p>
 	 * <p>Resets the statistics reported by Redis using the <a href="/commands/info">INFO</a> command.</p>
-	 * @return true if successful, false otherwise.
+	 * @return always true.
 	 */
 	public boolean configResetStat();
 
@@ -125,27 +105,11 @@ public interface RedisServerCommands
 	public long dbsize();
 	
 	/**
-	 * <p>From <a href="http://redis.io/commands/debug-object">http://redis.io/commands/debug-object</a>:</p>
-	 * <p><strong>Available since 1.0.0.</strong></p>
-	 * <p><code>DEBUG OBJECT</code> is a debugging command that should not be used
-	 * by clients. Check the {@link RedisGenericCommands#object(String, String)} command instead.</p>
-	 */
-	public String debugObject();
-
-	/**
-	 * <p>From <a href="http://redis.io/commands/debug-segfault">http://redis.io/commands/debug-segfault</a>:</p>
-	 * <p><strong>Available since 1.0.0.</strong></p>
-	 * <p><code>DEBUG SEGFAULT</code> performs an invalid memory access that 
-	 * crashes Redis. It is used to simulate bugs during the development.</p>
-	 */
-	public void debugSegfault();
-	
-	/**
 	 * <p>From <a href="http://redis.io/commands/flushall">http://redis.io/commands/flushall</a>:</p>
 	 * <p><strong>Available since 1.0.0.</strong></p>
 	 * <p>Delete all the keys of all the existing databases, not just the 
 	 * currently selected one. This command never fails.</p>
-	 * @return true if successful, false otherwise.
+	 * @return always true.
 	 */
 	public boolean flushall();
 
@@ -165,6 +129,15 @@ public interface RedisServerCommands
 	 * @return a collection of text lines parseable for info.
 	 */
 	public String info();
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/info">http://redis.io/commands/info</a>:</p>
+	 * <p><strong>Available since 1.0.0.</strong></p>
+	 * <p>The <a href="/commands/info">INFO</a> command returns information and statistics 
+	 * about the server in a format that is simple to parse by computers and easy to read by humans.</p>
+	 * @return a collection of text lines parseable for info.
+	 */
+	public String info(String section);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/lastsave">http://redis.io/commands/lastsave</a>:</p>
@@ -275,7 +248,7 @@ public interface RedisServerCommands
 	 * the state of the Pub/Sub subsystem.</p>
 	 * <p>This call is here in order to support commands that don't have signatures.</p>
 	 */
-	public String pubsub(String subcommand, String... arguments);
+	public RedisObject pubsub(String subcommand, String... arguments);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/pubsub">http://redis.io/commands/pubsub</a>:</p>
@@ -287,7 +260,7 @@ public interface RedisServerCommands
 	 * the state of the Pub/Sub subsystem.</p>
 	 * @return a list of active channels, optionally matching the specified pattern.
 	 */
-	public String[] pubsubChannels(String... arguments);
+	public String[] pubsubChannels(String pattern);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/pubsub">http://redis.io/commands/pubsub</a>:</p>
@@ -300,7 +273,7 @@ public interface RedisServerCommands
 	 * The order in which the channels are listed is the same as the order of 
 	 * the channels specified in the command call.
 	 */
-	public void pubsubNumsub(String... arguments);
+	public String[] pubsubNumsub(String... arguments);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/pubsub">http://redis.io/commands/pubsub</a>:</p>
@@ -310,7 +283,7 @@ public interface RedisServerCommands
 	 * the state of the Pub/Sub subsystem.</p>
 	 * @return the number of patterns all the clients are subscribed to.
 	 */
-	public long pubsubNumpat(String... arguments);
+	public long pubsubNumpat();
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/save">http://redis.io/commands/save</a>:</p>
@@ -318,7 +291,7 @@ public interface RedisServerCommands
 	 * <p>The <a href="/commands/save">SAVE</a> commands performs a <strong>synchronous</strong> 
 	 * save of the dataset producing a <em>point in time</em> snapshot of all the data 
 	 * inside the Redis instance, in the form of an RDB file.</p>
-	 * @return true if successful, false otherwise.
+	 * @return always true.
 	 */
 	public boolean save();
 
@@ -340,7 +313,7 @@ public interface RedisServerCommands
 	 * turning the Redis server into a MASTER. In the proper form {@link #slaveof(String, String)}
 	 * hostname port will make the server a slave of another server listening at the specified 
 	 * hostname and port.</p>
-	 * @return true if successful, false if not. 
+	 * @return always true.
 	 */
 	public boolean slaveof(String host, String port);
 
@@ -353,7 +326,7 @@ public interface RedisServerCommands
 	 * turning the Redis server into a MASTER. In the proper form {@link #slaveof(String, String)}
 	 * hostname port will make the server a slave of another server listening at the specified 
 	 * hostname and port.</p>
-	 * @return true if successful, false if not. 
+	 * @return always true.
 	 */
 	public boolean slaveofNoOne();
 
@@ -363,13 +336,6 @@ public interface RedisServerCommands
 	 * <p>This command is used in order to read and reset the Redis slow queries log.</p>
 	 */
 	public void slowlog(String subcommand, String argument);
-
-	/**
-	 * <p>From <a href="http://redis.io/commands/sync">http://redis.io/commands/sync</a>:</p>
-	 * <p><strong>Available since 1.0.0.</strong></p>
-	 * Internal sync.
-	 */
-	public void sync();
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/time">http://redis.io/commands/time</a>:</p>

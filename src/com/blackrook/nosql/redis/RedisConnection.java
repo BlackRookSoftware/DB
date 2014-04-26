@@ -130,6 +130,20 @@ public class RedisConnection extends RedisConnectionAbstract implements
 	}
 
 	@Override
+	public String clientGetName()
+	{
+		writer.writeArray("CLIENT", "GETNAME");
+		return reader.readString();
+	}
+
+	@Override
+	public boolean clientSetName(String name)
+	{
+		writer.writeArray("CLIENT", "SETNAME", name);
+		return reader.readOK();
+	}
+
+	@Override
 	public long del(String key, String... keys)
 	{
 		if (keys.length > 0)

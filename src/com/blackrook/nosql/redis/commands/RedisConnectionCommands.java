@@ -38,4 +38,24 @@ public interface RedisConnectionCommands
 	 */
 	public boolean select(long db);
 
+	/**
+	 * <p>From <a href="http://redis.io/commands/client-getname">http://redis.io/commands/client-getname</a>:</p>
+	 * <p><strong>Available since 2.6.9.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(1)</p>
+	 * <p>The <code>CLIENT GETNAME</code> returns the name of the current connection as set by 
+	 * <code>CLIENT SETNAME</code>. Since every new connection starts without an associated 
+	 * name, if no name was assigned a null bulk reply is returned.</p>
+	 * @return the connection name, or null if no name is set.
+	 */
+	public String clientGetName();
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/client-setname">http://redis.io/commands/client-setname</a>:</p>
+	 * <p><strong>Available since 2.6.9.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(1)</p>
+	 * <p>The <code>CLIENT SETNAME</code> command assigns a name to the current connection.</p>
+	 * @return true if successful, false otherwise.
+	 */
+	public boolean clientSetName(String name);
+
 }

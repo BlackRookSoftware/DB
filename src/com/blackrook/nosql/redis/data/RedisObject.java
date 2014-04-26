@@ -135,6 +135,15 @@ public final class RedisObject
 	}
 
 	/**
+	 * Returns true if this represents an error.
+	 * False, otherwise.
+	 */
+	public boolean isError()
+	{
+		return type == Type.ERROR;
+	}
+
+	/**
 	 * Returns true if this is a NULL object, STRING or ARRAY typed.
 	 * False, otherwise.
 	 */
