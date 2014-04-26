@@ -1,5 +1,7 @@
 package com.blackrook.nosql.redis.commands;
 
+import com.blackrook.nosql.redis.data.RedisObject;
+
 /**
  * Interface of Redis server commands.
  * @author Matthew Tropiano
@@ -11,7 +13,7 @@ public interface RedisServerCommands
 	 * <p><strong>Available since 1.0.0.</strong></p>
 	 * <p>Instruct Redis to start an <a href="/topics/persistence#append-only-file">Append Only File</a> rewrite process. 
 	 * The rewrite will create a small optimized version of the current Append Only File.</p>
-	 * @return true if successful, false if not.
+	 * @return always true.
 	 */
 	public boolean bgrewriteaof();
 
@@ -21,7 +23,7 @@ public interface RedisServerCommands
 	 * <p>Save the DB in background. The OK code is immediately returned. Redis forks, 
 	 * the parent continues to serve the clients, the child saves the DB on disk then 
 	 * exits. A client my be able to check if the operation succeeded using the {@link #lastsave()} command.</p>
-	 * @return true if successful, false if not.
+	 * @return always true.
 	 */
 	public boolean bgsave();
 
@@ -30,9 +32,9 @@ public interface RedisServerCommands
 	 * <p><strong>Available since 2.4.0.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(N) where N is the number of client connections</p>
 	 * <p>The <code>CLIENT KILL</code> command closes a given client connection identified by ip:port.</p>
-	 * @return true if the client connection was closed, false if not.
+	 * @return true once the client connection was closed.
 	 */
-	public void clientkill(String ipPort);
+	public boolean clientKill(String ip, int port);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/client-list">http://redis.io/commands/client-list</a>:</p>
@@ -41,7 +43,7 @@ public interface RedisServerCommands
 	 * <p>The <code>CLIENT LIST</code> command returns information and statistics about the client connections server in a mostly human readable format.</p>
 	 * @return a list of client strings that describe each connection.
 	 */
-	public String[] clientlist();
+	public String[] clientList();
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/client-getname">http://redis.io/commands/client-getname</a>:</p>
@@ -52,7 +54,7 @@ public interface RedisServerCommands
 	 * name, if no name was assigned a null bulk reply is returned.</p>
 	 * @return the connection name, or null if no name is set.
 	 */
-	public void clientgetname();
+	public String clientGetName();
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/client-pause">http://redis.io/commands/client-pause</a>:</p>
@@ -62,7 +64,7 @@ public interface RedisServerCommands
 	 * the Redis clients for the specified amount of time (in milliseconds).</p>
 	 * @return true if successful, false otherwise.
 	 */
-	public boolean clientpause(long millis);
+	public boolean clientPause(long millis);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/client-setname">http://redis.io/commands/client-setname</a>:</p>
@@ -71,7 +73,7 @@ public interface RedisServerCommands
 	 * <p>The <code>CLIENT SETNAME</code> command assigns a name to the current connection.</p>
 	 * @return true if successful, false otherwise.
 	 */
-	public boolean clientsetname(String name);
+	public boolean clientSetName(String name);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/config-get">http://redis.io/commands/config-get</a>:</p>
@@ -82,7 +84,7 @@ public interface RedisServerCommands
 	 * of a server using this command.</p>
 	 * @return the config value.
 	 */
-	public String configget(String configKey);
+	public String configGet(String configKey);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/config-rewrite">http://redis.io/commands/config-rewrite</a>:</p>
@@ -93,7 +95,7 @@ public interface RedisServerCommands
 	 * different compared to the original one because of the use of the {@link #configset(String, String)} command.</p>
 	 * @return true if successful, false otherwise.
 	 */
-	public boolean configrewrite();
+	public boolean configRewrite();
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/config-set">http://redis.io/commands/config-set</a>:</p>
@@ -103,7 +105,7 @@ public interface RedisServerCommands
 	 * trivial parameters or switch from one to another persistence option using this command.</p>
 	 * @return true if successful, false otherwise.
 	 */
-	public boolean configset(String parameter, String value);
+	public boolean configSet(String parameter, String value);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/config-resetstat">http://redis.io/commands/config-resetstat</a>:</p>
@@ -112,7 +114,7 @@ public interface RedisServerCommands
 	 * <p>Resets the statistics reported by Redis using the <a href="/commands/info">INFO</a> command.</p>
 	 * @return true if successful, false otherwise.
 	 */
-	public boolean configresetstat();
+	public boolean configResetStat();
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/dbsize">http://redis.io/commands/dbsize</a>:</p>
@@ -128,7 +130,7 @@ public interface RedisServerCommands
 	 * <p><code>DEBUG OBJECT</code> is a debugging command that should not be used
 	 * by clients. Check the {@link RedisGenericCommands#object(String, String)} command instead.</p>
 	 */
-	public String debugobject();
+	public String debugObject();
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/debug-segfault">http://redis.io/commands/debug-segfault</a>:</p>
@@ -136,7 +138,7 @@ public interface RedisServerCommands
 	 * <p><code>DEBUG SEGFAULT</code> performs an invalid memory access that 
 	 * crashes Redis. It is used to simulate bugs during the development.</p>
 	 */
-	public void debugsegfault();
+	public void debugSegfault();
 	
 	/**
 	 * <p>From <a href="http://redis.io/commands/flushall">http://redis.io/commands/flushall</a>:</p>
@@ -174,6 +176,92 @@ public interface RedisServerCommands
 	 * @return a UNIX time stamp.
 	 */
 	public long lastsave();
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/migrate">http://redis.io/commands/migrate</a>:</p>
+	 * <p><strong>Available since 2.6.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> This command actually executes a {@link #dump} 
+	 * and {@link #del} in the source instance, and a {@link #restore} in the target 
+	 * instance. See the pages of these commands for time complexity. Also an O(N) 
+	 * data transfer between the two instances is performed.</p>
+	 * <p>Atomically transfer a key from a source Redis instance to a destination 
+	 * Redis instance. On success the key is deleted from the original instance 
+	 * and is guaranteed to exist in the target instance.</p>
+	 * @param host the hostname/address of the target server.
+	 * @param port the port.
+	 * @param key the key to migrate.
+	 * @param destinationDB the database to target on the server.
+	 * @param timeout the timeout for the connection.
+	 * @param copy if true, the key is copied, not removed from the source.
+	 * @param replace if true, the remote key is replaced.
+	 * @return always true.
+	 */
+	public boolean migrate(String host, int port, String key, long destinationDB, long timeout, boolean copy, boolean replace);
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/object">http://redis.io/commands/object</a>:</p>
+	 * <p><strong>Available since 2.2.3.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(1).</p>
+	 * <p>The <code>object</code> command allows to inspect the internals of Redis 
+	 * Objects associated with keys. It is useful for debugging or to understand if 
+	 * your keys are using the specially encoded data types to save space. Your 
+	 * application may also use the information reported by the <code>object</code> 
+	 * command to implement application level key eviction policies when using 
+	 * Redis as a Cache.</p>
+	 * <p>This call is here in order to support commands that don't have signatures.</p>
+	 */
+	public RedisObject object(String subcommand, String key);
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/object">http://redis.io/commands/object</a>:</p>
+	 * <p><strong>Available since 2.2.3.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(1).</p>
+	 * <p>The <code>object</code> command allows to inspect the internals of 
+	 * Redis Objects associated with keys. It is useful for debugging or to 
+	 * understand if your keys are using the specially encoded data types to 
+	 * save space. Your application may also use the information reported by 
+	 * the <code>object</code> command to implement application level key eviction 
+	 * policies when using Redis as a Cache.</p>
+	 * @param the key to count.
+	 * @return the number of references of the value associated with the 
+	 * specified key. This command is mainly useful for debugging.
+	 */
+	public long objectRefcount(String key);
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/object">http://redis.io/commands/object</a>:</p>
+	 * <p><strong>Available since 2.2.3.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(1).</p>
+	 * <p>The <code>object</code> command allows to inspect the internals 
+	 * of Redis Objects associated with keys. It is useful for debugging or 
+	 * to understand if your keys are using the specially encoded data types 
+	 * to save space. Your application may also use the information reported 
+	 * by the <code>object</code> command to implement application level key 
+	 * eviction policies when using Redis as a Cache.</p>
+	 * @param the key to inspect.
+	 * @return the kind of internal representation used in order to store the 
+	 * value associated with a key, or null for missing key.
+	 * TODO: Return an enum?
+	 */
+	public String objectEncoding(String key);
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/object">http://redis.io/commands/object</a>:</p>
+	 * <p><strong>Available since 2.2.3.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(1).</p>
+	 * <p>The <code>object</code> command allows to inspect the internals of 
+	 * Redis Objects associated with keys. It is useful for debugging or to 
+	 * understand if your keys are using the specially encoded data types to 
+	 * save space. Your application may also use the information reported by 
+	 * the <code>object</code> command to implement application level key eviction 
+	 * policies when using Redis as a Cache.</p>
+	 * @param the key to inspect.
+	 * @return the number of seconds since the object stored at the specified key 
+	 * is idle (not requested by read or write operations). While the value is 
+	 * returned in seconds the actual resolution of this timer is 10 seconds, 
+	 * but may vary in future implementations.
+	 */
+	public long objectIdletime(String key);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/pubsub">http://redis.io/commands/pubsub</a>:</p>

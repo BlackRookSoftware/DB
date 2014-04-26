@@ -1,7 +1,6 @@
 package com.blackrook.nosql.redis.commands;
 
 import com.blackrook.nosql.redis.data.RedisCursor;
-import com.blackrook.nosql.redis.data.RedisObject;
 import com.blackrook.nosql.redis.enums.DataType;
 import com.blackrook.nosql.redis.enums.SortOrder;
 
@@ -99,27 +98,6 @@ public interface RedisGenericCommands
 	public String[] keys(String pattern);
 
 	/**
-	 * <p>From <a href="http://redis.io/commands/migrate">http://redis.io/commands/migrate</a>:</p>
-	 * <p><strong>Available since 2.6.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> This command actually executes a {@link #dump} 
-	 * and {@link #del} in the source instance, and a {@link #restore} in the target 
-	 * instance. See the pages of these commands for time complexity. Also an O(N) 
-	 * data transfer between the two instances is performed.</p>
-	 * <p>Atomically transfer a key from a source Redis instance to a destination 
-	 * Redis instance. On success the key is deleted from the original instance 
-	 * and is guaranteed to exist in the target instance.</p>
-	 * @param host the hostname/address of the target server.
-	 * @param port the port.
-	 * @param key the key to migrate.
-	 * @param destinationDB the database to target on the server.
-	 * @param timeout the timeout for the connection.
-	 * @param copy if true, the key is copied, not removed from the source.
-	 * @param replace if true, the remote key is replaced.
-	 * @return always true.
-	 */
-	public boolean migrate(String host, int port, String key, long destinationDB, long timeout, boolean copy, boolean replace);
-
-	/**
 	 * <p>From <a href="http://redis.io/commands/move">http://redis.io/commands/move</a>:</p>
 	 * <p><strong>Available since 1.0.0.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(1)</p>
@@ -132,71 +110,6 @@ public interface RedisGenericCommands
 	 * @return true if the key was moved, false if not.
 	 */
 	public boolean move(String key, long db);
-
-	/**
-	 * <p>From <a href="http://redis.io/commands/object">http://redis.io/commands/object</a>:</p>
-	 * <p><strong>Available since 2.2.3.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(1).</p>
-	 * <p>The <code>object</code> command allows to inspect the internals of Redis 
-	 * Objects associated with keys. It is useful for debugging or to understand if 
-	 * your keys are using the specially encoded data types to save space. Your 
-	 * application may also use the information reported by the <code>object</code> 
-	 * command to implement application level key eviction policies when using 
-	 * Redis as a Cache.</p>
-	 * <p>This call is here in order to support commands that don't have signatures.</p>
-	 */
-	public RedisObject object(String subcommand, String key);
-
-	/**
-	 * <p>From <a href="http://redis.io/commands/object">http://redis.io/commands/object</a>:</p>
-	 * <p><strong>Available since 2.2.3.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(1).</p>
-	 * <p>The <code>object</code> command allows to inspect the internals of 
-	 * Redis Objects associated with keys. It is useful for debugging or to 
-	 * understand if your keys are using the specially encoded data types to 
-	 * save space. Your application may also use the information reported by 
-	 * the <code>object</code> command to implement application level key eviction 
-	 * policies when using Redis as a Cache.</p>
-	 * @param the key to count.
-	 * @return the number of references of the value associated with the 
-	 * specified key. This command is mainly useful for debugging.
-	 */
-	public long objectRefcount(String key);
-
-	/**
-	 * <p>From <a href="http://redis.io/commands/object">http://redis.io/commands/object</a>:</p>
-	 * <p><strong>Available since 2.2.3.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(1).</p>
-	 * <p>The <code>object</code> command allows to inspect the internals 
-	 * of Redis Objects associated with keys. It is useful for debugging or 
-	 * to understand if your keys are using the specially encoded data types 
-	 * to save space. Your application may also use the information reported 
-	 * by the <code>object</code> command to implement application level key 
-	 * eviction policies when using Redis as a Cache.</p>
-	 * @param the key to inspect.
-	 * @return the kind of internal representation used in order to store the 
-	 * value associated with a key, or null for missing key.
-	 * TODO: Return an enum?
-	 */
-	public String objectEncoding(String key);
-
-	/**
-	 * <p>From <a href="http://redis.io/commands/object">http://redis.io/commands/object</a>:</p>
-	 * <p><strong>Available since 2.2.3.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(1).</p>
-	 * <p>The <code>object</code> command allows to inspect the internals of 
-	 * Redis Objects associated with keys. It is useful for debugging or to 
-	 * understand if your keys are using the specially encoded data types to 
-	 * save space. Your application may also use the information reported by 
-	 * the <code>object</code> command to implement application level key eviction 
-	 * policies when using Redis as a Cache.</p>
-	 * @param the key to inspect.
-	 * @return the number of seconds since the object stored at the specified key 
-	 * is idle (not requested by read or write operations). While the value is 
-	 * returned in seconds the actual resolution of this timer is 10 seconds, 
-	 * but may vary in future implementations.
-	 */
-	public long objectIdletime(String key);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/persist">http://redis.io/commands/persist</a>:</p>
@@ -311,6 +224,44 @@ public interface RedisGenericCommands
 	 * @return always true.
 	 */
 	public boolean restore(String key, long ttl, String serializedvalue);
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/scan">http://redis.io/commands/scan</a>:</p>
+	 * <p><strong>Available since 2.8.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete 
+	 * iteration, including enough command calls for the cursor to return back to 0.
+	 * N is the number of elements inside the collection..</p>
+	 * <p>Incrementally iterates over a collection of elements.</p>
+	 * @param cursor the cursor value.
+	 * @return a RedisCursor that represents the result of a SCAN call.
+	 */
+	public RedisCursor scan(long cursor);
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/scan">http://redis.io/commands/scan</a>:</p>
+	 * <p><strong>Available since 2.8.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete 
+	 * iteration, including enough command calls for the cursor to return back to 0.
+	 * N is the number of elements inside the collection..</p>
+	 * <p>Incrementally iterates over a collection of elements.</p>
+	 * @param cursor the cursor value.
+	 * @param pattern if not null, return keys that fit a pattern.
+	 * @return a RedisCursor that represents the result of a SCAN call.
+	 */
+	public RedisCursor scan(long cursor, String pattern);
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/scan">http://redis.io/commands/scan</a>:</p>
+	 * <p><strong>Available since 2.8.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete 
+	 * iteration, including enough command calls for the cursor to return back to 0.
+	 * N is the number of elements inside the collection..</p>
+	 * <p>Incrementally iterates over a collection of elements.</p>
+	 * @param cursor the cursor value.
+	 * @param count if not null, cap the iterable keys at a limit.
+	 * @return a RedisCursor that represents the result of a SCAN call.
+	 */
+	public RedisCursor scan(long cursor, long count);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/scan">http://redis.io/commands/scan</a>:</p>

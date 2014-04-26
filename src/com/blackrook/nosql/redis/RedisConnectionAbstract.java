@@ -19,8 +19,7 @@ public class RedisConnectionAbstract implements Closeable
 	private RedisInfo info;
 	
 	/** The socket connection. */
-	private Socket redisSocket;
-
+	private Socket socket;
 	/** The input wrapper. */
 	protected RESPReader reader;
 	/** The output wrapper. */
@@ -88,12 +87,16 @@ public class RedisConnectionAbstract implements Closeable
 	 */
 	public void reconnect() throws IOException
 	{
-		if (redisSocket != null)
+		if (socket != null)
 			throw new IOException("Socket is already open.");
 
-		this.redisSocket = new Socket(info.getHost(), info.getPort());
-		this.reader = new RESPReader(redisSocket.getInputStream());
-		this.writer = new RESPWriter(redisSocket.getOutputStream());
+		this.socket = new Socket(info.getHost(), info.getPort());
+		
+		if (info.getTimeout() > 0)
+			socket.setSoTimeout(info.getTimeout());
+		
+		this.reader = new RESPReader(socket.getInputStream());
+		this.writer = new RESPWriter(socket.getOutputStream());
 		
 		if (info.getPassword() != null)
 		{
@@ -108,7 +111,7 @@ public class RedisConnectionAbstract implements Closeable
 	 */
 	public boolean isBound()
 	{
-		return redisSocket.isBound();
+		return socket.isBound();
 	}
 	
 	/**
@@ -117,7 +120,7 @@ public class RedisConnectionAbstract implements Closeable
 	 */
 	public boolean isConnected()
 	{
-		return redisSocket.isConnected();
+		return socket.isConnected();
 	}
 	
 	/**
@@ -126,19 +129,19 @@ public class RedisConnectionAbstract implements Closeable
 	 */
 	public boolean isClosed()
 	{
-		return redisSocket.isClosed();
+		return socket.isClosed();
 	}
 	
 	@Override
 	public void close() throws IOException
 	{
-		if (redisSocket == null)
+		if (socket == null)
 			return;
 		
-		redisSocket.close();
+		socket.close();
 		this.reader = null;
 		this.writer = null;
-		this.redisSocket = null;
+		this.socket = null;
 	}
 	
 	@Override

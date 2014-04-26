@@ -35,7 +35,6 @@ import com.blackrook.nosql.redis.exception.RedisException;
 /**
  * A single connection to a Redis server.
  * @author Matthew Tropiano
- * TODO: Add more commands.
  */
 public class RedisConnection extends RedisConnectionAbstract implements 
 	RedisConnectionCommands, RedisGenericCommands, RedisStringCommands, RedisHashCommands,
@@ -175,79 +174,11 @@ public class RedisConnection extends RedisConnectionAbstract implements
 		return reader.readArray();
 	}
 
-	/**
-	 * <p>From <a href="http://redis.io/commands/migrate">http://redis.io/commands/migrate</a>:</p>
-	 * <p><strong>Available since 2.6.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> This command actually executes a {@link #dump} 
-	 * and {@link #del} in the source instance, and a {@link #restore} in the target 
-	 * instance. See the pages of these commands for time complexity. Also an O(N) 
-	 * data transfer between the two instances is performed.</p>
-	 * <p>Atomically transfer a key from a source Redis instance to a destination 
-	 * Redis instance. On success the key is deleted from the original instance 
-	 * and is guaranteed to exist in the target instance.</p>
-	 * @param host the hostname/address of the target server.
-	 * @param port the port.
-	 * @param key the key to migrate.
-	 * @param destinationDB the database to target on the server.
-	 * @param timeout the timeout for the connection.
-	 * @return always true.
-	 */
-	public boolean migrate(String host, int port, String key, long destinationDB, long timeout)
-	{
-		return migrate(host, port, key, destinationDB, timeout, false, false);
-	}
-
-	@Override
-	public boolean migrate(String host, int port, String key, long destinationDB, long timeout, boolean copy, boolean replace)
-	{
-		List<Object> out = new List<Object>(8);
-		out.add("MIGRATE");
-		out.add(host);
-		out.add(port);
-		out.add(key);
-		out.add(destinationDB);
-		out.add(timeout);
-		if (copy)
-			out.add("COPY");
-		if (replace)
-			out.add("REPLACE");
-		writer.writeArray(out);
-		return reader.readOK();
-	}
-
 	@Override
 	public boolean move(String key, long db)
 	{
 		writer.writeArray("MOVE", key, db);
 		return reader.readInteger() != 0;
-	}
-
-	@Override
-	public RedisObject object(String subcommand, String key)
-	{
-		writer.writeArray("OBJECT", subcommand, key);
-		return reader.readObject();
-	}
-
-	@Override
-	public long objectRefcount(String key)
-	{
-		writer.writeArray("OBJECT", "REFCOUNT", key);
-		return reader.readInteger();
-	}
-
-	@Override
-	public String objectEncoding(String key)
-	{
-		writer.writeArray("OBJECT", "ENCODING", key);
-		return reader.readString();
-	}
-
-	@Override
-	public long objectIdletime(String key)
-	{
-		writer.writeArray("OBJECT", "IDLETIME", key);
-		return reader.readInteger();
 	}
 
 	@Override
@@ -313,48 +244,19 @@ public class RedisConnection extends RedisConnectionAbstract implements
 		return reader.readOK();
 	}
 
-	/**
-	 * <p>From <a href="http://redis.io/commands/scan">http://redis.io/commands/scan</a>:</p>
-	 * <p><strong>Available since 2.8.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete 
-	 * iteration, including enough command calls for the cursor to return back to 0.
-	 * N is the number of elements inside the collection..</p>
-	 * <p>Incrementally iterates over a collection of elements.</p>
-	 * @param cursor the cursor value.
-	 * @return a RedisCursor that represents the result of a SCAN call.
-	 */
+	@Override
 	public RedisCursor scan(long cursor)
 	{
 		return scan(cursor, null, null);
 	}
 
-	/**
-	 * <p>From <a href="http://redis.io/commands/scan">http://redis.io/commands/scan</a>:</p>
-	 * <p><strong>Available since 2.8.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete 
-	 * iteration, including enough command calls for the cursor to return back to 0.
-	 * N is the number of elements inside the collection..</p>
-	 * <p>Incrementally iterates over a collection of elements.</p>
-	 * @param cursor the cursor value.
-	 * @param pattern if not null, return keys that fit a pattern.
-	 * @return a RedisCursor that represents the result of a SCAN call.
-	 */
+	@Override
 	public RedisCursor scan(long cursor, String pattern)
 	{
 		return scan(cursor, pattern, null);
 	}
 
-	/**
-	 * <p>From <a href="http://redis.io/commands/scan">http://redis.io/commands/scan</a>:</p>
-	 * <p><strong>Available since 2.8.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete 
-	 * iteration, including enough command calls for the cursor to return back to 0.
-	 * N is the number of elements inside the collection..</p>
-	 * <p>Incrementally iterates over a collection of elements.</p>
-	 * @param cursor the cursor value.
-	 * @param count if not null, cap the iterable keys at a limit.
-	 * @return a RedisCursor that represents the result of a SCAN call.
-	 */
+	@Override
 	public RedisCursor scan(long cursor, long count)
 	{
 		return scan(cursor, null, count);
@@ -468,13 +370,7 @@ public class RedisConnection extends RedisConnectionAbstract implements
 		return reader.readInteger();
 	}
 
-	/**
-	 * <p>From <a href="http://redis.io/commands/bitpos">http://redis.io/commands/bitpos</a>:</p>
-	 * <p><strong>Available since 2.8.7.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(N)</p>
-	 * <p>Return the position of the first bit set to 1 or 0 in a string.</p>
-	 * @return the command returns the position of the first bit set to 1 or 0 according to the request.
-	 */
+	@Override
 	public long bitpos(String key, long bit)
 	{
 		writer.writeArray("BITPOS", key, bit);
@@ -547,15 +443,7 @@ public class RedisConnection extends RedisConnectionAbstract implements
 		return reader.readString();
 	}
 
-	/**
-	 * <p>From <a href="http://redis.io/commands/getset">http://redis.io/commands/getset</a>:</p>
-	 * <p><strong>Available since 1.0.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(1)</p>
-	 * <p>Atomically sets <code>key</code> to <code>value</code> and returns the 
-	 * old value stored at <code>key</code>. Returns an error when <code>key</code> 
-	 * exists but does not hold a string value.</p>
-	 * @return the old value stored at <code>key</code>, or <code>null</code> when <code>key</code> did not exist.
-	 */
+	@Override
 	public String getset(String key, Number value)
 	{
 		writer.writeArray("GETSET", key, value);
@@ -621,9 +509,7 @@ public class RedisConnection extends RedisConnectionAbstract implements
 		return reader.readOK();
 	}
 
-	/**
-	 * Like {@link #mset(String, String, String...)}, but takes key-value pairs.
-	 */
+	@Override
 	public boolean mset(ObjectPair<String, Object>... pairs)
 	{
 		if (pairs.length == 0)
@@ -654,9 +540,7 @@ public class RedisConnection extends RedisConnectionAbstract implements
 		return reader.readOK();
 	}
 
-	/** 
-	 * Like {@link #msetnx(String, String, String...)}, but takes key-value pairs.
-	 */
+	@Override
 	public boolean msetnx(ObjectPair<String, Object>... pairs)
 	{
 		if (pairs.length == 0)
@@ -691,15 +575,7 @@ public class RedisConnection extends RedisConnectionAbstract implements
 		return reader.readOK();
 	}
 
-	/**
-	 * <p>From <a href="http://redis.io/commands/set">http://redis.io/commands/set</a>:</p>
-	 * <p><strong>Available since 1.0.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(1)</p>
-	 * <p>Set <code>key</code> to hold the string <code>value</code>. If <code>key</code> 
-	 * already holds a value, it is overwritten, regardless of its type. Any previous time 
-	 * to live associated with the key is discarded on successful <code>SET</code> operation.</p>
-	 * @return true, always.
-	 */
+	@Override
 	public boolean set(String key, Number value)
 	{
 		writer.writeArray("SET", key, value);
@@ -994,15 +870,7 @@ public class RedisConnection extends RedisConnectionAbstract implements
 		return reader.readInteger() != 0;
 	}
 
-	/**
-	 * <p>From <a href="http://redis.io/commands/hset">http://redis.io/commands/hset</a>:</p>
-	 * <p><strong>Available since 2.0.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(1)</p>
-	 * <p>Sets <code>field</code> in the hash stored at <code>key</code> to <code>value</code>. 
-	 * If <code>key</code> does not exist, a new key holding a hash is created. If 
-	 * <code>field</code> already exists in the hash, it is overwritten.</p>
-	 * @return true if a new field, false if set, but not a new field.
-	 */
+	@Override
 	public boolean hset(String key, String field, Number value)
 	{
 		writer.writeArray("HSET", key, field, value);
@@ -1016,16 +884,7 @@ public class RedisConnection extends RedisConnectionAbstract implements
 		return reader.readInteger() != 0;
 	}
 
-	/**
-	 * <p>From <a href="http://redis.io/commands/hsetnx">http://redis.io/commands/hsetnx</a>:</p>
-	 * <p><strong>Available since 2.0.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(1)</p>
-	 * <p>Sets <code>field</code> in the hash stored at <code>key</code> to <code>value</code>, 
-	 * only if <code>field</code> does not yet exist. If <code>key</code> does not exist, a 
-	 * new key holding a hash is created. If <code>field</code> already exists, this 
-	 * operation has no effect.</p>
-	 * @return true if a new field, false if set, but not a new field.
-	 */
+	@Override
 	public boolean hsetnx(String key, String field, Number value)
 	{
 		writer.writeArray("HSETNX", key, field, value);
@@ -1039,48 +898,19 @@ public class RedisConnection extends RedisConnectionAbstract implements
 		return reader.readArray();
 	}
 
-	/**
-	 * <p>From <a href="http://redis.io/commands/sscan">http://redis.io/commands/sscan</a>:</p>
-	 * <p><strong>Available since 2.8.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete 
-	 * iteration, including enough command calls for the cursor to return back to 0. 
-	 * N is the number of elements inside the collection..</p>
-	 * @param key the key of the hash to scan.
-	 * @param cursor the cursor value.
-	 * @return a RedisCursor that represents the result of a SCAN call.
-	 */
+	@Override
 	public RedisCursor hscan(String key, long cursor)
 	{
 		return hscan(key, cursor, null, null);
 	}
 	
-	/**
-	 * <p>From <a href="http://redis.io/commands/sscan">http://redis.io/commands/sscan</a>:</p>
-	 * <p><strong>Available since 2.8.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete 
-	 * iteration, including enough command calls for the cursor to return back to 0. 
-	 * N is the number of elements inside the collection..</p>
-	 * @param key the key of the hash to scan.
-	 * @param cursor the cursor value.
-	 * @param pattern if not null, return keys that fit a pattern.
-	 * @return a RedisCursor that represents the result of a SCAN call.
-	 */
+	@Override
 	public RedisCursor hscan(String key, long cursor, String pattern)
 	{
 		return hscan(key, cursor, pattern, null);
 	}
 	
-	/**
-	 * <p>From <a href="http://redis.io/commands/sscan">http://redis.io/commands/sscan</a>:</p>
-	 * <p><strong>Available since 2.8.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete 
-	 * iteration, including enough command calls for the cursor to return back to 0. 
-	 * N is the number of elements inside the collection..</p>
-	 * @param key the key of the hash to scan.
-	 * @param cursor the cursor value.
-	 * @param count if not null, cap the iterable keys at a limit.
-	 * @return a RedisCursor that represents the result of a SCAN call.
-	 */
+	@Override
 	public RedisCursor hscan(String key, long cursor, long count)
 	{
 		return hscan(key, cursor, null, count);
@@ -1223,18 +1053,7 @@ public class RedisConnection extends RedisConnectionAbstract implements
 		return reader.readInteger();
 	}
 
-	/**
-	 * <p>From <a href="http://redis.io/commands/linsert">http://redis.io/commands/linsert</a>:</p>
-	 * <p><strong>Available since 2.2.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(N) where N is the number of elements to 
-	 * traverse before seeing the value pivot. This means that inserting somewhere on 
-	 * the left end on the list (head) can be considered O(1) and inserting somewhere 
-	 * on the right end (tail) is O(N).</p>
-	 * <p>Inserts <code>value</code> in the list stored at <code>key</code> either 
-	 * before or after the reference value <code>pivot</code>.</p>
-	 * @return the length of the list after the insert operation, or <code>-1</code> 
-	 * when the value <code>pivot</code> was not found.
-	 */
+	@Override
 	public long linsert(String key, boolean before, String pivot, Number value)
 	{
 		writer.writeArray("LINSERT", key, before ? "BEFORE" : "AFTER", pivot, value);
@@ -1576,48 +1395,19 @@ public class RedisConnection extends RedisConnectionAbstract implements
 		return reader.readInteger();
 	}
 
-	/**
-	 * <p>From <a href="http://redis.io/commands/hscan">http://redis.io/commands/hscan</a>:</p>
-	 * <p><strong>Available since 2.8.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete 
-	 * iteration, including enough command calls for the cursor to return back to 0. 
-	 * N is the number of elements inside the collection..</p>
-	 * @param key the key of the hash to scan.
-	 * @param cursor the cursor value.
-	 * @return a RedisCursor that represents the result of a SCAN call.
-	 */
+	@Override
 	public RedisCursor sscan(String key, long cursor)
 	{
 		return hscan(key, cursor, null, null);
 	}
 	
-	/**
-	 * <p>From <a href="http://redis.io/commands/hscan">http://redis.io/commands/hscan</a>:</p>
-	 * <p><strong>Available since 2.8.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete 
-	 * iteration, including enough command calls for the cursor to return back to 0. 
-	 * N is the number of elements inside the collection..</p>
-	 * @param key the key of the hash to scan.
-	 * @param cursor the cursor value.
-	 * @param pattern if not null, return keys that fit a pattern.
-	 * @return a RedisCursor that represents the result of a SCAN call.
-	 */
+	@Override
 	public RedisCursor sscan(String key, long cursor, String pattern)
 	{
 		return hscan(key, cursor, pattern, null);
 	}
 	
-	/**
-	 * <p>From <a href="http://redis.io/commands/hscan">http://redis.io/commands/hscan</a>:</p>
-	 * <p><strong>Available since 2.8.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete 
-	 * iteration, including enough command calls for the cursor to return back to 0. 
-	 * N is the number of elements inside the collection..</p>
-	 * @param key the key of the hash to scan.
-	 * @param cursor the cursor value.
-	 * @param count if not null, cap the iterable keys at a limit.
-	 * @return a RedisCursor that represents the result of a SCAN call.
-	 */
+	@Override
 	public RedisCursor sscan(String key, long cursor, long count)
 	{
 		return hscan(key, cursor, null, count);
@@ -1650,20 +1440,7 @@ public class RedisConnection extends RedisConnectionAbstract implements
 		return reader.readInteger();
 	}
 
-	/**
-	 * <p>From <a href="http://redis.io/commands/zadd">http://redis.io/commands/zadd</a>:</p>
-	 * <p><strong>Available since 1.2.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> O(log(N)) where N is the number of elements in the sorted set.</p>
-	 * <p>Adds all the specified members with the specified scores to the sorted set 
-	 * stored at <code>key</code>. It is possible to specify multiple score/member pairs. 
-	 * If a specified member is already a member of the sorted set, the score is updated 
-	 * and the element reinserted at the right position to ensure the correct ordering. 
-	 * If <code>key</code> does not exist, a new sorted set with the specified members as 
-	 * sole members is created, like if the sorted set was empty. If the key exists but 
-	 * does not hold a sorted set, an error is returned.</p>
-	 * @return the number of elements added to the sorted sets, not including elements 
-	 * already existing for which the score was updated.
-	 */
+	@Override
 	public long zadd(String key, ObjectPair<Double, String>... pairs)
 	{
 		List<Object> out = new List<Object>(2 + (pairs.length * 2));
@@ -1744,27 +1521,19 @@ public class RedisConnection extends RedisConnectionAbstract implements
 		return reader.readArray();
 	}
 
-	/**
-	 * Like {@link #zrangebyscore(String, String, String, boolean)},
-	 * except it accepts doubles for min and max, not strings.
-	 */
+	@Override
 	public String[] zrangebyscore(String key, double min, double max, boolean withScores)
 	{
 		return zrangebyscore(key, specialDouble(min), specialDouble(max), withScores, null, null);
 	}
 
-	/**
-	 * Like {@link #zrangebyscore(String, String, String, boolean, Long, Long)}, except specifies no limit.
-	 */
+	@Override
 	public String[] zrangebyscore(String key, String min, String max, boolean withScores)
 	{
 		return zrangebyscore(key, min, max, withScores, null, null);
 	}
 
-	/**
-	 * Like {@link #zrangebyscore(String, String, String, boolean, Long, Long)}, 
-	 * except it accepts doubles for min and max, not strings.
-	 */
+	@Override
 	public String[] zrangebyscore(String key, double min, double max, boolean withScores, Long limitOffset, Long limitCount)
 	{
 		return zrangebyscore(key, specialDouble(min), specialDouble(max), withScores, limitOffset, limitCount);
@@ -1851,27 +1620,19 @@ public class RedisConnection extends RedisConnectionAbstract implements
 		return reader.readArray();
 	}
 	
-	/**
-	 * Like {@link #zrevrangebyscore(String, String, String, boolean)},
-	 * except it accepts doubles for min and max, not strings.
-	 */
+	@Override
 	public String[] zrevrangebyscore(String key, double min, double max, boolean withScores)
 	{
 		return zrevrangebyscore(key, specialDouble(min), specialDouble(max), withScores, null, null);
 	}
 
-	/**
-	 * Like {@link #zrevrangebyscore(String, String, String, boolean, Long, Long)}, except specifies no limit.
-	 */
+	@Override
 	public String[] zrevrangebyscore(String key, String min, String max, boolean withScores)
 	{
 		return zrevrangebyscore(key, min, max, withScores, null, null);
 	}
 
-	/**
-	 * Like {@link #zrevrangebyscore(String, String, String, boolean, Long, Long)}, 
-	 * except it accepts doubles for min and max, not strings.
-	 */
+	@Override
 	public String[] zrevrangebyscore(String key, double min, double max, boolean withScores, Long limitOffset, Long limitCount)
 	{
 		return zrevrangebyscore(key, specialDouble(min), specialDouble(max), withScores, limitOffset, limitCount);
@@ -1886,45 +1647,202 @@ public class RedisConnection extends RedisConnectionAbstract implements
 	}
 
 	@Override
-	public long zinterstore(String destination, String[] keys, String[] weights, Aggregation aggregation)
+	public long zinterstore(String destination, double[] weights, Aggregation aggregation, String key, String... keys)
 	{
-		// TODO Auto-generated method stub
-		return 0;
+		List<Object> out = new List<Object>(6 + keys.length + (weights != null ? weights.length : 0));
+		out.add("ZINTERSTORE");
+		out.add(destination);
+
+		out.add(keys.length + 1);
+		out.add(key);
+		for (String k : keys)
+			out.add(k);
+		
+		if (weights.length > 0)
+		{
+			out.add("WEIGHTS");
+			for (double w : weights)
+				out.add(w);
+		}
+		
+		if (aggregation != null)
+			out.add(aggregation.name());
+		
+		writer.writeArray(out);
+		return reader.readInteger();
 	}
 
 	@Override
-	public long zunionstore(String destination, String[] keys, String[] weights, Aggregation aggregation)
+	public long zinterstore(String destination, Aggregation aggregation, String key, String... keys)
 	{
-		// TODO Auto-generated method stub
-		return 0;
+		return zinterstore(destination, null, aggregation, key, keys);
 	}
 
+	@Override
+	public long zinterstore(String destination, double[] weights, String key, String... keys)
+	{
+		return zinterstore(destination, weights, null, key, keys);
+	}
+
+	@Override
+	public long zinterstore(String destination, String key, String... keys)
+	{
+		return zinterstore(destination, null, null, key, keys);
+	}
+	
+	@Override
+	public long zunionstore(String destination, double[] weights, Aggregation aggregation, String key, String... keys)
+	{
+		List<Object> out = new List<Object>(6 + keys.length + (weights != null ? weights.length : 0));
+		out.add("ZUNIONSTORE");
+		out.add(destination);
+
+		out.add(keys.length + 1);
+		out.add(key);
+		for (String k : keys)
+			out.add(k);
+		
+		if (weights.length > 0)
+		{
+			out.add("WEIGHTS");
+			for (double w : weights)
+				out.add(w);
+		}
+		
+		if (aggregation != null)
+			out.add(aggregation.name());
+		
+		writer.writeArray(out);
+		return reader.readInteger();
+	}
+
+	@Override
+	public long zunionstore(String destination, Aggregation aggregation, String key, String... keys)
+	{
+		return zunionstore(destination, null, aggregation, key, keys);
+	}
+
+	@Override
+	public long zunionstore(String destination, double[] weights, String key, String... keys)
+	{
+		return zunionstore(destination, weights, null, key, keys);
+	}
+
+	@Override
+	public long zunionstore(String destination, String key, String... keys)
+	{
+		return zunionstore(destination, null, null, key, keys);
+	}
+	
 	@Override
 	public long zlexcount(String key, String min, String max)
 	{
-		// TODO Auto-generated method stub
-		return 0;
+		writer.writeArray("ZLEXCOUNT", key, min, max);
+		return reader.readInteger();
+	}
+
+	@Override
+	public long zlexcount(String key, double min, double max)
+	{
+		return zlexcount(key, specialDouble(min), specialDouble(max));
 	}
 
 	@Override
 	public long zrangebylex(String key, String min, String max, Long limitOffset, Long limitCount)
 	{
-		// TODO Auto-generated method stub
-		return 0;
+		List<Object> out = new List<Object>(8);
+		out.add("ZRANGEBYLEX");
+		out.add(key);
+
+		out.add(min);
+		out.add(max);
+		
+		if (limitOffset != null && limitCount != null)
+		{
+			out.add("LIMIT");
+			out.add(limitOffset);
+			out.add(limitCount);
+		}
+		
+		writer.writeArray(out);
+		return reader.readInteger();
+	}
+
+	/**
+	 * Like {@link #zrangebylex(String, String, String, Long, Long)},
+	 * except it accepts doubles for min and max, not strings.
+	 */
+	public long zrangebylex(String key, double min, double max, Long limitOffset, Long limitCount)
+	{
+		return zrangebylex(key, specialDouble(min), specialDouble(max), limitOffset, limitCount);
+	}
+
+	/**
+	 * Like {@link #zrangebylex(String, String, String, Long, Long)}, with no limit.
+	 */
+	public long zrangebylex(String key, String min, String max)
+	{
+		return zrangebylex(key, min, max, null, null);
+	}
+
+	/**
+	 * Like {@link #zrangebylex(String, String, String)},
+	 * except it accepts doubles for min and max, not strings, with no limit.
+	 */
+	public long zrangebylex(String key, double min, double max)
+	{
+		return zrangebylex(key, specialDouble(min), specialDouble(max), null, null);
 	}
 
 	@Override
 	public long zremrangebylex(String key, String min, String max)
 	{
-		// TODO Auto-generated method stub
-		return 0;
+		writer.writeArray("ZREMRANGEBYLEX", key, min, max);
+		return reader.readInteger();
 	}
 
 	@Override
+	public long zremrangebylex(String key, double min, double max)
+	{
+		return zremrangebylex(key, specialDouble(min), specialDouble(max));
+	}
+
+	@Override
+	public RedisCursor zscan(String key, long cursor)
+	{
+		return zscan(key, cursor, null, null);
+	}
+
+	@Override
+	public RedisCursor zscan(String key, long cursor, String pattern)
+	{
+		return zscan(key, cursor, pattern, null);
+	}
+
+	@Override
+	public RedisCursor zscan(String key, long cursor, long count)
+	{
+		return zscan(key, cursor, null, count);
+	}
+	
+	@Override
 	public RedisCursor zscan(String key, long cursor, String pattern, Long count)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		if (pattern == null)
+		{
+			if (count == null)
+				writer.writeArray("ZSCAN", key, cursor);
+			else
+				writer.writeArray("ZSCAN", key, cursor, "COUNT", count);
+		}
+		else
+		{
+			if (count == null)
+				writer.writeArray("ZSCAN", key, cursor, "MATCH", pattern);
+			else
+				writer.writeArray("ZSCAN", key, cursor, "MATCH", pattern, "COUNT", count);
+		}
+		return RedisCursor.create(reader.readInteger(), reader.readArray());
 	}
 
 	/**
@@ -1945,4 +1863,5 @@ public class RedisConnection extends RedisConnectionAbstract implements
 		else
 			return String.valueOf(d);
 	}
+
 }

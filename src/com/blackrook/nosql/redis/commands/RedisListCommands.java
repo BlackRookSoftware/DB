@@ -79,10 +79,26 @@ public interface RedisListCommands
 	public long linsert(String key, boolean before, String pivot, String value);
 
 	/**
+	 * <p>From <a href="http://redis.io/commands/linsert">http://redis.io/commands/linsert</a>:</p>
+	 * <p><strong>Available since 2.2.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(N) where N is the number of elements to 
+	 * traverse before seeing the value pivot. This means that inserting somewhere on 
+	 * the left end on the list (head) can be considered O(1) and inserting somewhere 
+	 * on the right end (tail) is O(N).</p>
+	 * <p>Inserts <code>value</code> in the list stored at <code>key</code> either 
+	 * before or after the reference value <code>pivot</code>.</p>
+	 * @return the length of the list after the insert operation, or <code>-1</code> 
+	 * when the value <code>pivot</code> was not found.
+	 */
+	public long linsert(String key, boolean before, String pivot, Number value);
+
+	/**
 	 * <p>From <a href="http://redis.io/commands/llen">http://redis.io/commands/llen</a>:</p>
 	 * <p><strong>Available since 1.0.0.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(1)</p>
-	 * <p>Returns the length of the list stored at <code>key</code>. If <code>key</code> does not exist, it is interpreted as an empty list and <code>0</code> is returned. An error is returned when the value stored at <code>key</code> is not a list.</p>
+	 * <p>Returns the length of the list stored at <code>key</code>. If <code>key</code> does 
+	 * not exist, it is interpreted as an empty list and <code>0</code> is returned. An error 
+	 * is returned when the value stored at <code>key</code> is not a list.</p>
 	 * @return the length of the list at <code>key</code>.
 	 */
 	public long llen(String key);

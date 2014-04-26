@@ -1,5 +1,6 @@
 package com.blackrook.nosql.redis.commands;
 
+import com.blackrook.commons.ObjectPair;
 import com.blackrook.nosql.redis.data.RedisCursor;
 import com.blackrook.nosql.redis.enums.Aggregation;
 
@@ -26,6 +27,22 @@ public interface RedisSortedSetCommands
 	public long zadd(String key, double score, String member);
 
 	/**
+	 * <p>From <a href="http://redis.io/commands/zadd">http://redis.io/commands/zadd</a>:</p>
+	 * <p><strong>Available since 1.2.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(log(N)) where N is the number of elements in the sorted set.</p>
+	 * <p>Adds all the specified members with the specified scores to the sorted set 
+	 * stored at <code>key</code>. It is possible to specify multiple score/member pairs. 
+	 * If a specified member is already a member of the sorted set, the score is updated 
+	 * and the element reinserted at the right position to ensure the correct ordering. 
+	 * If <code>key</code> does not exist, a new sorted set with the specified members as 
+	 * sole members is created, like if the sorted set was empty. If the key exists but 
+	 * does not hold a sorted set, an error is returned.</p>
+	 * @return the number of elements added to the sorted sets, not including elements 
+	 * already existing for which the score was updated.
+	 */
+	public long zadd(String key, ObjectPair<Double, String>... pairs);
+
+	/**
 	 * <p>From <a href="http://redis.io/commands/zcard">http://redis.io/commands/zcard</a>:</p>
 	 * <p><strong>Available since 1.2.0.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(1)</p>
@@ -44,6 +61,12 @@ public interface RedisSortedSetCommands
 	 * @return the number of elements in the specified score range.
 	 */
 	public long zcount(String key, String min, String max);
+
+	/**
+	 * Like {@link #zcount(String, String, String)}, 
+	 * except it accepts doubles for min and max, not strings.
+	 */
+	public long zcount(String key, double min, double max);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/zincrby">http://redis.io/commands/zincrby</a>:</p>
@@ -80,11 +103,33 @@ public interface RedisSortedSetCommands
 	 * between <code>min</code> and <code>max</code> (including elements with score equal 
 	 * to <code>min</code> or <code>max</code>). The elements are considered to be ordered 
 	 * from low to high scores.</p>
+	 * <p>The optional <code>LIMIT</code> argument can be used to only get a range of the matching
+	 * elements (similar to <em>SELECT LIMIT offset, count</em> in SQL).
+	 * Keep in mind that if <code>offset</code> is large, the sorted set needs to be traversed for
+	 * <code>offset</code> elements before getting to the elements to return, which can add up to
+	 * <span class="math">O(N) </span>time complexity.</p>
 	 * <p>The arguments <code>min</code> and <code>max</code> are Strings so they can accept special ranges.</p>
 	 * @return list of elements in the specified score range (optionally with their scores).
 	 */
 	public String[] zrangebyscore(String key, String min, String max, boolean withScores, Long limitOffset, Long limitCount);
 	
+	/**
+	 * Like {@link #zrangebyscore(String, String, String, boolean)},
+	 * except it accepts doubles for min and max, not strings.
+	 */
+	public String[] zrangebyscore(String key, double min, double max, boolean withScores);
+
+	/**
+	 * Like {@link #zrangebyscore(String, String, String, boolean, Long, Long)}, except specifies no limit.
+	 */
+	public String[] zrangebyscore(String key, String min, String max, boolean withScores);
+
+	/**
+	 * Like {@link #zrangebyscore(String, String, String, boolean, Long, Long)}, 
+	 * except it accepts doubles for min and max, not strings.
+	 */
+	public String[] zrangebyscore(String key, double min, double max, boolean withScores, Long limitOffset, Long limitCount);
+
 	/**
 	 * <p>From <a href="http://redis.io/commands/zrank">http://redis.io/commands/zrank</a>:</p>
 	 * <p><strong>Available since 2.0.0.</strong></p>
@@ -138,6 +183,12 @@ public interface RedisSortedSetCommands
 	public long zremrangebyscore(String key, String min, String max);
 
 	/**
+	 * Like {@link #zremrangebyscore(String, String, String)},
+	 * except it accepts doubles for min and max, not strings.
+	 */
+	public long zremrangebyscore(String key, double min, double max);
+
+	/**
 	 * <p>From <a href="http://redis.io/commands/zrevrank">http://redis.io/commands/zrevrank</a>:</p>
 	 * <p><strong>Available since 2.0.0.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(log(N))</p>
@@ -170,10 +221,32 @@ public interface RedisSortedSetCommands
 	 * <code>max</code> and <code>min</code> (including elements with score equal 
 	 * to max or min). In contrary to the default ordering of sorted sets, for this 
 	 * command the elements are considered to be ordered from high to low scores.</p>
+	 * <p>The optional <code>LIMIT</code> argument can be used to only get a range of the matching
+	 * elements (similar to <em>SELECT LIMIT offset, count</em> in SQL).
+	 * Keep in mind that if <code>offset</code> is large, the sorted set needs to be traversed for
+	 * <code>offset</code> elements before getting to the elements to return, which can add up to
+	 * <span class="math">O(N) </span>time complexity.</p>
 	 * <p>The arguments <code>min</code> and <code>max</code> are Strings so they can accept special ranges.</p>
 	 * @return list of elements in the specified score range (optionally with their scores).
 	 */
 	public String[] zrevrangebyscore(String key, String min, String max, boolean withScores, Long limitOffset, Long limitCount);
+
+	/**
+	 * Like {@link #zrevrangebyscore(String, String, String, boolean)},
+	 * except it accepts doubles for min and max, not strings.
+	 */
+	public String[] zrevrangebyscore(String key, double min, double max, boolean withScores);
+
+	/**
+	 * Like {@link #zrevrangebyscore(String, String, String, boolean, Long, Long)}, except specifies no limit.
+	 */
+	public String[] zrevrangebyscore(String key, String min, String max, boolean withScores);
+
+	/**
+	 * Like {@link #zrevrangebyscore(String, String, String, boolean, Long, Long)}, 
+	 * except it accepts doubles for min and max, not strings.
+	 */
+	public String[] zrevrangebyscore(String key, double min, double max, boolean withScores, Long limitOffset, Long limitCount);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/zscore">http://redis.io/commands/zscore</a>:</p>
@@ -196,7 +269,7 @@ public interface RedisSortedSetCommands
 	 * input keys and the other (optional) arguments.</p>
 	 * @return the number of elements in the resulting sorted set at <code>destination</code>.
 	 */
-	public long zinterstore(String destination, String[] keys, String[] weights, Aggregation aggregation);
+	public long zinterstore(String destination, double[] weights, Aggregation aggregation, String key, String... keys);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/zunionstore">http://redis.io/commands/zunionstore</a>:</p>
@@ -210,7 +283,7 @@ public interface RedisSortedSetCommands
 	 * keys and the other (optional) arguments.</p>
 	 * @return the number of elements in the resulting sorted set at <code>destination</code>.
 	 */
-	public long zunionstore(String destination, String[] keys, String[] weights, Aggregation aggregation);
+	public long zunionstore(String destination, double[] weights, Aggregation aggregation, String key, String... keys);
 
 	
 	/**
@@ -234,7 +307,12 @@ public interface RedisSortedSetCommands
 	 * <p>When all the elements in a sorted set are inserted with the same score, in order 
 	 * to force lexicographical ordering, this command returns all the elements in the sorted 
 	 * set at <code>key</code> with a value between <code>min</code> and <code>max</code>.</p>
-	 * <p>The arguments <code>min</code> and <code>max</code> are Strings so they can accept special ranges.</p>
+	 * <p>The optional <code>LIMIT</code> argument can be used to only get a range of the matching
+	 * elements (similar to <em>SELECT LIMIT offset, count</em> in SQL).
+	 * Keep in mind that if <code>offset</code> is large, the sorted set needs to be traversed for
+	 * <code>offset</code> elements before getting to the elements to return, which can add up to
+	 * <span class="math">O(N) </span>time complexity.</p>
+     * <p>The arguments <code>min</code> and <code>max</code> are Strings so they can accept special ranges.</p>
 	 * @return list of elements in the specified score range.
 	 */
 	public long zrangebylex(String key, String min, String max, Long limitOffset, Long limitCount);
@@ -258,12 +336,121 @@ public interface RedisSortedSetCommands
 	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete iteration, 
 	 * including enough command calls for the cursor to return back to 0. N is the number of 
 	 * elements inside the collection..</p>
-	 * @param key the key of the hash to scan.
+	 * @param key the key of the sorted set to scan.
 	 * @param cursor the cursor value.
 	 * @param pattern if not null, return keys that fit a pattern.
 	 * @param count if not null, cap the iterable keys at a limit.
 	 * @return a RedisCursor that represents the result of a SCAN call.
 	 */
 	public RedisCursor zscan(String key, long cursor, String pattern, Long count);
+
+	/**
+	 * Like {@link #zinterstore(String, double[], Aggregation, String, String...)}, except no weights are
+	 * applied to the source value scores.
+	 * <p>Equivalent to: <code>zinterstore(destination, null, aggregation, key, keys)</code></p>
+	 */
+	public long zinterstore(String destination, Aggregation aggregation, String key, String... keys);
+
+	/**
+	 * Like {@link #zinterstore(String, double[], Aggregation, String, String...)}, except it does no
+	 * aggregation of scores.
+	 * <p>Equivalent to: <code>zinterstore(destination, weights, null, key, keys)</code></p>
+	 */
+	public long zinterstore(String destination, double[] weights, String key, String... keys);
+
+	/**
+	 * Like {@link #zinterstore(String, double[], Aggregation, String, String...)}, except no weights are
+	 * applied to the source value scores, and does no aggregation of scores.
+	 * <p>Equivalent to: <code>zinterstore(destination, null, null, key, keys)</code></p>
+	 */
+	public long zinterstore(String destination, String key, String... keys);
+
+	/**
+	 * Like {@link #zunionstore(String, double[], Aggregation, String, String...)}, except no weights are
+	 * applied to the source value scores.
+	 * <p>Equivalent to: <code>zunionstore(destination, null, aggregation, key, keys)</code></p>
+	 */
+	public long zunionstore(String destination, Aggregation aggregation, String key, String... keys);
+
+	/**
+	 * Like {@link #zunionstore(String, double[], Aggregation, String, String...)}, except it does no
+	 * aggregation of scores.
+	 * <p>Equivalent to: <code>zunionstore(destination, weights, null, key, keys)</code></p>
+	 */
+	public long zunionstore(String destination, double[] weights, String key, String... keys);
+
+	/**
+	 * Like {@link #zunionstore(String, double[], Aggregation, String, String...)}, except no weights are
+	 * applied to the source value scores, and does no aggregation of scores.
+	 * <p>Equivalent to: <code>zunionstore(destination, null, null, key, keys)</code></p>
+	 */
+	public long zunionstore(String destination, String key, String... keys);
+
+	/**
+	 * Like {@link #zlexcount(String, String, String)}, 
+	 * except it accepts doubles for min and max, not strings.
+	 */
+	public long zlexcount(String key, double min, double max);
+
+	/**
+	 * Like {@link #zrangebylex(String, String, String, Long, Long)},
+	 * except it accepts doubles for min and max, not strings.
+	 */
+	public long zrangebylex(String key, double min, double max, Long limitOffset, Long limitCount);
+
+	/**
+	 * Like {@link #zrangebylex(String, String, String, Long, Long)}, with no limit.
+	 */
+	public long zrangebylex(String key, String min, String max);
+
+	/**
+	 * Like {@link #zrangebylex(String, String, String)},
+	 * except it accepts doubles for min and max, not strings, with no limit.
+	 */
+	public long zrangebylex(String key, double min, double max);
+
+	/**
+	 * Like {@link #zrangebylex(String, String, String)},
+	 * except it accepts doubles for min and max.
+	 */
+	public long zremrangebylex(String key, double min, double max);
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/zscan">http://redis.io/commands/zscan</a>:</p>
+	 * <p><strong>Available since 2.8.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete iteration, 
+	 * including enough command calls for the cursor to return back to 0. N is the number of 
+	 * elements inside the collection..</p>
+	 * @param key the key of the sorted set to scan.
+	 * @param cursor the cursor value.
+	 * @return a RedisCursor that represents the result of a SCAN call.
+	 */
+	public RedisCursor zscan(String key, long cursor);
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/zscan">http://redis.io/commands/zscan</a>:</p>
+	 * <p><strong>Available since 2.8.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete iteration, 
+	 * including enough command calls for the cursor to return back to 0. N is the number of 
+	 * elements inside the collection..</p>
+	 * @param key the key of the sorted set to scan.
+	 * @param cursor the cursor value.
+	 * @param pattern if not null, return keys that fit a pattern.
+	 * @return a RedisCursor that represents the result of a SCAN call.
+	 */
+	public RedisCursor zscan(String key, long cursor, String pattern);
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/zscan">http://redis.io/commands/zscan</a>:</p>
+	 * <p><strong>Available since 2.8.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete iteration, 
+	 * including enough command calls for the cursor to return back to 0. N is the number of 
+	 * elements inside the collection..</p>
+	 * @param key the key of the sorted set to scan.
+	 * @param cursor the cursor value.
+	 * @param count if not null, cap the iterable keys at a limit.
+	 * @return a RedisCursor that represents the result of a SCAN call.
+	 */
+	public RedisCursor zscan(String key, long cursor, long count);
 
 }

@@ -1,5 +1,9 @@
 package com.blackrook.nosql.redis.commands;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+
 import com.blackrook.nosql.redis.data.RedisObject;
 
 /**
@@ -70,5 +74,29 @@ public interface RedisScriptingCommands
 	 * @return the SHA1 digest of the script added into the script cache.
 	 */
 	public String scriptLoad(String content);
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/script-load">http://redis.io/commands/script-load</a>:</p>
+	 * <p><strong>Available since 2.6.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(N) with N being the length in bytes of the script body.</p>
+	 * <p>Load a script into the scripts cache from the specified file without executing it. After the specified 
+	 * command is loaded into the script cache it will be callable using {@link #evalsha(String, String[], String[])} 
+	 * with the correct SHA1 digest of the script, exactly like after the first successful invocation of {@link #eval(String, String[], String[])}.</p>
+	 * @return the SHA1 digest of the script added into the script cache.
+	 */
+	public String scriptLoad(File content) throws IOException;
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/script-load">http://redis.io/commands/script-load</a>:</p>
+	 * <p><strong>Available since 2.6.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(N) with N being the length in bytes of the script body.</p>
+	 * <p>Load a script into the scripts cache from the specified input stream (until the end is reached) without executing it. 
+	 * The stream is not closed after read. After the specified command is loaded into the 
+	 * script cache it will be callable using {@link #evalsha(String, String[], String[])} 
+	 * with the correct SHA1 digest of the script, exactly like after the first 
+	 * successful invocation of {@link #eval(String, String[], String[])}.</p>
+	 * @return the SHA1 digest of the script added into the script cache.
+	 */
+	public String scriptLoad(InputStream content) throws IOException;
 
 }

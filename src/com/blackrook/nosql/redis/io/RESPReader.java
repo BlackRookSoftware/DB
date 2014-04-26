@@ -65,11 +65,40 @@ public class RESPReader
 	}
 	
 	/**
+	 * Reads and expects "QUEUED" from Redis.
+	 * Will block until something is read from the stream.
+	 * Should be used if AND ONLY IF "QUEUED" is expected.
+	 * @return true.
+	 * @throws RedisException if the server reports an error, or isn't QUEUED.
+	 * @throws RedisParseException if an error occurs during the read.
+	 */
+	public boolean readQueued()
+	{
+		try {
+			
+			readLine(buffer);
+			String resp = new String(buffer.toByteArray(), "UTF-8");
+			
+			// is error?
+			if (resp.startsWith("-"))
+				throw new RedisException(resp.substring(1));
+			// is QUEUED?
+			else if (resp.equals("+QUEUED"))
+				return true;
+			else
+				throw new RedisException("Expected QUEUED.");
+			
+		} catch (IOException e) {
+			throw new RedisParseException("Could not read from stream.", e);
+		}
+	}
+	
+	/**
 	 * Reads and expects "PONG" from Redis.
 	 * Will block until something is read from the stream.
 	 * Should be used if AND ONLY IF "PONG" is expected.
 	 * @return true.
-	 * @throws RedisException if the server reports an error, or isn't OK.
+	 * @throws RedisException if the server reports an error, or isn't PONG.
 	 * @throws RedisParseException if an error occurs during the read.
 	 */
 	public boolean readPong()

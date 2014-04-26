@@ -128,6 +128,17 @@ public interface RedisHashCommands
 	public boolean hset(String key, String field, String value);
 
 	/**
+	 * <p>From <a href="http://redis.io/commands/hset">http://redis.io/commands/hset</a>:</p>
+	 * <p><strong>Available since 2.0.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(1)</p>
+	 * <p>Sets <code>field</code> in the hash stored at <code>key</code> to <code>value</code>. 
+	 * If <code>key</code> does not exist, a new key holding a hash is created. If 
+	 * <code>field</code> already exists in the hash, it is overwritten.</p>
+	 * @return true if a new field, false if set, but not a new field.
+	 */
+	public boolean hset(String key, String field, Number value);
+
+	/**
 	 * <p>From <a href="http://redis.io/commands/hsetnx">http://redis.io/commands/hsetnx</a>:</p>
 	 * <p><strong>Available since 2.0.0.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(1)</p>
@@ -140,6 +151,18 @@ public interface RedisHashCommands
 	public boolean hsetnx(String key, String field, String value);
 
 	/**
+	 * <p>From <a href="http://redis.io/commands/hsetnx">http://redis.io/commands/hsetnx</a>:</p>
+	 * <p><strong>Available since 2.0.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(1)</p>
+	 * <p>Sets <code>field</code> in the hash stored at <code>key</code> to <code>value</code>, 
+	 * only if <code>field</code> does not yet exist. If <code>key</code> does not exist, a 
+	 * new key holding a hash is created. If <code>field</code> already exists, this 
+	 * operation has no effect.</p>
+	 * @return true if a new field, false if set, but not a new field.
+	 */
+	public boolean hsetnx(String key, String field, Number value);
+
+	/**
 	 * <p>From <a href="http://redis.io/commands/hvals">http://redis.io/commands/hvals</a>:</p>
 	 * <p><strong>Available since 2.0.0.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(N) where N is the size of the hash.</p>
@@ -147,6 +170,44 @@ public interface RedisHashCommands
 	 * @return a list of values in the hash, or an empty list when <code>key</code> does not exist.
 	 */
 	public String[] hvals(String key);
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/sscan">http://redis.io/commands/sscan</a>:</p>
+	 * <p><strong>Available since 2.8.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete 
+	 * iteration, including enough command calls for the cursor to return back to 0. 
+	 * N is the number of elements inside the collection..</p>
+	 * @param key the key of the hash to scan.
+	 * @param cursor the cursor value.
+	 * @return a RedisCursor that represents the result of a SCAN call.
+	 */
+	public RedisCursor hscan(String key, long cursor);
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/sscan">http://redis.io/commands/sscan</a>:</p>
+	 * <p><strong>Available since 2.8.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete 
+	 * iteration, including enough command calls for the cursor to return back to 0. 
+	 * N is the number of elements inside the collection..</p>
+	 * @param key the key of the hash to scan.
+	 * @param cursor the cursor value.
+	 * @param pattern if not null, return keys that fit a pattern.
+	 * @return a RedisCursor that represents the result of a SCAN call.
+	 */
+	public RedisCursor hscan(String key, long cursor, String pattern);
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/sscan">http://redis.io/commands/sscan</a>:</p>
+	 * <p><strong>Available since 2.8.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(1) for every call. O(N) for a complete 
+	 * iteration, including enough command calls for the cursor to return back to 0. 
+	 * N is the number of elements inside the collection..</p>
+	 * @param key the key of the hash to scan.
+	 * @param cursor the cursor value.
+	 * @param count if not null, cap the iterable keys at a limit.
+	 * @return a RedisCursor that represents the result of a SCAN call.
+	 */
+	public RedisCursor hscan(String key, long cursor, long count);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/hscan">http://redis.io/commands/hscan</a>:</p>

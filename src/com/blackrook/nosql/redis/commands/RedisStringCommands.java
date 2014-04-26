@@ -1,5 +1,6 @@
 package com.blackrook.nosql.redis.commands;
 
+import com.blackrook.commons.ObjectPair;
 import com.blackrook.nosql.redis.enums.BitwiseOperation;
 
 /**
@@ -45,6 +46,15 @@ public interface RedisStringCommands
 	 * equal to the size of the longest input string.
 	 */
 	public long bitop(BitwiseOperation operation, String destkey, String key, String... keys);
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/bitpos">http://redis.io/commands/bitpos</a>:</p>
+	 * <p><strong>Available since 2.8.7.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(N)</p>
+	 * <p>Return the position of the first bit set to 1 or 0 in a string.</p>
+	 * @return the command returns the position of the first bit set to 1 or 0 according to the request.
+	 */
+	public long bitpos(String key, long bit);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/bitpos">http://redis.io/commands/bitpos</a>:</p>
@@ -127,6 +137,17 @@ public interface RedisStringCommands
 	public String getset(String key, String value);
 
 	/**
+	 * <p>From <a href="http://redis.io/commands/getset">http://redis.io/commands/getset</a>:</p>
+	 * <p><strong>Available since 1.0.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(1)</p>
+	 * <p>Atomically sets <code>key</code> to <code>value</code> and returns the 
+	 * old value stored at <code>key</code>. Returns an error when <code>key</code> 
+	 * exists but does not hold a string value.</p>
+	 * @return the old value stored at <code>key</code>, or <code>null</code> when <code>key</code> did not exist.
+	 */
+	public String getset(String key, Number value);
+
+	/**
 	 * <p>From <a href="http://redis.io/commands/incr">http://redis.io/commands/incr</a>:</p>
 	 * <p><strong>Available since 1.0.0.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(1)</p>
@@ -183,6 +204,11 @@ public interface RedisStringCommands
 	public boolean mset(String key, String value, String... keyValues);
 
 	/**
+	 * Like {@link #mset(String, String, String...)}, but takes key-value pairs.
+	 */
+	public boolean mset(ObjectPair<String, Object>... pairs);
+
+	/**
 	 * <p>From <a href="http://redis.io/commands/msetnx">http://redis.io/commands/msetnx</a>:</p>
 	 * <p><strong>Available since 1.0.1.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(N) where N is the number of keys to set.</p>
@@ -191,6 +217,11 @@ public interface RedisStringCommands
 	 * @return true if all of the keys were set, false if no key was set.
 	 */
 	public boolean msetnx(String key, String value, String... keyValues);
+
+	/** 
+	 * Like {@link #msetnx(String, String, String...)}, but takes key-value pairs.
+	 */
+	public boolean msetnx(ObjectPair<String, Object>... pairs);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/psetex">http://redis.io/commands/psetex</a>:</p>
@@ -212,6 +243,17 @@ public interface RedisStringCommands
 	 * @return true, always.
 	 */
 	public boolean set(String key, String value);
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/set">http://redis.io/commands/set</a>:</p>
+	 * <p><strong>Available since 1.0.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(1)</p>
+	 * <p>Set <code>key</code> to hold the string <code>value</code>. If <code>key</code> 
+	 * already holds a value, it is overwritten, regardless of its type. Any previous time 
+	 * to live associated with the key is discarded on successful <code>SET</code> operation.</p>
+	 * @return true, always.
+	 */
+	public boolean set(String key, Number value);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/setbit">http://redis.io/commands/setbit</a>:</p>
