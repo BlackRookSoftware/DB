@@ -16,14 +16,7 @@ import com.blackrook.commons.hash.HashMap;
 import com.blackrook.commons.list.List;
 import com.blackrook.db.hints.DBIgnore;
 import com.blackrook.nosql.redis.commands.RedisConnectionCommands;
-import com.blackrook.nosql.redis.commands.RedisGenericCommands;
-import com.blackrook.nosql.redis.commands.RedisHashCommands;
 import com.blackrook.nosql.redis.commands.RedisHyperlogCommands;
-import com.blackrook.nosql.redis.commands.RedisListCommands;
-import com.blackrook.nosql.redis.commands.RedisScriptingCommands;
-import com.blackrook.nosql.redis.commands.RedisSetCommands;
-import com.blackrook.nosql.redis.commands.RedisSortedSetCommands;
-import com.blackrook.nosql.redis.commands.RedisStringCommands;
 import com.blackrook.nosql.redis.data.RedisCursor;
 import com.blackrook.nosql.redis.data.RedisObject;
 import com.blackrook.nosql.redis.enums.Aggregation;
@@ -36,10 +29,7 @@ import com.blackrook.nosql.redis.exception.RedisException;
  * A single connection to a Redis server.
  * @author Matthew Tropiano
  */
-public class RedisConnection extends RedisConnectionAbstract implements 
-	RedisConnectionCommands, RedisGenericCommands, RedisStringCommands, RedisHashCommands,
-	RedisHyperlogCommands, RedisListCommands, RedisScriptingCommands, RedisSetCommands,
-	RedisSortedSetCommands
+public class RedisConnection extends RedisConnectionAbstract implements RedisConnectionCommands, RedisHyperlogCommands
 {
 	/**
 	 * Creates an open connection to localhost, port 6379, the default Redis port.
@@ -114,19 +104,8 @@ public class RedisConnection extends RedisConnectionAbstract implements
 	{
 		writer.writeArray("QUIT");
 		reader.readOK();
-		try {
-			close();
-		} catch (IOException e) {
-			throw new RedisException(e);
-		}
+		disconnect();
 		return true;
-	}
-
-	@Override
-	public boolean select(long db)
-	{
-		writer.writeArray("SELECT", db);
-		return reader.readOK();
 	}
 
 	@Override

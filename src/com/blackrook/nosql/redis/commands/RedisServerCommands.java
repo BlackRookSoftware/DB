@@ -335,7 +335,29 @@ public interface RedisServerCommands
 	 * <p><strong>Available since 2.2.12.</strong></p>
 	 * <p>This command is used in order to read and reset the Redis slow queries log.</p>
 	 */
-	public void slowlog(String subcommand, String argument);
+	public RedisObject slowlog(String subcommand, String argument);
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/slowlog">http://redis.io/commands/slowlog</a>:</p>
+	 * <p><strong>Available since 2.2.12.</strong></p>
+	 * <p>This command is used in order to read and reset the Redis slow queries log.</p>
+	 * @param recentCount the amount of recent entries to view.
+	 */
+	public RedisObject slowlogGet(long recentCount);
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/slowlog">http://redis.io/commands/slowlog</a>:</p>
+	 * <p><strong>Available since 2.2.12.</strong></p>
+	 * <p>Gets just the length of the slow log.</p>
+	 */
+	public RedisObject slowlogLen();
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/slowlog">http://redis.io/commands/slowlog</a>:</p>
+	 * <p><strong>Available since 2.2.12.</strong></p>
+	 * <p>Resets the slow log. Once deleted the information is lost forever.</p>
+	 */
+	public RedisObject slowlogReset();
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/time">http://redis.io/commands/time</a>:</p>

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import com.blackrook.commons.Common;
 import com.blackrook.nosql.redis.exception.RedisException;
 import com.blackrook.nosql.redis.io.RESPReader;
 import com.blackrook.nosql.redis.io.RESPWriter;
@@ -103,6 +104,20 @@ public class RedisConnectionAbstract implements Closeable
 			writer.writeArray("AUTH", info.getPassword());
 			reader.readString();
 		}
+		
+		writer.writeArray("SELECT", info.getDB());
+		reader.readOK();
+	}
+	
+	protected void disconnect()
+	{
+		if (socket == null)
+			return;
+		
+		Common.close(socket);
+		this.reader = null;
+		this.writer = null;
+		this.socket = null;
 	}
 	
 	/**
@@ -133,15 +148,9 @@ public class RedisConnectionAbstract implements Closeable
 	}
 	
 	@Override
-	public void close() throws IOException
+	public void close()
 	{
-		if (socket == null)
-			return;
-		
-		socket.close();
-		this.reader = null;
-		this.writer = null;
-		this.socket = null;
+		disconnect();
 	}
 	
 	@Override

@@ -185,6 +185,9 @@ public class RedisServerConnection extends RedisConnectionAbstract implements Re
 		try {
 			while ((line = br.readLine()) != null)
 			{
+				line = line.trim();
+				if (line.length() == 0 || line.startsWith("#"))
+					continue;
 				int cidx = line.indexOf(':');
 				out.put(line.substring(0, cidx), line.substring(cidx + 1));
 			}
@@ -333,9 +336,31 @@ public class RedisServerConnection extends RedisConnectionAbstract implements Re
 	}
 
 	@Override
-	public void slowlog(String subcommand, String argument)
+	public RedisObject slowlog(String subcommand, String argument)
 	{
-		// TODO Auto-generated method stub
+		if (argument != null)
+			writer.writeArray("SLOWLOG", subcommand, argument);
+		else
+			writer.writeArray("SLOWLOG", subcommand);
+		return reader.readObject();
+	}
+
+	@Override
+	public RedisObject slowlogGet(long recentCount)
+	{
+		return slowlog("GET", String.valueOf(recentCount));
+	}
+
+	@Override
+	public RedisObject slowlogLen()
+	{
+		return slowlog("LEN", null);
+	}
+
+	@Override
+	public RedisObject slowlogReset()
+	{
+		return slowlog("RESET", null);
 	}
 
 	@Override
