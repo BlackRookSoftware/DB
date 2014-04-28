@@ -16,11 +16,16 @@ pooling, two of the most tedious things to do with SQL databases. Queried rows
 can be returned as specialized maps or POJOs with their values set via 
 reflection.
 
+This also contains support for some popular NoSQL servers. 
+
 ### Library
 
 Contained in this release is a series of classes used for database querying, 
 SQL database connection pooling, and other SQL-related tasks. The javadocs 
 contain basic outlines of each package's contents plus class documentation.
+
+This also contains a Redis client for interfacing with the Key-Value store,
+[http:/redis.io/](Redis).
 
 ### Other
 

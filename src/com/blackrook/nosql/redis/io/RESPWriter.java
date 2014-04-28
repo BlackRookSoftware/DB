@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.math.BigDecimal;
 import java.util.Iterator;
 
@@ -36,6 +37,15 @@ public class RESPWriter implements Closeable
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	/**
+	 * Opens a RedisWriter attached to a writer. 
+	 * @param out the {@link Writer} to use.
+	 */
+	public RESPWriter(Writer out)
+	{
+		this.out = new PrintWriter(out, false);
 	}
 
 	@Override
@@ -182,6 +192,16 @@ public class RESPWriter implements Closeable
 		writeArray(cmd);
 	}
 
+	/**
+	 * Writes raw content into this writer and flushes it.
+	 * @param rawcontent the content to send.
+	 */
+	public void writeRaw(String rawcontent)
+	{
+		out.write(rawcontent);
+		out.flush();
+	}
+	
 	/**
 	 * Writes a null object.
 	 */

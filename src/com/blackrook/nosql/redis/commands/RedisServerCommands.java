@@ -1,6 +1,7 @@
 package com.blackrook.nosql.redis.commands;
 
 import com.blackrook.nosql.redis.data.RedisObject;
+import com.blackrook.nosql.redis.enums.EncodingType;
 
 /**
  * Interface of Redis server commands.
@@ -214,9 +215,8 @@ public interface RedisServerCommands
 	 * @param the key to inspect.
 	 * @return the kind of internal representation used in order to store the 
 	 * value associated with a key, or null for missing key.
-	 * TODO: Return an enum?
 	 */
-	public String objectEncoding(String key);
+	public EncodingType objectEncoding(String key);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/object">http://redis.io/commands/object</a>:</p>

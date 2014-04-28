@@ -10,6 +10,8 @@ import com.blackrook.commons.hash.HashMap;
 import com.blackrook.commons.list.List;
 import com.blackrook.nosql.redis.commands.RedisServerCommands;
 import com.blackrook.nosql.redis.data.RedisObject;
+import com.blackrook.nosql.redis.enums.EncodingType;
+import com.blackrook.nosql.redis.enums.ReturnType;
 import com.blackrook.nosql.redis.exception.RedisException;
 import com.blackrook.nosql.redis.exception.RedisParseException;
 
@@ -75,84 +77,84 @@ public class RedisServerConnection extends RedisConnectionAbstract implements Re
 	public boolean bgrewriteaof()
 	{
 		writer.writeArray("BGREWRITEAOF");
-		return reader.readOK();
+		return ReturnType.OK.readFrom(reader);
 	}
 
 	@Override
 	public boolean bgsave()
 	{
 		writer.writeArray("BGSAVE");
-		return reader.readOK();
+		return ReturnType.OK.readFrom(reader);
 	}
 
 	@Override
 	public boolean clientKill(String ip, int port)
 	{
 		writer.writeArray("CLIENT", "KILL", ip+":"+port);
-		return reader.readOK();
+		return ReturnType.OK.readFrom(reader);
 	}
 
 	@Override
 	public String[] clientList()
 	{
 		writer.writeArray("CLIENT", "LIST");
-		return reader.readArray();
+		return ReturnType.ARRAY.readFrom(reader);
 	}
 
 	@Override
 	public boolean clientPause(long millis)
 	{
 		writer.writeArray("CLIENT", "PAUSE", millis);
-		return reader.readOK();
+		return ReturnType.OK.readFrom(reader);
 	}
 
 	@Override
 	public String configGet(String configKey)
 	{
 		writer.writeArray("CONFIG", "GET", configKey);
-		return reader.readString();
+		return ReturnType.STRING.readFrom(reader);
 	}
 
 	@Override
 	public boolean configRewrite()
 	{
 		writer.writeArray("CONFIG", "REWRITE");
-		return reader.readOK();
+		return ReturnType.OK.readFrom(reader);
 	}
 
 	@Override
 	public boolean configSet(String parameter, String value)
 	{
 		writer.writeArray("CONFIG", "GET", parameter, value);
-		return reader.readOK();
+		return ReturnType.OK.readFrom(reader);
 	}
 
 	@Override
 	public boolean configResetStat()
 	{
 		writer.writeArray("CONFIG", "RESETSTAT");
-		return reader.readOK();
+		return ReturnType.OK.readFrom(reader);
 	}
 
 	@Override
 	public long dbsize()
 	{
 		writer.writeArray("DBSIZE");
-		return reader.readInteger();
+		return ReturnType.INTEGER.readFrom(reader);
 	}
 
 	@Override
 	public boolean flushall()
 	{
 		writer.writeArray("FLUSHALL");
-		return reader.readOK();
+		return ReturnType.OK.readFrom(reader);
 	}
 
 	@Override
 	public boolean flushdb()
 	{
 		writer.writeArray("FLUSHDB");
-		return reader.readOK();
+		return ReturnType.OK.readFrom(reader);
 	}
 
 	@Override
@@ -168,7 +170,7 @@ public class RedisServerConnection extends RedisConnectionAbstract implements Re
 			writer.writeArray("INFO", section);
 		else
 			writer.writeArray("INFO");
-		return reader.readString();
+		return ReturnType.STRING.readFrom(reader);
 	}
 
 	public HashMap<String, String> infoMap()
@@ -204,7 +206,7 @@ public class RedisServerConnection extends RedisConnectionAbstract implements Re
 	public long lastsave()
 	{
 		writer.writeArray("LASTSAVE");
-		return reader.readInteger();
+		return ReturnType.INTEGER.readFrom(reader);
 	}
 
 	/**
@@ -244,77 +246,77 @@ public class RedisServerConnection extends RedisConnectionAbstract implements Re
 		if (replace)
 			out.add("REPLACE");
 		writer.writeArray(out);
-		return reader.readOK();
+		return ReturnType.OK.readFrom(reader);
 	}
 
 	@Override
 	public RedisObject object(String subcommand, String key)
 	{
 		writer.writeArray("OBJECT", subcommand, key);
-		return reader.readObject();
+		return ReturnType.OBJECT.readFrom(reader);
 	}
 
 	@Override
 	public long objectRefcount(String key)
 	{
 		writer.writeArray("OBJECT", "REFCOUNT", key);
-		return reader.readInteger();
+		return ReturnType.INTEGER.readFrom(reader);
 	}
 
 	@Override
-	public String objectEncoding(String key)
+	public EncodingType objectEncoding(String key)
 	{
 		writer.writeArray("OBJECT", "ENCODING", key);
-		return reader.readString();
+		return ReturnType.ENCODING.readFrom(reader);
 	}
 
 	@Override
 	public long objectIdletime(String key)
 	{
 		writer.writeArray("OBJECT", "IDLETIME", key);
-		return reader.readInteger();
+		return ReturnType.INTEGER.readFrom(reader);
 	}
 
 	@Override
 	public RedisObject pubsub(String subcommand, String... arguments)
 	{
 		writer.writeArray(Common.joinArrays(new String[]{"PUBSUB", subcommand}, arguments));
-		return reader.readObject();
+		return ReturnType.OBJECT.readFrom(reader);
 	}
 
 	@Override
 	public String[] pubsubChannels(String pattern)
 	{
 		writer.writeArray("PUBSUB", "CHANNELS", pattern);
-		return reader.readArray();
+		return ReturnType.ARRAY.readFrom(reader);
 	}
 
 	@Override
 	public String[] pubsubNumsub(String... arguments)
 	{
 		writer.writeArray(Common.joinArrays(new String[]{"PUBSUB", "NUMSUB"}, arguments));
-		return reader.readArray();
+		return ReturnType.ARRAY.readFrom(reader);
 	}
 
 	@Override
 	public long pubsubNumpat()
 	{
 		writer.writeArray("PUBSUB", "NUMPAT");
-		return reader.readInteger();
+		return ReturnType.INTEGER.readFrom(reader);
 	}
 
 	@Override
 	public boolean save()
 	{
 		writer.writeArray("SAVE");
-		return reader.readOK();
+		return ReturnType.OK.readFrom(reader);
 	}
 
 	@Override
 	public void shutdown(boolean save)
 	{
 		writer.writeArray("SHUTDOWN", save ? "SAVE" : "NOSAVE");
-		RedisObject obj = reader.readObject();
+		RedisObject obj = ReturnType.OBJECT.readFrom(reader);
 		if (obj.isError())
 			throw new RedisException(obj.asString());
 		else
@@ -325,14 +327,14 @@ public class RedisServerConnection extends RedisConnectionAbstract implements Re
 	public boolean slaveof(String host, String port)
 	{
 		writer.writeArray("SLAVEOF", host, port);
-		return reader.readOK();
+		return ReturnType.OK.readFrom(reader);
 	}
 
 	@Override
 	public boolean slaveofNoOne()
 	{
 		writer.writeArray("SLAVEOF", "NO", "ONE");
-		return reader.readOK();
+		return ReturnType.OK.readFrom(reader);
 	}
 
 	@Override
@@ -342,7 +344,7 @@ public class RedisServerConnection extends RedisConnectionAbstract implements Re
 			writer.writeArray("SLOWLOG", subcommand, argument);
 		else
 			writer.writeArray("SLOWLOG", subcommand);
-		return reader.readObject();
+		return ReturnType.OBJECT.readFrom(reader);
 	}
 
 	@Override
@@ -367,7 +369,7 @@ public class RedisServerConnection extends RedisConnectionAbstract implements Re
 	public long[] time()
 	{
 		writer.writeArray("TIME");
-		String[] out = reader.readArray();
+		String[] out = ReturnType.ARRAY.readFrom(reader);
 		return new long[]{Common.parseLong(out[0]), Common.parseLong(out[1])};
 	}
 
