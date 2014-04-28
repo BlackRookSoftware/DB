@@ -578,7 +578,7 @@ public class RedisPipeline implements RedisDeferredCommands
 	public void hmset(String key, String field, String value, String... fieldvalues)
 	{
 		if (fieldvalues.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"HMSET", key, field}, fieldvalues));
+			writer.writeArray(Common.joinArrays(new String[]{"HMSET", key, field, value}, fieldvalues));
 		else
 			writer.writeArray("HMSET", key, field, value);
 		queued++;

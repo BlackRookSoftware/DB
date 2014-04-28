@@ -1,5 +1,11 @@
 Database Utilities (C) Black Rook Software, All rights reserved.
 
+Slated for 2.2.1
+================
+
+- Fixed: RedisConnection and RedisPipeline.hmset(...) would fail due to an 
+  incorrect amount of arguments in a mass insert. Not anymore!
+
 Changed in 2.2.0
 ================
 
