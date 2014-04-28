@@ -24,7 +24,14 @@
 	<property name="project.javadoc.packages" value="
 		com.blackrook.db,
 		com.blackrook.db.hints,
-    	com.blackrook.sql,
+		com.blackrook.nosql.redis,
+		com.blackrook.nosql.redis.commands,
+		com.blackrook.nosql.redis.data,
+		com.blackrook.nosql.redis.enums,
+		com.blackrook.nosql.redis.event,
+		com.blackrook.nosql.redis.exception,
+		com.blackrook.nosql.redis.io,
+		com.blackrook.sql,
 		"
 	/>
 
