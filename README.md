@@ -25,7 +25,7 @@ SQL database connection pooling, and other SQL-related tasks. The javadocs
 contain basic outlines of each package's contents plus class documentation.
 
 This also contains a Redis client for interfacing with the Key-Value store,
-[http:/redis.io/](Redis).
+[Redis](http:/redis.io/).
 
 ### Other
 
