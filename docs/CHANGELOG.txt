@@ -5,6 +5,7 @@ Slated for 2.2.1
 
 - Fixed: RedisConnection and RedisPipeline.hmset(...) would fail due to an 
   incorrect amount of arguments in a mass insert. Not anymore!
+- Changed: RedisPipeline empties its buffer on finish().
 
 Changed in 2.2.0
 ================

@@ -72,6 +72,7 @@ public class RedisPipeline implements RedisDeferredCommands
 			out[i++] = connection.reader.readObject();
 			queued--;
 		}
+		buffer.getBuffer().delete(0, buffer.getBuffer().length());
 		return out;
 	}
 	
