@@ -735,6 +735,18 @@ public interface RedisConnectionCommands
 	public boolean hmset(String key, String field, String value, String... fieldvalues);
 
 	/**
+	 * <p>From <a href="http://redis.io/commands/hmset">http://redis.io/commands/hmset</a>:</p>
+	 * <p><strong>Available since 2.0.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(N) where N is the number of fields being set.</p>
+	 * <p>Sets the specified fields to their respective values in the hash stored 
+	 * at <code>key</code>. This command overwrites any existing fields in the hash. 
+	 * If <code>key</code> does not exist, a new key holding a hash is created.</p>
+	 * @return always true.
+	 * @since 2.2.1
+	 */
+	public boolean hmset(String key, ObjectPair<String, Object>... pairs);
+
+	/**
 	 * <p>From <a href="http://redis.io/commands/hset">http://redis.io/commands/hset</a>:</p>
 	 * <p><strong>Available since 2.0.0.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(1)</p>

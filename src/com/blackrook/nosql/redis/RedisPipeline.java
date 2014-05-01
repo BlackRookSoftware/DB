@@ -585,6 +585,53 @@ public class RedisPipeline implements RedisDeferredCommands
 		queued++;
 	}
 
+	/**
+	 * <p>From <a href="http://redis.io/commands/hmset">http://redis.io/commands/hmset</a>:</p>
+	 * <p><strong>Available since 2.0.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(N) where N is the number of fields being set.</p>
+	 * <p>Sets the specified fields to their respective values in the hash stored 
+	 * at <code>key</code>. This command overwrites any existing fields in the hash. 
+	 * If <code>key</code> does not exist, a new key holding a hash is created.</p>
+	 * <p>Parameters should alternate between field, value, field, value ...</p>
+	 * @since 2.2.1
+	 */
+	public void hmset(String key, Object field, Object value, Object... fieldvalues)
+	{
+		if (fieldvalues.length > 0)
+			writer.writeArray(Common.joinArrays(new Object[]{"HMSET", key, field, value}, fieldvalues));
+		else
+			writer.writeArray("HMSET", key, field, value);
+		queued++;
+	}
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/hmset">http://redis.io/commands/hmset</a>:</p>
+	 * <p><strong>Available since 2.0.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(N) where N is the number of fields being set.</p>
+	 * <p>Sets the specified fields to their respective values in the hash stored 
+	 * at <code>key</code>. This command overwrites any existing fields in the hash. 
+	 * If <code>key</code> does not exist, a new key holding a hash is created.</p>
+	 */
+	public void hmset(String key, ObjectPair<String, Object>... pairs)
+	{
+		if (pairs.length == 0)
+			throw new IllegalArgumentException("This requires more than 0 arguments.");
+		
+		List<Object> out = new List<Object>(1 + (pairs.length * 2));
+		out.add("HMSET");
+		
+		for (ObjectPair<String, Object> p : pairs)
+		{
+			if (p.getValue() != null)
+			{
+				out.add(p.getKey());
+				out.add(String.valueOf(p.getValue()));
+			}
+		}
+		writer.writeArray(out);
+		queued++;
+	}
+
 	@Override
 	public void hset(String key, String field, String value)
 	{
