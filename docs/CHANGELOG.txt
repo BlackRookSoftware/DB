@@ -5,6 +5,7 @@ Slated for 2.2.1
 
 - Fixed: RedisConnection and RedisPipeline.hmset(...) would fail due to an 
   incorrect amount of arguments in a mass insert. Not anymore!
+- Fixed: Redis client now reads blank strings properly.
 - Changed: RedisPipeline empties its buffer on finish().
 - Added: Multiple convenience methods to RedisConnection and RedisPipeline.
 

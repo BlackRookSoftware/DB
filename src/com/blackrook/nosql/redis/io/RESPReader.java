@@ -194,13 +194,21 @@ public class RESPReader
 				
 				if (len == -1)
 					return null;
+				else if (len == 0)
+				{
+					buf = readLine(buffer);
+					if (buf != 0)
+						throw new RedisParseException("Expected blank string.");
+				}
 				else if (len > BULK_STRING_LIMIT)
 					throw new RedisParseException("Server attempted to return bulk reply over MAX allowed.");
-
-				try {
-					buf = readBulk(buffer, len);
-				} catch (IOException e) {
-					throw new RedisParseException("Malformed response; expected "+len+"-byte string, got "+buf, e);
+				else
+				{
+					try {
+						buf = readBulk(buffer, len);
+					} catch (IOException e) {
+						throw new RedisParseException("Malformed response; expected "+len+"-byte string, got "+buf, e);
+					}
 				}
 				
 				resp = new String(buffer.toByteArray(), "UTF-8");
@@ -407,8 +415,10 @@ public class RESPReader
 					if (b == '\r')
 						state = STATE_CR;
 					else
+					{
 						dl.append(b);
-					buf++;
+						buf++;
+					}
 				}
 				break;
 				case STATE_CR:
