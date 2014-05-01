@@ -1037,6 +1037,17 @@ public interface RedisConnectionCommands
 	public long sadd(String key, String member, String... members);
 
 	/**
+	 * <p>From <a href="http://redis.io/commands/sadd">http://redis.io/commands/sadd</a>:</p>
+	 * <p><strong>Available since 1.0.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(N) where N is the number of members to be added.</p>
+	 * <p>Add the specified members to the set stored at <code>key</code>. Specified members 
+	 * that are already a member of this set are ignored. If <code>key</code> does not exist, 
+	 * a new set is created before adding the specified members.</p>
+	 * @since 2.2.1
+	 */
+	public long sadd(String key, Object member, Object... members);
+
+	/**
 	 * <p>From <a href="http://redis.io/commands/scard">http://redis.io/commands/scard</a>:</p>
 	 * <p><strong>Available since 1.0.0.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(1)</p>
@@ -1154,6 +1165,18 @@ public interface RedisConnectionCommands
 	public long srem(String key, String member, String... members);
 
 	/**
+	 * <p>From <a href="http://redis.io/commands/srem">http://redis.io/commands/srem</a>:</p>
+	 * <p><strong>Available since 1.0.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(N) where N is the number of members to be removed.</p>
+	 * <p>Remove the specified members from the set stored at <code>key</code>. Specified 
+	 * members that are not a member of this set are ignored. If <code>key</code> does not 
+	 * exist, it is treated as an empty set and this command returns <code>0</code>.</p>
+	 * @return the number of members that were removed from the set, not including non existing members.
+	 * @since 2.2.1
+	 */
+	public long srem(String key, Object member, Object... members);
+
+	/**
 	 * <p>From <a href="http://redis.io/commands/sunion">http://redis.io/commands/sunion</a>:</p>
 	 * <p><strong>Available since 1.0.0.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(N) where N is the total number of elements in all given sets.</p>
@@ -1187,6 +1210,21 @@ public interface RedisConnectionCommands
 	 * already existing for which the score was updated.
 	 */
 	public long zadd(String key, double score, String member);
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/zadd">http://redis.io/commands/zadd</a>:</p>
+	 * <p><strong>Available since 1.2.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(log(N)) where N is the number of elements in the sorted set.</p>
+	 * <p>Adds all the specified members with the specified scores to the sorted set 
+	 * stored at <code>key</code>. It is possible to specify multiple score/member pairs. 
+	 * If a specified member is already a member of the sorted set, the score is updated 
+	 * and the element reinserted at the right position to ensure the correct ordering. 
+	 * If <code>key</code> does not exist, a new sorted set with the specified members as 
+	 * sole members is created, like if the sorted set was empty. If the key exists but 
+	 * does not hold a sorted set, an error is returned.</p>
+	 * @since 2.2.1
+	 */
+	public long zadd(String key, double score, Number member);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/zadd">http://redis.io/commands/zadd</a>:</p>

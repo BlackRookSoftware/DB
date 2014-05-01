@@ -890,6 +890,24 @@ public class RedisPipeline implements RedisDeferredCommands
 		queued++;
 	}
 
+	/**
+	 * <p>From <a href="http://redis.io/commands/sadd">http://redis.io/commands/sadd</a>:</p>
+	 * <p><strong>Available since 1.0.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(N) where N is the number of members to be added.</p>
+	 * <p>Add the specified members to the set stored at <code>key</code>. Specified members 
+	 * that are already a member of this set are ignored. If <code>key</code> does not exist, 
+	 * a new set is created before adding the specified members.</p>
+	 * @since 2.2.1
+	 */
+	public void sadd(String key, Object member, Object... members)
+	{
+		if (members.length > 0)
+			writer.writeArray(Common.joinArrays(new Object[]{"SADD", key, member}, members));
+		else
+			writer.writeArray("SADD", key, member);
+		queued++;
+	}
+
 	@Override
 	public void scard(String key)
 	{
@@ -990,6 +1008,16 @@ public class RedisPipeline implements RedisDeferredCommands
 	}
 
 	@Override
+	public void srem(String key, Object member, Object... members)
+	{
+		if (members.length > 0)
+			writer.writeArray(Common.joinArrays(new Object[]{"SREM", key, member}, members));
+		else
+			writer.writeArray("SREM", key, member);
+		queued++;
+	}
+
+	@Override
 	public void sunion(String key, String... keys)
 	{
 		if (keys.length > 0)
@@ -1011,6 +1039,13 @@ public class RedisPipeline implements RedisDeferredCommands
 
 	@Override
 	public void zadd(String key, double score, String member)
+	{
+		writer.writeArray("ZADD", score, member);
+		queued++;
+	}
+
+	@Override
+	public void zadd(String key, double score, Number member)
 	{
 		writer.writeArray("ZADD", score, member);
 		queued++;

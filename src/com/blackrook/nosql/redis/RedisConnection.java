@@ -1292,6 +1292,16 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	}
 
 	@Override
+	public long sadd(String key, Object member, Object... members)
+	{
+		if (members.length > 0)
+			writer.writeArray(Common.joinArrays(new Object[]{"SADD", key, member}, members));
+		else
+			writer.writeArray("SADD", key, member);
+		return ReturnType.INTEGER.readFrom(reader);
+	}
+
+	@Override
 	public long scard(String key)
 	{
 		writer.writeArray("SCARD", key);
@@ -1400,6 +1410,16 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	}
 
 	@Override
+	public long srem(String key, Object member, Object... members)
+	{
+		if (members.length > 0)
+			writer.writeArray(Common.joinArrays(new Object[]{"SREM", key, member}, members));
+		else
+			writer.writeArray("SREM", key, member);
+		return ReturnType.INTEGER.readFrom(reader);
+	}
+
+	@Override
 	public String[] sunion(String key, String... keys)
 	{
 		if (keys.length > 0)
@@ -1459,6 +1479,13 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 
 	@Override
 	public long zadd(String key, double score, String member)
+	{
+		writer.writeArray("ZADD", score, member);
+		return ReturnType.INTEGER.readFrom(reader);
+	}
+
+	@Override
+	public long zadd(String key, double score, Number member)
 	{
 		writer.writeArray("ZADD", score, member);
 		return ReturnType.INTEGER.readFrom(reader);
