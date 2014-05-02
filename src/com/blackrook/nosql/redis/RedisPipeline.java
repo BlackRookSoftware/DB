@@ -1165,10 +1165,27 @@ public class RedisPipeline implements RedisDeferredCommands
 	}
 
 	@Override
+	public void zrank(String key, Number member)
+	{
+		writer.writeArray("ZRANK", key, member);
+		queued++;
+	}
+
+	@Override
 	public void zrem(String key, String member, String... members)
 	{
 		if (members.length > 0)
 			writer.writeArray(Common.joinArrays(new String[]{"ZREM", key, member}, members));
+		else
+			writer.writeArray("ZREM", key, member);
+		queued++;
+	}
+
+	@Override
+	public void zrem(String key, Number member, Number... members)
+	{
+		if (members.length > 0)
+			writer.writeArray(Common.joinArrays(new Object[]{"ZREM", key, member}, members));
 		else
 			writer.writeArray("ZREM", key, member);
 		queued++;

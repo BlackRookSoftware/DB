@@ -1291,6 +1291,20 @@ public interface RedisDeferredCommands
 	public void zrank(String key, String member);
 
 	/**
+	 * <p>From <a href="http://redis.io/commands/zrank">http://redis.io/commands/zrank</a>:</p>
+	 * <p><strong>Available since 2.0.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(log(N))</p>
+	 * <p>Returns the rank of <code>member</code> in the sorted set stored at <code>key</code>,
+	 * with the scores ordered from low to high. The rank (or index) is 0-based, which
+	 * means that the member with the lowest score has rank <code>0</code>.</p>
+	 * 
+	 * If <code>member</code> does not exist in the sorted set or <code>key</code> 
+	 * does not exist, <code>null</code>.
+	 * @since 2.2.2
+	 */
+	public void zrank(String key, Number member);
+
+	/**
 	 * <p>From <a href="http://redis.io/commands/zrem">http://redis.io/commands/zrem</a>:</p>
 	 * <p><strong>Available since 1.2.0.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(M*log(N)) with N being the number of 
@@ -1300,6 +1314,17 @@ public interface RedisDeferredCommands
 	 * 
 	 */
 	public void zrem(String key, String member, String... members);
+
+	/**
+	 * <p>From <a href="http://redis.io/commands/zrem">http://redis.io/commands/zrem</a>:</p>
+	 * <p><strong>Available since 1.2.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(M*log(N)) with N being the number of 
+	 * elements in the sorted set and M the number of elements to be removed.</p>
+	 * <p>Removes the specified members from the sorted set stored at <code>key</code>. 
+	 * Non existing members are ignored.</p>
+	 * @since 2.2.2
+	 */
+	public void zrem(String key, Number member, Number... members);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/zremrangebyrank">http://redis.io/commands/zremrangebyrank</a>:</p>
