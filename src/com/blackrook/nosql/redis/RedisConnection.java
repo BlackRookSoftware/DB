@@ -1487,14 +1487,14 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	@Override
 	public long zadd(String key, double score, String member)
 	{
-		writer.writeArray("ZADD", score, member);
+		writer.writeArray("ZADD", key, score, member);
 		return ReturnType.INTEGER.readFrom(reader);
 	}
 
 	@Override
 	public long zadd(String key, double score, Number member)
 	{
-		writer.writeArray("ZADD", score, member);
+		writer.writeArray("ZADD", key, score, member);
 		return ReturnType.INTEGER.readFrom(reader);
 	}
 

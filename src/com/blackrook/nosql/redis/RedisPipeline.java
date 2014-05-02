@@ -1047,14 +1047,14 @@ public class RedisPipeline implements RedisDeferredCommands
 	@Override
 	public void zadd(String key, double score, String member)
 	{
-		writer.writeArray("ZADD", score, member);
+		writer.writeArray("ZADD", key, score, member);
 		queued++;
 	}
 
 	@Override
 	public void zadd(String key, double score, Number member)
 	{
-		writer.writeArray("ZADD", score, member);
+		writer.writeArray("ZADD", key, score, member);
 		queued++;
 	}
 
