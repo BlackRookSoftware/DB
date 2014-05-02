@@ -1,5 +1,14 @@
 Database Utilities (C) Black Rook Software, All rights reserved.
 
+Slated for 2.2.2
+================
+
+- Fixed: Redis EVALSHA now actually calls EVALSHA.
+- Fixed: Redis RPOP now actually calls RPOP.
+- Changed: Redis signature for EVAL and EVALSHA changed to (String, String[], 
+  Object... )
+- Added: Other Redis method signatures for convenience.
+
 Changed in 2.2.1
 ================
 

@@ -777,7 +777,7 @@ public class RedisPipeline implements RedisDeferredCommands
 	@Override
 	public void rpop(String key)
 	{
-		writer.writeArray("LPOP", key);
+		writer.writeArray("RPOP", key);
 		queued++;
 	}
 
@@ -806,16 +806,16 @@ public class RedisPipeline implements RedisDeferredCommands
 	}
 
 	@Override
-	public void eval(String scriptContent, String[] keys, String[] args)
+	public void eval(String scriptContent, String[] keys, Object... args)
 	{
 		writer.writeArray(Common.joinArrays(new Object[]{"EVAL", scriptContent, keys.length}, keys, args));
 		queued++;
 	}
 
 	@Override
-	public void evalsha(String hash, String[] keys, String[] args)
+	public void evalsha(String hash, String[] keys, Object... args)
 	{
-		writer.writeArray(Common.joinArrays(new Object[]{"EVAL", hash, keys.length}, keys, args));
+		writer.writeArray(Common.joinArrays(new Object[]{"EVALSHA", hash, keys.length}, keys, args));
 		queued++;
 	}
 
@@ -957,6 +957,13 @@ public class RedisPipeline implements RedisDeferredCommands
 
 	@Override
 	public void sismember(String key, String member)
+	{
+		writer.writeArray("SISMEMBER", key, member);
+		queued++;
+	}
+
+	@Override
+	public void sismember(String key, Number member)
 	{
 		writer.writeArray("SISMEMBER", key, member);
 		queued++;

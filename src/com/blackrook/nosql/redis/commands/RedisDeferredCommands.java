@@ -1048,6 +1048,15 @@ public interface RedisDeferredCommands
 	public void sismember(String key, String member);
 
 	/**
+	 * <p>From <a href="http://redis.io/commands/sismember">http://redis.io/commands/sismember</a>:</p>
+	 * <p><strong>Available since 1.0.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(1)</p>
+	 * <p>Returns if <code>member</code> is a member of the set stored at <code>key</code>.</p>
+	 * @since 2.2.2
+	 */
+	public void sismember(String key, Number member);
+
+	/**
 	 * <p>From <a href="http://redis.io/commands/smembers">http://redis.io/commands/smembers</a>:</p>
 	 * <p><strong>Available since 1.0.0.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(N) where N is the set cardinality.</p>
@@ -1546,7 +1555,7 @@ public interface RedisDeferredCommands
 	 * be used as a hint for Redis as to what keys are touched during the script call.</p>
 	 * 
 	 */
-	public void eval(String scriptContent, String[] keys, String[] args);
+	public void eval(String scriptContent, String[] keys, Object... args);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/evalsha">http://redis.io/commands/evalsha</a>:</p>
@@ -1557,7 +1566,7 @@ public interface RedisDeferredCommands
 	 * The command is otherwise identical to {@link #eval(String, String[], String[])}.</p>
 	 * 
 	 */
-	public void evalsha(String hash, String[] keys, String[] args);
+	public void evalsha(String hash, String[] keys, Object... args);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/script-exists">http://redis.io/commands/script-exists</a>:</p>

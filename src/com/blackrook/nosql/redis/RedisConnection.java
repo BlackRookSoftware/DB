@@ -1160,7 +1160,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	@Override
 	public String rpop(String key)
 	{
-		writer.writeArray("LPOP", key);
+		writer.writeArray("RPOP", key);
 		return ReturnType.STRING.readFrom(reader);
 	}
 
@@ -1207,16 +1207,16 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	}
 
 	@Override
-	public RedisObject eval(String scriptContent, String[] keys, String[] args)
+	public RedisObject eval(String scriptContent, String[] keys, Object... args)
 	{
 		writer.writeArray(Common.joinArrays(new Object[]{"EVAL", scriptContent, keys.length}, keys, args));
 		return ReturnType.OBJECT.readFrom(reader);
 	}
 
 	@Override
-	public RedisObject evalsha(String hash, String[] keys, String[] args)
+	public RedisObject evalsha(String hash, String[] keys, Object... args)
 	{
-		writer.writeArray(Common.joinArrays(new Object[]{"EVAL", hash, keys.length}, keys, args));
+		writer.writeArray(Common.joinArrays(new Object[]{"EVALSHA", hash, keys.length}, keys, args));
 		return ReturnType.OBJECT.readFrom(reader);
 	}
 
@@ -1350,6 +1350,13 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 
 	@Override
 	public boolean sismember(String key, String member)
+	{
+		writer.writeArray("SISMEMBER", key, member);
+		return ReturnType.BOOLEAN.readFrom(reader);
+	}
+
+	@Override
+	public boolean sismember(String key, Number member)
 	{
 		writer.writeArray("SISMEMBER", key, member);
 		return ReturnType.BOOLEAN.readFrom(reader);

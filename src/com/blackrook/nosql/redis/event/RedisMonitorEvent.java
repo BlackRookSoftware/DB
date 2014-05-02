@@ -67,6 +67,7 @@ public final class RedisMonitorEvent
 		
 		StringBuilder sb = new StringBuilder();
 		RedisMonitorEvent out = new RedisMonitorEvent();
+		boolean escape = false;
 		
 		int i = 0;
 		int state = STATE_SECS;
@@ -205,7 +206,17 @@ public final class RedisMonitorEvent
 				
 				case STATE_ARGUMENT:
 				{
-					if (c == '"')
+					if (escape)
+					{
+						escape = false;
+						sb.append(c);
+					}
+					else if (c == '\\')
+					{
+						sb.append(c);
+						escape = true;
+					}
+					else if (c == '"')
 					{
 						args.add(sb.toString());
 						sb.delete(0, sb.length());

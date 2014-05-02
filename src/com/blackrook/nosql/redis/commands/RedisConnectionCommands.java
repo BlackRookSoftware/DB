@@ -1105,6 +1105,16 @@ public interface RedisConnectionCommands
 	public boolean sismember(String key, String member);
 
 	/**
+	 * <p>From <a href="http://redis.io/commands/sismember">http://redis.io/commands/sismember</a>:</p>
+	 * <p><strong>Available since 1.0.0.</strong></p>
+	 * <p><strong>Time complexity:</strong> O(1)</p>
+	 * <p>Returns if <code>member</code> is a member of the set stored at <code>key</code>.</p>
+	 * @return true if the member is in the set, or false if not.
+	 * @since 2.2.2
+	 */
+	public boolean sismember(String key, Number member);
+
+	/**
 	 * <p>From <a href="http://redis.io/commands/smembers">http://redis.io/commands/smembers</a>:</p>
 	 * <p><strong>Available since 1.0.0.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(N) where N is the set cardinality.</p>
@@ -1608,7 +1618,7 @@ public interface RedisConnectionCommands
 	 * be used as a hint for Redis as to what keys are touched during the script call.</p>
 	 * @return the content returned by the script. Can be null.
 	 */
-	public RedisObject eval(String scriptContent, String[] keys, String[] args);
+	public RedisObject eval(String scriptContent, String[] keys, Object... args);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/evalsha">http://redis.io/commands/evalsha</a>:</p>
@@ -1619,7 +1629,7 @@ public interface RedisConnectionCommands
 	 * The command is otherwise identical to {@link #eval(String, String[], String[])}.</p>
 	 * @return the content returned by the script. Can be null.
 	 */
-	public RedisObject evalsha(String hash, String[] keys, String[] args);
+	public RedisObject evalsha(String hash, String[] keys, Object... args);
 
 	/**
 	 * <p>From <a href="http://redis.io/commands/script-exists">http://redis.io/commands/script-exists</a>:</p>
