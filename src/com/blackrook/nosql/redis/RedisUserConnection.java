@@ -77,7 +77,7 @@ public class RedisUserConnection extends RedisConnectionAbstract
 	/**
 	 * Sends a request to a Redis server in the form of a literal command.
 	 * This command is NOT sent verbatim - it is converted to a raw request before send.
-	 * @param arguments the list of arguments to send as a full request.
+	 * @param commandString the command to send as a full request.
 	 * @return a {@link RedisObject} representing the response from the server.
 	 */
 	public RedisObject sendCommandString(String commandString)

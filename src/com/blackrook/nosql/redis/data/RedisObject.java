@@ -70,7 +70,7 @@ public final class RedisObject
 
 	/**
 	 * Creates an object of type ERROR.
-	 * @param value the error message.
+	 * @param message the error message.
 	 */
 	public static RedisObject createError(String message)
 	{
@@ -124,7 +124,7 @@ public final class RedisObject
 
 	/**
 	 * Creates an object of type ARRAY, but with all <code>null</code> elements.
-	 * @param value the length of the array to create. If &lt; 0, this returns {@link #NULL_ARRAY}.
+	 * @param length the length of the array to create. If &lt; 0, this returns {@link #NULL_ARRAY}.
 	 */
 	public static RedisObject createEmptyArray(int length)
 	{

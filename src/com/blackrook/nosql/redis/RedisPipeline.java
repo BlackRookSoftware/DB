@@ -857,7 +857,6 @@ public class RedisPipeline implements RedisDeferredCommands
 	 * <p>Load a script into the scripts cache from the specified file without executing it. After the specified 
 	 * command is loaded into the script cache it will be callable using {@link #evalsha(String, String[], String[])} 
 	 * with the correct SHA1 digest of the script, exactly like after the first successful invocation of {@link #eval(String, String[], String[])}.</p>
-	 * @return the SHA1 digest of the script added into the script cache.
 	 */
 	public void scriptLoad(File content) throws IOException
 	{
@@ -873,7 +872,6 @@ public class RedisPipeline implements RedisDeferredCommands
 	 * script cache it will be callable using {@link #evalsha(String, String[], String[])} 
 	 * with the correct SHA1 digest of the script, exactly like after the first 
 	 * successful invocation of {@link #eval(String, String[], String[])}.</p>
-	 * @return the SHA1 digest of the script added into the script cache.
 	 */
 	public void scriptLoad(InputStream content) throws IOException
 	{

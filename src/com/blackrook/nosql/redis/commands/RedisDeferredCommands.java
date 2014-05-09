@@ -109,12 +109,12 @@ public interface RedisDeferredCommands
 	 * <p>From <a href="http://redis.io/commands/move">http://redis.io/commands/move</a>:</p>
 	 * <p><strong>Available since 1.0.0.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(1)</p>
-	 * <p>Move <code>key</code> from the currently selected database (see {@link RedisStringCommands#select}) 
+	 * <p>Move <code>key</code> from the currently selected database 
 	 * to the specified destination database. When <code>key</code> already exists in the 
 	 * destination database, or it does not exist in the source database, it does nothing.
 	 * It is possible to use <a href="/commands/move">MOVE</a> as a locking primitive because of this.</p>
-	 * @param the key to move.
-	 * @param the target database. 
+	 * @param key the key to move.
+	 * @param db the target database. 
 	 * 
 	 */
 	public void move(String key, long db);
@@ -126,7 +126,7 @@ public interface RedisDeferredCommands
 	 * <p>Remove the existing timeout on <code>key</code>, turning the key 
 	 * from <em>volatile</em> (a key with an expire set) to <em>persistent</em> 
 	 * (a key that will never expire as no timeout is associated).</p>
-	 * @param the key to persist (remove TTL).
+	 * @param key the key to persist (remove TTL).
 	 * 
 	 */
 	public void persist(String key);
@@ -137,7 +137,7 @@ public interface RedisDeferredCommands
 	 * <p><strong>Time complexity:</strong> O(1)</p>
 	 * <p>This command works exactly like {@link #expire} but the time to 
 	 * live of the key is specified in milliseconds instead of seconds.</p>
-	 * @param the key to expire.
+	 * @param key the key to expire.
 	 * @param milliseconds the time-to-live in milliseconds.
 	 * 
 	 */
@@ -150,7 +150,7 @@ public interface RedisDeferredCommands
 	 * <p>PEXPIREAT has the same effect and semantic as {@link #expireat}, but 
 	 * the Unix time at which the key will expire is specified in milliseconds 
 	 * instead of seconds.</p>
-	 * @param the key to expire.
+	 * @param key the key to expire.
 	 * @param timestamp the timestamp in from-Epoch milliseconds.
 	 * 
 	 */
@@ -163,7 +163,7 @@ public interface RedisDeferredCommands
 	 * <p>Like {@link #ttl}, this command returns the remaining time to live 
 	 * of a key that has an expire set, with the sole difference that TTL returns 
 	 * the amount of remaining time in seconds while PTTL returns it in milliseconds.</p>
-	 * @param the key to inspect.
+	 * @param key the key to inspect.
 	 * 
 	 */
 	public void pttl(String key);
@@ -228,7 +228,7 @@ public interface RedisDeferredCommands
 	 * the provided serialized value (obtained via {@link #dump}).</p>
 	 * @param key the key to restore.
 	 * @param ttl the time-to-live in milliseconds.
-	 * @param serializedvalue the serialized value (from a {@link #dump()} call). 
+	 * @param serializedvalue the serialized value (from a {@link #dump} call). 
 	 * 
 	 */
 	public void restore(String key, long ttl, String serializedvalue);
@@ -262,7 +262,7 @@ public interface RedisDeferredCommands
 	 * <p>Returns the remaining time to live of a key that has a timeout. This 
 	 * introspection capability allows a Redis client to check how many seconds 
 	 * a given key will continue to be part of the dataset.</p>
-	 * @param the key to inspect.
+	 * @param key the key to inspect.
 	 * 
 	 */
 	public void ttl(String key);
@@ -387,7 +387,6 @@ public interface RedisDeferredCommands
 	 * string. The complexity is ultimately determined by the returned length, but because 
 	 * creating a substring from an existing string is very cheap, it can be considered 
 	 * O(1) for small strings.</p>
-	 * <p><strong>Warning</strong>: this command was renamed to {@link #getrange(String, String, String)}, 
 	 * it is called <code>SUBSTR</code> in Redis versions <code>&lt;= 2.0</code>.</p>
 	 * 
 	 */
@@ -465,7 +464,7 @@ public interface RedisDeferredCommands
 	 * <p><strong>Available since 1.0.1.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(N) where N is the number of keys to set.</p>
 	 * <p>Sets the given keys to their respective values. <code>MSET</code> replaces existing 
-	 * values with new values, just as regular <a href="/commands/set">SET</a>. See {@link #msetnx(String...)} 
+	 * values with new values, just as regular <a href="/commands/set">SET</a>. See {@link #msetnx} 
 	 * if you don't want to overwrite existing values.</p>
 	 * 
 	 */
@@ -762,7 +761,7 @@ public interface RedisDeferredCommands
 	 * <p><strong>Available since 2.0.0.</strong></p>
 	 * <p><strong>Time complexity:</strong> O(1)</p>
 	 * <p><code>BRPOP</code> is a blocking list pop primitive. It is the blocking 
-	 * version of {@link #rpop()} because it blocks the connection when there are 
+	 * version of {@link #rpop} because it blocks the connection when there are 
 	 * no elements to pop from any of the given lists. An element is popped from 
 	 * the tail of the first list that is non-empty, with the given keys being 
 	 * checked in the order that they are given. A <code>timeout</code> of zero 
@@ -865,7 +864,7 @@ public interface RedisDeferredCommands
 	 * <p><strong>Time complexity:</strong> O(1)</p>
 	 * <p>Inserts <code>value</code> at the head of the list stored at <code>key</code>,
 	 * only if <code>key</code> already exists and holds a list. In contrary to 
-	 * {@link #lpush(String, String...)}, no operation will be performed when 
+	 * {@link #lpush}, no operation will be performed when 
 	 * <code>key</code> does not yet exist.</p>
 	 * 
 	 */
@@ -962,7 +961,7 @@ public interface RedisDeferredCommands
 	 * <p><strong>Time complexity:</strong> O(1)</p>
 	 * <p>Inserts <code>value</code> at the tail of the list stored at <code>key</code>, 
 	 * only if <code>key</code> already exists and holds a list. In contrary to 
-	 * {@link #rpush(String, String...)}, no operation will be performed when 
+	 * {@link #rpush}, no operation will be performed when 
 	 * <code>key</code> does not yet exist.</p>
 	 * 
 	 */
@@ -1587,7 +1586,7 @@ public interface RedisDeferredCommands
 	 * <p><strong>Available since 2.6.0.</strong></p>
 	 * <p><strong>Time complexity:</strong> Depends on the script that is executed.</p>
 	 * <p>Evaluates a script cached on the server side by its SHA1 digest. 
-	 * Scripts are cached on the server side using the {@link #scriptload(String)} command. 
+	 * Scripts are cached on the server side using the {@link #scriptLoad(String)} command. 
 	 * The command is otherwise identical to {@link #eval(String, String[], String[])}.</p>
 	 * 
 	 */

@@ -15,6 +15,7 @@ import java.net.UnknownHostException;
 import com.blackrook.commons.Common;
 import com.blackrook.commons.hash.HashMap;
 import com.blackrook.commons.list.List;
+import com.blackrook.nosql.redis.commands.RedisConnectionCommands;
 import com.blackrook.nosql.redis.commands.RedisServerCommands;
 import com.blackrook.nosql.redis.data.RedisObject;
 import com.blackrook.nosql.redis.enums.EncodingType;
@@ -219,8 +220,8 @@ public class RedisServerConnection extends RedisConnectionAbstract implements Re
 	/**
 	 * <p>From <a href="http://redis.io/commands/migrate">http://redis.io/commands/migrate</a>:</p>
 	 * <p><strong>Available since 2.6.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> This command actually executes a {@link #dump} 
-	 * and {@link #del} in the source instance, and a {@link #restore} in the target 
+	 * <p><strong>Time complexity:</strong> This command actually executes a {@link RedisConnectionCommands#dump} 
+	 * and {@link RedisConnectionCommands#del} in the source instance, and a {@link RedisConnectionCommands#restore} in the target 
 	 * instance. See the pages of these commands for time complexity. Also an O(N) 
 	 * data transfer between the two instances is performed.</p>
 	 * <p>Atomically transfer a key from a source Redis instance to a destination 

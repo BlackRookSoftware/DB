@@ -159,7 +159,7 @@ public class RESPWriter implements Closeable
 	
 	/**
 	 * Writes a full object that represents a Redis request.
-	 * @param strings the series of strings.
+	 * @param object the Redis object to write.
 	 */
 	public void writeObject(RedisObject object)
 	{

@@ -15,6 +15,7 @@ import com.blackrook.commons.Counter;
 import com.blackrook.commons.linkedlist.Queue;
 import com.blackrook.nosql.redis.event.RedisMonitorEvent;
 import com.blackrook.nosql.redis.event.RedisMonitorListener;
+import com.blackrook.nosql.redis.event.RedisSubscriptionListener;
 import com.blackrook.nosql.redis.exception.RedisException;
 
 /**

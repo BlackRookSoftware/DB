@@ -80,7 +80,7 @@ public interface RedisServerCommands
 	 * <p>The <code>CONFIG REWRITE</code> command rewrites the <code>redis.conf</code> 
 	 * file the server was started with, applying the minimal changes needed to make 
 	 * it reflecting the configuration currently used by the server, that may be 
-	 * different compared to the original one because of the use of the {@link #configset(String, String)} command.</p>
+	 * different compared to the original one because of the use of the {@link #configSet} command.</p>
 	 * @return always true.
 	 */
 	public boolean configRewrite();
@@ -161,8 +161,8 @@ public interface RedisServerCommands
 	/**
 	 * <p>From <a href="http://redis.io/commands/migrate">http://redis.io/commands/migrate</a>:</p>
 	 * <p><strong>Available since 2.6.0.</strong></p>
-	 * <p><strong>Time complexity:</strong> This command actually executes a {@link #dump} 
-	 * and {@link #del} in the source instance, and a {@link #restore} in the target 
+	 * <p><strong>Time complexity:</strong> This command actually executes a {@link RedisConnectionCommands#dump} 
+	 * and {@link RedisConnectionCommands#del} in the source instance, and a {@link RedisConnectionCommands#restore} in the target 
 	 * instance. See the pages of these commands for time complexity. Also an O(N) 
 	 * data transfer between the two instances is performed.</p>
 	 * <p>Atomically transfer a key from a source Redis instance to a destination 
@@ -203,7 +203,7 @@ public interface RedisServerCommands
 	 * save space. Your application may also use the information reported by 
 	 * the <code>object</code> command to implement application level key eviction 
 	 * policies when using Redis as a Cache.</p>
-	 * @param the key to count.
+	 * @param key the key to count.
 	 * @return the number of references of the value associated with the 
 	 * specified key. This command is mainly useful for debugging.
 	 */
@@ -219,7 +219,7 @@ public interface RedisServerCommands
 	 * to save space. Your application may also use the information reported 
 	 * by the <code>object</code> command to implement application level key 
 	 * eviction policies when using Redis as a Cache.</p>
-	 * @param the key to inspect.
+	 * @param key the key to inspect.
 	 * @return the kind of internal representation used in order to store the 
 	 * value associated with a key, or null for missing key.
 	 */
@@ -235,7 +235,7 @@ public interface RedisServerCommands
 	 * save space. Your application may also use the information reported by 
 	 * the <code>object</code> command to implement application level key eviction 
 	 * policies when using Redis as a Cache.</p>
-	 * @param the key to inspect.
+	 * @param key the key to inspect.
 	 * @return the number of seconds since the object stored at the specified key 
 	 * is idle (not requested by read or write operations). While the value is 
 	 * returned in seconds the actual resolution of this timer is 10 seconds, 
@@ -306,8 +306,6 @@ public interface RedisServerCommands
 	 * <p>From <a href="http://redis.io/commands/shutdown">http://redis.io/commands/shutdown</a>:</p>
 	 * <p><strong>Available since 1.0.0.</strong></p>
 	 * <p>The command behavior is the following:</p>
-	 * @return <a href="/topics/protocol#simple-string-reply">Simple string reply</a> 
-	 * on error. On success nothing is returned since the server quits and the connection is closed.
 	 */
 	public void shutdown(boolean save);
 

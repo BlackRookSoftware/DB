@@ -9,6 +9,7 @@ Slated for 2.2.2
 - Changed: Redis signature for EVAL and EVALSHA changed to (String, String[], 
   Object... )
 - Added: Other Redis method signatures for convenience.
+- Fixed: Documentation stuff.
 
 Changed in 2.2.1
 ================
