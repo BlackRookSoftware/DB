@@ -1,6 +1,6 @@
 Database Utilities (C) Black Rook Software, All rights reserved.
 
-Slated for 2.2.2
+Changed in 2.2.2
 ================
 
 - Fixed: Redis EVALSHA now actually calls EVALSHA.
