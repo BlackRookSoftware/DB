@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import com.blackrook.commons.linkedlist.Queue;
+import com.blackrook.sql.SQLTransaction.Level;
 
 /**
  * This is a database connection pool class for a bunch of shared, managed connections.
@@ -122,6 +123,20 @@ public class SQLConnectionPool
 	public int getTotalConnectionCount()
 	{
 		return connectionCount;
+	}
+
+	/**
+	 * Generates a transaction for multiple queries in one set.
+	 * This transaction performs all of its queries through one connection.
+	 * The connection is held by this transaction until it is finished via {@link SQLTransaction#finish()}.
+	 * @param transactionLevel the isolation level of the transaction.
+	 * @return a {@link SQLTransaction} object to handle a contiguous transaction.
+	 * @throws InterruptedException	if an interrupt is thrown by the current thread waiting for an available connection. 
+	 * @since 2.3.0
+	 */
+	public SQLTransaction startTransaction(Level transactionLevel) throws InterruptedException
+	{
+		return new SQLTransaction(getAvailableConnection(), transactionLevel);
 	}
 
 	/**
