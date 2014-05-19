@@ -46,9 +46,20 @@ public class RedisConnectionPool
 	 */
 	public RedisConnectionPool(int connections, String host, int port, String password) throws IOException
 	{
+		this(connections, new RedisInfo(host, port, password));
+	}
+	
+	/**
+	 * Creates a connection pool using a connection to a host.
+	 * @param connections the number of connections to open.
+	 * @param info the {@link RedisInfo} object to use to describe DB information.
+	 * @throws IOException if a connection can't be made.
+	 * @throws UnknownHostException if the server host can't be resolved.
+	 * @since 2.3.0
+	 */
+	public RedisConnectionPool(int connections, RedisInfo info) throws IOException
+	{
 		this();
-		info = new RedisInfo(host, port, password);
-		//info.setTimeout(0);
 		for (int i = 0; i < connections; i++)
 			availableConnections.add(new RedisConnection(info));
 	}
