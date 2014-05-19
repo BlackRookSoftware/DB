@@ -25,9 +25,6 @@ public class RedisConnectionPool
 	/** Used connections. */
 	private Hash<RedisConnection> usedConnections;
 	
-	/** Primary info. */
-	private RedisInfo info;
-	
 	// private constructor.
 	private RedisConnectionPool()
 	{
