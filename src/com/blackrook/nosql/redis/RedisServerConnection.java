@@ -133,7 +133,7 @@ public class RedisServerConnection extends RedisConnectionAbstract implements Re
 	@Override
 	public boolean configSet(String parameter, String value)
 	{
-		writer.writeArray("CONFIG", "GET", parameter, value);
+		writer.writeArray("CONFIG", "SET", parameter, value);
 		return ReturnType.OK.readFrom(reader);
 	}
 

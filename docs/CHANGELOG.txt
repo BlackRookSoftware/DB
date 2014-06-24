@@ -3,7 +3,8 @@ Database Utilities (C) Black Rook Software, All rights reserved.
 Slated for 2.3.0
 ================
 
-- Added: Transaction encapsulation.
+- Added: SQL Transaction encapsulation.
+- Fixed: RedisServerConnection submitted the wrong command for configSet(...).
 
 Changed in 2.2.2
 ================
