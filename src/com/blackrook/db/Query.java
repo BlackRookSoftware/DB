@@ -25,5 +25,6 @@ public final class Query
 	public static SelectQuery select(ColumnDescriptor ... columns)
 	{
 		return new SelectQuery(false, false).addColumns(columns);
-}
+	}
+	
 }

@@ -14,14 +14,16 @@ import java.lang.annotation.Target;
 
 /**
  * Placing this annotation on public fields or getter/setter methods on POJOs
- * hints at this field being a primary key of a record of some kind.
- * Primary keys are always unique and indexed.
- * The convention is: Not included in INSERT, used on DELETE and UPDATE. 
+ * hints at this field being indexed in some way. 
  * @author Matthew Tropiano
+ * @since 2.3.0
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})
-public @interface DBPrimaryKey
+public @interface DBIndexed
 {
-
+	/**
+	 * If true, the order of this key matters in some way.
+	 */
+	boolean ordered() default true;
 }

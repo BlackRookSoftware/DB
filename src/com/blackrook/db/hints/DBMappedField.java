@@ -14,14 +14,28 @@ import java.lang.annotation.Target;
 
 /**
  * Placing this annotation on public fields or getter/setter methods on POJOs
- * hints at this field being a primary key of a record of some kind.
- * Primary keys are always unique and indexed.
- * The convention is: Not included in INSERT, used on DELETE and UPDATE. 
+ * hints that this field is mapped to a different collection's field in some way.
  * @author Matthew Tropiano
+ * @since 2.3.0
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})
-public @interface DBPrimaryKey
+public @interface DBMappedField
 {
-
+	/**
+	 * The field on this object that serves as the source key.
+	 */
+	String key() default "";
+	
+	/**
+	 * The destination table in which to look up the matching key value.
+	 */
+	String table() default "";
+	
+	/**
+	 * The destination table key to match the value of the source key to.
+	 * If not specified, this uses the source key name.
+	 */
+	String tableKey() default "";
+	
 }

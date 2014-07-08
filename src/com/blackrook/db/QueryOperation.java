@@ -31,17 +31,17 @@ public enum QueryOperation
 	private QueryOperation()
 	{
 		this(0);
-}
+	}
 	
 	private QueryOperation(int operandCount)
 	{
 		this.operandCount = operandCount; 
-}
+	}
 	
 	/** Operand count. */
 	public int getOperandCount()
 	{
 		return operandCount;
-}
+	}
 	
 }

@@ -52,7 +52,7 @@ public final class SelectQuery
 		this.groupClauses = null;
 		this.unionClauses = null;
 		this.limitClause = null;
-}
+	}
 	
 	/**
 	 * Adds a set of columns to select to select from.
@@ -73,7 +73,7 @@ public final class SelectQuery
 		for (ColumnDescriptor t : columns)
 			columnList.add(t);
 		return this;
-}
+	}
 	
 	/**
 	 * Adds tables to select from.
@@ -92,7 +92,7 @@ public final class SelectQuery
 		for (TableDescriptor t : tables)
 			fromTables.add(t);
 		return this;
-}
+	}
 	
 	/**
 	 * Adds conditional clauses to this query.
@@ -110,7 +110,7 @@ public final class SelectQuery
 		for (CriteriaClause t : criteria)
 			whereClauses.add(t);
 		return this;
-}
+	}
 	
 	/**
 	 * Adds conditional clauses to this query.
@@ -129,7 +129,7 @@ public final class SelectQuery
 		for (GroupDescriptor t : groups)
 			groupClauses.add(t);
 		return this;
-}
+	}
 	
 	/**
 	 * Adds conditional clauses to this query, after grouping.
@@ -147,7 +147,7 @@ public final class SelectQuery
 		for (CriteriaClause t : criteria)
 			havingClauses.add(t);
 		return this;
-}
+	}
 	
 	/**
 	 * Adds ordering clauses to this query.
@@ -167,7 +167,7 @@ public final class SelectQuery
 		for (OrderClause t : ordering)
 			orderClauses.add(t);
 		return this;
-}
+	}
 	
 	/**
 	 * Adds a UNION with another query.
@@ -180,7 +180,7 @@ public final class SelectQuery
 		if (unionClauses == null) unionClauses = new List<UnionClause>(2);
 		unionClauses.add(new UnionClause(false, query));
 		return this;
-}
+	}
 	
 	/**
 	 * Adds a UNION ALL with another query.
@@ -193,7 +193,7 @@ public final class SelectQuery
 		if (unionClauses == null) unionClauses = new List<UnionClause>(2);
 		unionClauses.add(new UnionClause(true, query));
 		return this;
-}
+	}
 	
 	/**
 	 * Sets a limit on the amount of rows returned from this query.
@@ -204,7 +204,7 @@ public final class SelectQuery
 	public SelectQuery limit(int count)
 	{
 		return limit(count, 0);
-}
+	}
 	
 	/**
 	 * Sets a limit on the amount of rows returned from this query, plus offset.
@@ -217,7 +217,7 @@ public final class SelectQuery
 	{
 		limitClause = new LimitClause(count, offset);
 		return this;
-}
+	}
 	
 	/**
 	 * Is this a DISTINCT query?
@@ -226,7 +226,7 @@ public final class SelectQuery
 	public boolean isDistinct()
 	{
 		return distinct;
-}
+	}
 
 	/**
 	 * Is this an EXPLAIN SELECT query?
@@ -235,7 +235,7 @@ public final class SelectQuery
 	public boolean isExplained()
 	{
 		return explained;
-}
+	}
 
 	/**
 	 * Returns the list of columns to return.
@@ -244,7 +244,7 @@ public final class SelectQuery
 	public List<ColumnDescriptor> getColumnList()
 	{
 		return columnList;
-}
+	}
 
 	/**
 	 * Returns the list of tables to pull from.
@@ -253,7 +253,7 @@ public final class SelectQuery
 	public List<TableDescriptor> getFromTables()
 	{
 		return fromTables;
-}
+	}
 
 	/**
 	 * Returns the list of where clauses.
@@ -262,7 +262,7 @@ public final class SelectQuery
 	public List<CriteriaClause> getWhereClauses()
 	{
 		return whereClauses;
-}
+	}
 
 	/**
 	 * Returns the list of grouping clauses.
@@ -271,7 +271,7 @@ public final class SelectQuery
 	public List<GroupDescriptor> getGroupClauses()
 	{
 		return groupClauses;
-}
+	}
 
 	/**
 	 * Returns the list of having clauses.
@@ -280,7 +280,7 @@ public final class SelectQuery
 	public List<CriteriaClause> getHavingClauses()
 	{
 		return havingClauses;
-}
+	}
 
 	/**
 	 * Returns the list of ordering clauses.
@@ -289,7 +289,7 @@ public final class SelectQuery
 	public List<OrderClause> getOrderClauses()
 	{
 		return orderClauses;
-}
+	}
 
 	/**
 	 * Returns the list of unions.
@@ -298,7 +298,7 @@ public final class SelectQuery
 	public List<UnionClause> getUnionClauses()
 	{
 		return unionClauses;
-}
+	}
 
 	/**
 	 * Gets the limit clause.
@@ -307,7 +307,7 @@ public final class SelectQuery
 	public LimitClause getLimitClause()
 	{
 		return limitClause;
-}
+	}
 
 	/**
 	 * Returns a new table descriptor.
@@ -316,7 +316,7 @@ public final class SelectQuery
 	public static TableDescriptor table(String name)
 	{
 		return table(name, null);
-}
+	}
 
 	/**
 	 * Returns a new table descriptor.
@@ -326,7 +326,7 @@ public final class SelectQuery
 	public static TableDescriptor table(String name, String alias)
 	{
 		return new TableDescriptor(name, alias);
-}
+	}
 
 	/**
 	 * Returns a new column descriptor.
@@ -335,7 +335,7 @@ public final class SelectQuery
 	public static ColumnDescriptor column(String name)
 	{
 		return new ColumnDescriptor(null, name, null);
-}
+	}
 	
 	/**
 	 * Returns a new column descriptor.
@@ -345,7 +345,7 @@ public final class SelectQuery
 	public static ColumnDescriptor column(String table, String name)
 	{
 		return new ColumnDescriptor(table, name, null);
-}
+	}
 	
 	/**
 	 * Returns a new column descriptor with alias.
@@ -355,7 +355,7 @@ public final class SelectQuery
 	public static ColumnDescriptor columnAs(String name, String as)
 	{
 		return new ColumnDescriptor(null, name, as);
-}
+	}
 	
 	/**
 	 * Returns a new column descriptor with alias.
@@ -366,7 +366,7 @@ public final class SelectQuery
 	public static ColumnDescriptor columnAs(String table, String name, String as)
 	{
 		return new ColumnDescriptor(table, name, as);
-}
+	}
 	
 	/**
 	 * Returns a new criteria clause.
@@ -378,7 +378,7 @@ public final class SelectQuery
 	public static CriteriaClause criterion(String name, QueryOperation operation, Object ... operands)
 	{
 		return new CriteriaClause(null, name, operation, operands);
-}
+	}
 	
 	/**
 	 * Returns a new criteria clause.
@@ -391,7 +391,7 @@ public final class SelectQuery
 	public static CriteriaClause criterion(String table, String name, QueryOperation operation, Object ... operands)
 	{
 		return new CriteriaClause(table, name, operation, operands);
-}
+	}
 	
 	/**
 	 * Returns an "identity" clause (1 = 1).
@@ -399,7 +399,7 @@ public final class SelectQuery
 	public static CriteriaClause criterionIdentity()
 	{
 		return new CriteriaClause(null, null, QueryOperation.EQUALS, 1, 1);
-}
+	}
 	
 	/**
 	 * Returns a sorting criteria for ordering clauses, ascending order.
@@ -408,7 +408,7 @@ public final class SelectQuery
 	public static OrderClause sort(String name)
 	{
 		return new OrderClause(null, name, false);
-}
+	}
 
 	/**
 	 * Returns a sorting criteria for ordering clauses.
@@ -418,7 +418,7 @@ public final class SelectQuery
 	public static OrderClause sort(String name, boolean descending)
 	{
 		return new OrderClause(null, name, descending);
-}
+	}
 	
 	/**
 	 * Returns a sorting criteria for ordering clauses, ascending order.
@@ -428,7 +428,7 @@ public final class SelectQuery
 	public static OrderClause sort(String table, String name)
 	{
 		return new OrderClause(table, name, false);
-}
+	}
 	
 	/**
 	 * Returns a sorting criteria for ordering clauses.
@@ -439,7 +439,7 @@ public final class SelectQuery
 	public static OrderClause sort(String table, String name, boolean descending)
 	{
 		return new OrderClause(table, name, descending);
-}
+	}
 	
 	/**
 	 * Returns a new grouping descriptor.
@@ -448,7 +448,7 @@ public final class SelectQuery
 	public static GroupDescriptor group(String name)
 	{
 		return new GroupDescriptor(null, name);
-}
+	}
 	
 	/**
 	 * Returns a new grouping descriptor.
@@ -458,7 +458,7 @@ public final class SelectQuery
 	public static GroupDescriptor group(String table, String name)
 	{
 		return new GroupDescriptor(table, name);
-}
+	}
 	
 	
 	/** 
@@ -478,32 +478,32 @@ public final class SelectQuery
 			this.table = table;
 			this.name = name;
 			this.as = as;
-	}
+		}
 
 		/** Column table. Null for no specific table. */
 		public String getTable()
 		{
 			return table;
-	}
+		}
 		
 		/** Column name. */
 		public String getName()
 		{
 			return name;
-	}
+		}
 		
 		/** Column as. Null for no as. */
 		public String getAlias()
 		{
 			return as;
-	}
+		}
 		
 		@Override
 		public String toString()
 		{
 			return (table != null ? table + "." : "") + name + (as != null ? " AS " + as : "");
+		}
 	}
-}
 	
 	/** 
 	 * Descriptor for a single table in the query.
@@ -519,26 +519,26 @@ public final class SelectQuery
 		{
 			this.name = name;
 			this.alias = alias;
-	}
+		}
 		
 		/** Table name. */
 		public String getName()
 		{
 			return name;
-	}
+		}
 		
 		/** Table as. Null for no as. */
 		public String getAlias()
 		{
 			return alias;
-	}
+		}
 		
 		@Override
 		public String toString()
 		{
 			return name + (alias != null ? " " + alias : "");
+		}
 	}
-}
 	
 	/**
 	 * Query "where" selection clause.
@@ -566,43 +566,43 @@ public final class SelectQuery
 				int targlen = operands.length + (this.name != null ? 1 : 0);
 				if (operation.getOperandCount() != targlen)
 					throw new IllegalArgumentException("Where clause operation needs "+operation.getOperandCount()+" operands; found "+targlen);
-		}
+			}
 			else if (name == null)
 			{
 				throw new IllegalArgumentException("IN LIST where clause requires a name.");
+			}
 		}
-	}
 		
 		/** Column table. Null for no specific table. */
 		public String getTable()
 		{
 			return table;
-	}
+		}
 		
 		/** Column name. Null for an extra operand. */
 		public String getName()
 		{
 			return name;
-	}
+		}
 		
 		/** Get operation */
 		public QueryOperation getOperation()
 		{
 			return operation;
-	}
+		}
 		
 		public Object[] getOperands()
 		{
 			return operands;
-	}
+		}
 		
 		@Override
 		public String toString()
 		{
 			return (name != null ? (table != null ? table + "." : "") + name + " " : "") + operation.name() + " " + Arrays.toString(operands);
-	}
+		}
 
-}
+	}
 	
 	/**
 	 * Query "order" or "sort" selection clause.
@@ -621,32 +621,32 @@ public final class SelectQuery
 			this.table = table;
 			this.name = name;
 			this.descending = descending;
-	}
+		}
 		
 		/** Column table. Null for no specific table. */
 		public String getTable()
 		{
 			return table;
-	}
+		}
 		
 		/** Column name. */
 		public String getName()
 		{
 			return name;
-	}
+		}
 
 		/** Descending? */
 		public boolean isDescending()
 		{
 			return descending;
-	}
+		}
 
 		@Override
 		public String toString()
 		{
 			return (table != null ? table + "." : "") + name + " " + (descending ? "DESC" : "ASC") ;
+		}
 	}
-}
 	
 	/**
 	 * Query "group" column.
@@ -662,26 +662,26 @@ public final class SelectQuery
 		{
 			this.table = table;
 			this.name = name;
-	}
+		}
 		
 		/** Column table. Null for no specific table. */
 		public String getTable()
 		{
 			return table;
-	}
+		}
 		
 		/** Column name. */
 		public String getName()
 		{
 			return name;
-	}
+		}
 		
 		@Override
 		public String toString()
 		{
 			return (table != null ? table + "." : "") + name ;
+		}
 	}
-}
 	
 	/**
 	 * Union clause.
@@ -697,26 +697,26 @@ public final class SelectQuery
 		{
 			this.all = all;
 			this.query = query;
-	}
+		}
 		
 		/** Union is an "ALL" union? */
 		public boolean isAll()
 		{
 			return all;
-	}
+		}
 		
 		/** Gets the query to union with. */
 		public SelectQuery getQuery()
 		{
 			return query;
-	}
+		}
 		
 		@Override
 		public String toString()
 		{
 			return "UNION" + (all ? "ALL" : "");
+		}
 	}
-}
 	
 	/**
 	 * Record limit clause.
@@ -732,27 +732,27 @@ public final class SelectQuery
 		{
 			this.limit = limit;
 			this.offset = offset;
-	}
+		}
 		
 		/** Gets the limit offset.*/
 		public int getLimit()
 		{
 			return limit;
-	}
+		}
 		
 		/** Gets the limit offset. */
 		public int getOffset()
 		{
 			return offset;
-	}
+		}
 		
 		@Override
 		public String toString()
 		{
 			return "LIMIT "+limit+" OFFSET "+offset;
-	}
+		}
 		
-}
+	}
 	
 	
 }

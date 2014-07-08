@@ -5,6 +5,7 @@ Slated for 2.3.0
 
 - Added: SQL Transaction encapsulation.
 - Fixed: RedisServerConnection submitted the wrong command for configSet(...).
+- Added: Additional DB annotation hints.
 
 Changed in 2.2.2
 ================
