@@ -1,6 +1,6 @@
 Database Utilities (C) Black Rook Software, All rights reserved.
 
-Slated for 2.3.0
+Changed in 2.3.0
 ================
 
 - Added: SQL Transaction encapsulation.
