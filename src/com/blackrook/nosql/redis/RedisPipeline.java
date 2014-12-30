@@ -399,6 +399,7 @@ public class RedisPipeline implements RedisDeferredCommands
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void mset(ObjectPair<String, Object>... pairs)
 	{
 		if (pairs.length == 0)
@@ -430,6 +431,7 @@ public class RedisPipeline implements RedisDeferredCommands
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void msetnx(ObjectPair<String, Object>... pairs)
 	{
 		if (pairs.length == 0)
@@ -612,6 +614,7 @@ public class RedisPipeline implements RedisDeferredCommands
 	 * at <code>key</code>. This command overwrites any existing fields in the hash. 
 	 * If <code>key</code> does not exist, a new key holding a hash is created.</p>
 	 */
+	@SuppressWarnings("unchecked")
 	public void hmset(String key, ObjectPair<String, Object>... pairs)
 	{
 		if (pairs.length == 0)
@@ -1057,6 +1060,7 @@ public class RedisPipeline implements RedisDeferredCommands
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void zadd(String key, ObjectPair<Double, String>... pairs)
 	{
 		List<Object> out = new List<Object>(2 + (pairs.length * 2));

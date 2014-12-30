@@ -156,7 +156,7 @@ public class SQLTransaction
 	
 	/**
 	 * Commits the actions completed so far in this transaction.
-	 * This is also called during {@link #finish()}.
+	 * This is also called during {@link #complete()}.
 	 * @throws IllegalStateException if this transaction was already finished.
 	 * @throws RuntimeException if this causes a database error.
 	 */
@@ -174,7 +174,7 @@ public class SQLTransaction
 	/**
 	 * Rolls back this entire transaction.
 	 * @throws IllegalStateException if this transaction was already finished.
-	 * @throws SQLException if this causes a database error.
+	 * @throws RuntimeException if this causes a database error.
 	 */
 	public void rollback()
 	{

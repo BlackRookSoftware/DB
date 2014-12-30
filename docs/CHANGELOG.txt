@@ -1,5 +1,11 @@
 Database Utilities (C) Black Rook Software, All rights reserved.
 
+Changed in 2.3.1
+================
+
+- Changed: Added annotations for various "varargs" methods to reduce potential
+  compiler warnings.
+
 Changed in 2.3.0
 ================
 

@@ -473,6 +473,7 @@ public interface RedisDeferredCommands
 	/**
 	 * Like {@link #mset(String, String, String...)}, but takes key-value pairs.
 	 */
+	@SuppressWarnings("unchecked")
 	public void mset(ObjectPair<String, Object>... pairs);
 
 	/**
@@ -488,6 +489,7 @@ public interface RedisDeferredCommands
 	/** 
 	 * Like {@link #msetnx(String, String, String...)}, but takes key-value pairs.
 	 */
+	@SuppressWarnings("unchecked")
 	public void msetnx(ObjectPair<String, Object>... pairs);
 
 	/**
@@ -1186,6 +1188,7 @@ public interface RedisDeferredCommands
 	 * sole members is created, like if the sorted set was empty. If the key exists but 
 	 * does not hold a sorted set, an error is returned.</p>
 	 */
+	@SuppressWarnings("unchecked")
 	public void zadd(String key, ObjectPair<Double, String>... pairs);
 
 	/**

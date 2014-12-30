@@ -520,6 +520,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public boolean mset(ObjectPair<String, Object>... pairs)
 	{
 		if (pairs.length == 0)
@@ -551,6 +552,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public boolean msetnx(ObjectPair<String, Object>... pairs)
 	{
 		if (pairs.length == 0)
@@ -799,6 +801,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	 * Like {@link #hmset(String, String, String, String...)}, except abstracted as {@link ObjectPair}s of
 	 * key-value pairs.
 	 */
+	@SuppressWarnings("unchecked")
 	public boolean hmset(String key, ObjectPair<String, Object>... pairs)
 	{
 		if (pairs.length == 0)
@@ -1499,6 +1502,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public long zadd(String key, ObjectPair<Double, String>... pairs)
 	{
 		List<Object> out = new List<Object>(2 + (pairs.length * 2));

@@ -518,6 +518,7 @@ public interface RedisConnectionCommands
 	/**
 	 * Like {@link #mset(String, String, String...)}, but takes key-value pairs.
 	 */
+	@SuppressWarnings("unchecked")
 	public boolean mset(ObjectPair<String, Object>... pairs);
 
 	/**
@@ -533,6 +534,7 @@ public interface RedisConnectionCommands
 	/** 
 	 * Like {@link #msetnx(String, String, String...)}, but takes key-value pairs.
 	 */
+	@SuppressWarnings("unchecked")
 	public boolean msetnx(ObjectPair<String, Object>... pairs);
 
 	/**
@@ -743,6 +745,7 @@ public interface RedisConnectionCommands
 	 * @return always true.
 	 * @since 2.2.1
 	 */
+	@SuppressWarnings("unchecked")
 	public boolean hmset(String key, ObjectPair<String, Object>... pairs);
 
 	/**
@@ -1249,6 +1252,7 @@ public interface RedisConnectionCommands
 	 * @return the number of elements added to the sorted sets, not including elements 
 	 * already existing for which the score was updated.
 	 */
+	@SuppressWarnings("unchecked")
 	public long zadd(String key, ObjectPair<Double, String>... pairs);
 
 	/**
