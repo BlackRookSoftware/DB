@@ -1,5 +1,10 @@
 Database Utilities (C) Black Rook Software, All rights reserved.
 
+Changed in 2.4.0
+================
+
+- Added: QueryRenderer interface.
+
 Changed in 2.3.1
 ================
 

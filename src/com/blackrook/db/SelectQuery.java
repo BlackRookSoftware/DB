@@ -12,7 +12,7 @@ import java.util.Arrays;
 import com.blackrook.commons.list.List;
 
 /**
- * An object that represents a simple query, renderable, in some cases, as other-language queries.
+ * An object that represents a simple selection query, renderable, in some cases, as other-language queries.
  * @author Matthew Tropiano
  */
 public final class SelectQuery
