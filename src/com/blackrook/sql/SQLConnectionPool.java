@@ -9,7 +9,10 @@ package com.blackrook.sql;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Iterator;
 
+import com.blackrook.commons.Common;
+import com.blackrook.commons.hash.Hash;
 import com.blackrook.commons.linkedlist.Queue;
 import com.blackrook.sql.SQLTransaction.Level;
 
@@ -23,15 +26,21 @@ import com.blackrook.sql.SQLTransaction.Level;
 public class SQLConnectionPool
 {
 	/** Util reference. */
-	protected SQLConnector utilRef;
+	private SQLConnector utilRef;
 	/** Pool username. */
-	protected String userName;
+	private String userName;
 	/** Pool password. */
-	protected String password;
-	/** List of managed connections. */
-	protected Queue<Connection> connections;
+	private String password;
 	/** Number of total connections. */
-	protected int connectionCount;
+	private int connectionCount;
+
+	/** Connection Mutex */
+	private Object connectionMutex;
+	
+	/** List of managed connections. */
+	private Hash<Connection> usedConnections;
+	/** List of managed connections. */
+	private Queue<Connection> connections;
 	
 	/**
 	 * Creates a new connection pool with a set amount of managed connections.
@@ -46,9 +55,12 @@ public class SQLConnectionPool
 		this.userName = userName;
 		this.password = password;
 		connectionCount = conns;
+		
+		connectionMutex = new Object();
+		
 		connections = new Queue<Connection>();
 		for (int i = 0; i < conns; i++)
-			connections.enqueue(new PoolConnection(connector.getConnection(userName,password)));
+			connections.enqueue(connector.getConnection(userName,password));
 	}
 	
 	/**
@@ -63,17 +75,18 @@ public class SQLConnectionPool
 		connectionCount = conns;
 		connections = new Queue<Connection>();
 		for (int i = 0; i < conns; i++)
-			connections.enqueue(new PoolConnection(util.getConnection()));
+			connections.enqueue(util.getConnection());
 	}
 	
 	/**
 	 * Retrieves an available connection from the pool.
 	 * @throws InterruptedException	if an interrupt is thrown by the current thread waiting for an available connection. 
 	 */
+	@SuppressWarnings("resource")
 	public Connection getAvailableConnection() throws InterruptedException
 	{
 		Connection c = null;
-		synchronized (connections)
+		synchronized (connectionMutex)
 		{
 			while (connections.isEmpty())
 				wait();
@@ -85,9 +98,9 @@ public class SQLConnectionPool
 					if (x.isClosed())
 					{
 						if (userName != null)
-							connections.enqueue(x = new PoolConnection(utilRef.getConnection(userName,password)));
+							connections.enqueue(x = utilRef.getConnection(userName, password));
 						else
-							connections.enqueue(x = new PoolConnection(utilRef.getConnection()));
+							connections.enqueue(x = utilRef.getConnection());
 					}
 					else
 						c = x;
@@ -95,7 +108,7 @@ public class SQLConnectionPool
 					throw new RuntimeException("Could not make connection: "+e.getLocalizedMessage());
 				}
 			}
-			
+			usedConnections.put(c);
 		}
 		
 		return c;
@@ -144,29 +157,35 @@ public class SQLConnectionPool
 	 */
 	public void releaseConnection(Connection c)
 	{
-		synchronized (connections)
+		synchronized (connectionMutex)
 		{
+			usedConnections.remove(c);
 			connections.enqueue(c);
-			connections.notifyAll();
 		}
 	}
 	
 	/**
-	 * PoolConnection class.
+	 * Closes all open connections in the pool.
+	 * @since 2.4.1
 	 */
-	protected class PoolConnection extends SQLConnectionAdapter
-	{		
-		PoolConnection(Connection conn)
+	public void closeAll()
+	{
+		synchronized (connectionMutex)
 		{
-			super(conn);
+			Iterator<Connection> it = usedConnections.iterator(); 
+			
+			while (it.hasNext())
+			{
+				Connection c = it.next();
+				Common.close(c);
+				it.remove();
+			}
+			while (connections.isEmpty())
+			{
+				Common.close(connections.dequeue());
+			}
+			connectionCount = 0;
 		}
-		
-		@Override
-		public void close() throws SQLException
-		{
-			releaseConnection(this);
-		}
-		
 	}
 	
 }

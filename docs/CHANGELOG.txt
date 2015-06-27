@@ -1,5 +1,10 @@
 Database Utilities (C) Black Rook Software, All rights reserved.
 
+Slated for 2.4.1
+================
+
+- Added: SQLConnectionPool.closeAll(). Not sure why it didn't exist.
+
 Changed in 2.4.0
 ================
 
