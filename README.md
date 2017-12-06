@@ -27,6 +27,24 @@ contain basic outlines of each package's contents plus class documentation.
 This also contains a Redis client for interfacing with the Key-Value store,
 [Redis](http:/redis.io/).
 
+### Compiling with Ant
+
+To download the dependencies for this project (if you didn't set that up yourself already), type:
+
+	ant dependencies
+
+A *build.properties* file will be created/appended to with the *dev.base* property set.
+	
+To compile this library with Apache Ant, type:
+
+	ant compile
+
+To make a JAR of this library, type:
+
+	ant jar
+
+And it will be placed in the *build/jar* directory.
+
 ### Other
 
 This program and the accompanying materials
