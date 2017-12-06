@@ -1,5 +1,15 @@
 Database Utilities (C) Black Rook Software, All rights reserved.
 
+Slated for 2.4.0
+================
+
+- Changed: A bunch of changes to the SQLConnectionPool class. Most notably, a 
+  close() function.
+- Changed: Calling close() on a SQLConnectionPool connection will actually close
+- Fixed: SQLConnectionPool.getAvailableConnection() never "wait()"'ed 
+  properly.
+
+
 Changed in 2.3.1
 ================
 
