@@ -1,14 +1,14 @@
 Database Utilities (C) Black Rook Software, All rights reserved.
 
-Slated for 2.4.1
-================
-
-- Added: SQLConnectionPool.closeAll(). Not sure why it didn't exist.
-
-Changed in 2.4.0
+Slated for 2.4.0
 ================
 
 - Added: QueryRenderer interface.
+- Changed: A bunch of changes to the SQLConnectionPool class. Most notably, a 
+  close() function.
+- Changed: Calling close() on a SQLConnectionPool connection will actually close
+- Fixed: SQLConnectionPool.getAvailableConnection() never "wait()"'ed 
+  properly.
 
 Changed in 2.3.1
 ================
@@ -77,4 +77,3 @@ Changed in 2.0.1
 ================
 
 - Fixed: SQLResult gathering ids for created rows fixed.
-

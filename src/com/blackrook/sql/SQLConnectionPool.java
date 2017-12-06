@@ -7,13 +7,13 @@
  ******************************************************************************/
 package com.blackrook.sql;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Iterator;
 
-import com.blackrook.commons.Common;
-import com.blackrook.commons.hash.Hash;
+import java.sql.Connection;
+import java.sql.SQLException;
+
 import com.blackrook.commons.linkedlist.Queue;
+import com.blackrook.commons.hash.Hash;
 import com.blackrook.sql.SQLTransaction.Level;
 
 /**
@@ -26,21 +26,15 @@ import com.blackrook.sql.SQLTransaction.Level;
 public class SQLConnectionPool
 {
 	/** Util reference. */
-	private SQLConnector utilRef;
+	protected SQLConnector connector;
 	/** Pool username. */
-	private String userName;
+	protected String userName;
 	/** Pool password. */
-	private String password;
-	/** Number of total connections. */
-	private int connectionCount;
-
-	/** Connection Mutex */
-	private Object connectionMutex;
-	
+	protected String password;
 	/** List of managed connections. */
-	private Hash<Connection> usedConnections;
-	/** List of managed connections. */
-	private Queue<Connection> connections;
+	protected final Queue<Connection> availableConnections;
+	/** List of used connections. */
+	protected final Hash<Connection> usedConnections;
 	
 	/**
 	 * Creates a new connection pool with a set amount of managed connections.
@@ -51,67 +45,64 @@ public class SQLConnectionPool
 	 */
 	public SQLConnectionPool(SQLConnector connector, int conns, String userName, String password) throws SQLException
 	{
-		utilRef = connector;
+		this.connector = connector;
 		this.userName = userName;
 		this.password = password;
-		connectionCount = conns;
-		
-		connectionMutex = new Object();
-		
-		connections = new Queue<Connection>();
+		this.availableConnections = new Queue<Connection>();
+		this.usedConnections = new Hash<Connection>();
 		for (int i = 0; i < conns; i++)
-			connections.enqueue(connector.getConnection(userName,password));
+			availableConnections.enqueue(connector.getConnection(userName,password));
 	}
 	
 	/**
 	 * Creates a new connection pool with a set amount of managed connections,
 	 * and no credentials (used with databases that require no login).
-	 * @param util		the DB utility library to use.
+	 * @param connector	the connector to use.
 	 * @param conns		the number of connections to pool.
 	 */
-	public SQLConnectionPool(SQLConnector util, int conns) throws SQLException
+	public SQLConnectionPool(SQLConnector connector, int conns) throws SQLException
 	{
-		utilRef = util;
-		connectionCount = conns;
-		connections = new Queue<Connection>();
+		this.connector = connector;
+		this.availableConnections = new Queue<Connection>();
+		this.usedConnections = new Hash<Connection>();
 		for (int i = 0; i < conns; i++)
-			connections.enqueue(util.getConnection());
+			availableConnections.enqueue(connector.getConnection());
 	}
 	
 	/**
 	 * Retrieves an available connection from the pool.
 	 * @throws InterruptedException	if an interrupt is thrown by the current thread waiting for an available connection. 
 	 */
-	@SuppressWarnings("resource")
 	public Connection getAvailableConnection() throws InterruptedException
 	{
-		Connection c = null;
-		synchronized (connectionMutex)
+		Connection out = null;
+		synchronized (availableConnections)
 		{
-			while (connections.isEmpty())
-				wait();
+			while (availableConnections.isEmpty())
+				availableConnections.wait();
 
-			while (c == null)
+			while (out == null)
 			{
 				try{
-					Connection x = connections.dequeue();
+					Connection x = availableConnections.dequeue();
 					if (x.isClosed())
 					{
 						if (userName != null)
-							connections.enqueue(x = utilRef.getConnection(userName, password));
+							availableConnections.enqueue(x = connector.getConnection(userName,password));
 						else
-							connections.enqueue(x = utilRef.getConnection());
+							availableConnections.enqueue(x = connector.getConnection());
 					}
-					else
-						c = x;
+					
+					out = x;
+					usedConnections.put(out);
 				} catch (SQLException e) {
-					throw new RuntimeException("Could not make connection: "+e.getLocalizedMessage());
+					throw new RuntimeException("Could not reopen connection: "+e.getLocalizedMessage());
 				}
 			}
-			usedConnections.put(c);
+			
 		}
 		
-		return c;
+		return out;
 	}
 	
 	/**
@@ -119,7 +110,7 @@ public class SQLConnectionPool
 	 */
 	public int getAvailableConnectionCount()
 	{
-		return connections.size();
+		return availableConnections.size();
 	}
 	
 	/**
@@ -127,7 +118,7 @@ public class SQLConnectionPool
 	 */
 	public int getUsedConnectionCount()
 	{
-		return connectionCount - getAvailableConnectionCount();
+		return usedConnections.size();
 	}
 
 	/**
@@ -135,7 +126,7 @@ public class SQLConnectionPool
 	 */
 	public int getTotalConnectionCount()
 	{
-		return connectionCount;
+		return getAvailableConnectionCount() + getUsedConnectionCount();
 	}
 
 	/**
@@ -154,38 +145,44 @@ public class SQLConnectionPool
 
 	/**
 	 * Releases a connection back to the pool.
+	 * @param c the connection to release.
 	 */
 	public void releaseConnection(Connection c)
 	{
-		synchronized (connectionMutex)
+		if (!usedConnections.contains(c))
+			throw new RuntimeException("Tried to release a connection not maintained by this pool.");
+		
+		synchronized (availableConnections)
 		{
 			usedConnections.remove(c);
-			connections.enqueue(c);
+			availableConnections.enqueue(c);
+			availableConnections.notifyAll();
 		}
 	}
 	
 	/**
 	 * Closes all open connections in the pool.
-	 * @since 2.4.1
 	 */
-	public void closeAll()
+	public void close()
 	{
-		synchronized (connectionMutex)
+		synchronized (availableConnections)
 		{
-			Iterator<Connection> it = usedConnections.iterator(); 
-			
+			Iterator<Connection> it = usedConnections.iterator();
 			while (it.hasNext())
 			{
-				Connection c = it.next();
-				Common.close(c);
+				availableConnections.enqueue(it.next());
 				it.remove();
 			}
-			while (connections.isEmpty())
+			while (!availableConnections.isEmpty())
 			{
-				Common.close(connections.dequeue());
+				try {
+					availableConnections.dequeue().close();
+				} catch (SQLException e) {
+					// Should not be thrown - does not matter anyway.
+				}
 			}
-			connectionCount = 0;
 		}
+		
 	}
 	
 }
