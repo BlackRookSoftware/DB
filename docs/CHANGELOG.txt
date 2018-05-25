@@ -1,6 +1,6 @@
 Database Utilities (C) Black Rook Software, All rights reserved.
 
-Slated for 2.4.0
+Changed in 2.4.0
 ================
 
 - Added: QueryRenderer interface.
@@ -9,6 +9,8 @@ Slated for 2.4.0
 - Changed: Calling close() on a SQLConnectionPool connection will actually close
 - Fixed: SQLConnectionPool.getAvailableConnection() never "wait()"'ed 
   properly.
+- Made a type converter for some DB SQL structures (see DBReflect/DBTypeConverter).
+- Removed some "finalize" deprecations.
 
 Changed in 2.3.1
 ================

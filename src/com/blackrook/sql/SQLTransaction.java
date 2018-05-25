@@ -16,7 +16,7 @@ import com.blackrook.sql.SQLResult;
  * @author Matthew Tropiano
  * @since 2.3.0
  */
-public class SQLTransaction
+public class SQLTransaction implements AutoCloseable
 {
 	/** 
 	 * Enumeration of transaction levels. 
@@ -380,11 +380,10 @@ public class SQLTransaction
 	}
 
 	@Override
-	protected void finalize() throws Throwable
+	public void close()
 	{
 		if (!isFinished())
 			abort();
-		super.finalize();
 	}
 	
 }

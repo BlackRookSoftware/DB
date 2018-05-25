@@ -21,6 +21,7 @@ import com.blackrook.commons.TypeProfile;
 import com.blackrook.commons.TypeProfile.MethodSignature;
 import com.blackrook.commons.hash.HashMap;
 import com.blackrook.commons.list.List;
+import com.blackrook.db.DBReflect;
 import com.blackrook.db.hints.DBIgnore;
 import com.blackrook.nosql.redis.commands.RedisConnectionCommands;
 import com.blackrook.nosql.redis.commands.RedisHyperlogCommands;
@@ -716,13 +717,13 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 			{
 				Field f = profile.getPublicFields().get(k);
 				if (!f.isAnnotationPresent(DBIgnore.class))
-					Reflect.setField(object, k, Reflect.createForType(k, v, f.getType()));
+					Reflect.setField(object, k, DBReflect.createForType(k, v, f.getType()));
 			}
 			else if (profile.getSetterMethods().containsKey(k))
 			{
 				MethodSignature ms = profile.getSetterMethods().get(k);
 				if (!ms.getMethod().isAnnotationPresent(DBIgnore.class))
-					Reflect.invokeBlind(ms.getMethod(), object, Reflect.createForType(k, v, ms.getType()));
+					Reflect.invokeBlind(ms.getMethod(), object, DBReflect.createForType(k, v, ms.getType()));
 			}
 		}
 		

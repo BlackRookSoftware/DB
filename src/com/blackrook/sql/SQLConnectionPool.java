@@ -73,6 +73,7 @@ public class SQLConnectionPool
 	 * Retrieves an available connection from the pool.
 	 * @throws InterruptedException	if an interrupt is thrown by the current thread waiting for an available connection. 
 	 */
+	@SuppressWarnings("resource")
 	public Connection getAvailableConnection() throws InterruptedException
 	{
 		Connection out = null;
