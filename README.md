@@ -6,8 +6,13 @@ Copyright (c) 2013-2014 Black Rook Software. All rights reserved.
 
 ### Required Libraries
 
-Black Rook Commons 2.17.0+  
+Black Rook Commons 2.31.4+  
 [https://github.com/BlackRookSoftware/Common](https://github.com/BlackRookSoftware/Common)
+
+### Required Java Modules
+
+[java.base](https://docs.oracle.com/javase/10/docs/api/java.base-summary.html)  
+[java.sql](https://docs.oracle.com/javase/10/docs/api/java.sql-summary.html)  
 
 ### Introduction
 

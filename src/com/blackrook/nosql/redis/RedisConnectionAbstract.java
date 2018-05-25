@@ -7,7 +7,6 @@
  ******************************************************************************/
 package com.blackrook.nosql.redis;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -21,7 +20,7 @@ import com.blackrook.nosql.redis.io.RESPWriter;
  * A single connection to a Redis server.
  * @author Matthew Tropiano
  */
-public class RedisConnectionAbstract implements Closeable
+public class RedisConnectionAbstract implements AutoCloseable
 {
 	/** The info describing the server to connect to. */
 	private RedisInfo info;
@@ -158,13 +157,6 @@ public class RedisConnectionAbstract implements Closeable
 	public void close()
 	{
 		disconnect();
-	}
-	
-	@Override
-	protected void finalize() throws Throwable
-	{
-		close();
-		super.finalize();
 	}
 	
 }

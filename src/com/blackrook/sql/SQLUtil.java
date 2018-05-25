@@ -22,6 +22,7 @@ import com.blackrook.commons.Reflect;
 import com.blackrook.commons.TypeProfile;
 import com.blackrook.commons.TypeProfile.MethodSignature;
 import com.blackrook.commons.list.List;
+import com.blackrook.db.DBReflect;
 
 /**
  * Core database utilities object.
@@ -263,13 +264,13 @@ public abstract class SQLUtil
 			if ((field = profile.getPublicFields().get(column)) != null)
 			{
 				Class<?> type = field.getType();
-				Reflect.setField(object, column, Reflect.createForType(column, resultSet.getObject(i + 1), type));
+				Reflect.setField(object, column, DBReflect.createForType(column, resultSet.getObject(i + 1), type));
 			}
 			else if ((setter = profile.getSetterMethods().get(column)) != null)
 			{
 				Class<?> type = setter.getType();
 				Method method = setter.getMethod();
-				Reflect.invokeBlind(method, object, Reflect.createForType(column, resultSet.getObject(i + 1), type));
+				Reflect.invokeBlind(method, object, DBReflect.createForType(column, resultSet.getObject(i + 1), type));
 			}			
 		}
 
