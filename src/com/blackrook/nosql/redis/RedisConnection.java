@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013-2014 Black Rook Software
+ * Copyright (c) 2013-2019 Black Rook Software
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser Public License v2.1
  * which accompanies this distribution, and is available at
@@ -14,13 +14,15 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.UnknownHostException;
 
-import com.blackrook.commons.Common;
 import com.blackrook.commons.ObjectPair;
 import com.blackrook.commons.Reflect;
 import com.blackrook.commons.TypeProfile;
 import com.blackrook.commons.TypeProfile.MethodSignature;
 import com.blackrook.commons.hash.HashMap;
 import com.blackrook.commons.list.List;
+import com.blackrook.commons.util.ArrayUtils;
+import com.blackrook.commons.util.IOUtils;
+import com.blackrook.commons.util.ValueUtils;
 import com.blackrook.db.DBReflect;
 import com.blackrook.db.hints.DBIgnore;
 import com.blackrook.nosql.redis.commands.RedisConnectionCommands;
@@ -144,7 +146,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public long del(String key, String... keys)
 	{
 		if (keys.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"DEL", key}, keys));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"DEL", key}, keys));
 		else
 			writer.writeArray("DEL", key);
 		return ReturnType.INTEGER.readFrom(reader);
@@ -375,7 +377,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public long bitop(BitwiseOperation operation, String destkey, String key, String... keys)
 	{
 		if (keys.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"BITOP", operation.name(), destkey, key}, keys));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"BITOP", operation.name(), destkey, key}, keys));
 		else
 			writer.writeArray("BITOP", operation.name(), destkey, key);
 		return ReturnType.INTEGER.readFrom(reader);
@@ -430,7 +432,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public Long getLong(String key)
 	{
 		String out = get(key);
-		return out != null ? Common.parseLong(out) : null;
+		return out != null ? ValueUtils.parseLong(out) : null;
 	}
 
 	@Override
@@ -467,7 +469,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public Long getsetLong(String key, String value)
 	{
 		String out = getset(key, value);
-		return out != null ? Common.parseLong(out) : null;
+		return out != null ? ValueUtils.parseLong(out) : null;
 	}
 
 	/**
@@ -476,7 +478,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public Long getsetLong(String key, Number value)
 	{
 		String out = getset(key, value);
-		return out != null ? Common.parseLong(out) : null;
+		return out != null ? ValueUtils.parseLong(out) : null;
 	}
 
 	@Override
@@ -504,7 +506,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public String[] mget(String key, String... keys)
 	{
 		if (keys.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"MGET", key}, keys));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"MGET", key}, keys));
 		else
 			writer.writeArray("MGET", key);
 		return ReturnType.ARRAY.readFrom(reader);
@@ -514,7 +516,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public boolean mset(String key, String value, String... keyValues)
 	{
 		if (keyValues.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"MSET", key, value}, keyValues));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"MSET", key, value}, keyValues));
 		else
 			writer.writeArray("MSET", key, value);
 		return ReturnType.OK.readFrom(reader);
@@ -546,7 +548,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public boolean msetnx(String key, String value, String... keyValues)
 	{
 		if (keyValues.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"MSETNX", key, value}, keyValues));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"MSETNX", key, value}, keyValues));
 		else
 			writer.writeArray("MSETNX", key, value);
 		return ReturnType.OK.readFrom(reader);
@@ -634,7 +636,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public long hdel(String key, String field, String... fields)
 	{
 		if (fields.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"HDEL", key, field}, fields));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"HDEL", key, field}, fields));
 		else
 			writer.writeArray("HDEL", key, field);
 		return ReturnType.INTEGER.readFrom(reader);
@@ -660,7 +662,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public Long hgetLong(String key, String field)
 	{
 		String out = hget(key, field);
-		return out != null ? Common.parseLong(out) : null;
+		return out != null ? ValueUtils.parseLong(out) : null;
 	}
 
 	@Override
@@ -762,7 +764,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public String[] hmget(String key, String field, String... fields)
 	{
 		if (fields.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"HMGET", key, field}, fields));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"HMGET", key, field}, fields));
 		else
 			writer.writeArray("HMGET", key, field);
 		return ReturnType.ARRAY.readFrom(reader);
@@ -772,7 +774,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public boolean hmset(String key, String field, String value, String... fieldvalues)
 	{
 		if (fieldvalues.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"HMSET", key, field, value}, fieldvalues));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"HMSET", key, field, value}, fieldvalues));
 		else
 			writer.writeArray("HMSET", key, field, value);
 		return ReturnType.OK.readFrom(reader);
@@ -792,7 +794,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public boolean hmset(String key, Object field, Object value, Object... fieldvalues)
 	{
 		if (fieldvalues.length > 0)
-			writer.writeArray(Common.joinArrays(new Object[]{"HMSET", key, field, value}, fieldvalues));
+			writer.writeArray(ArrayUtils.joinArrays(new Object[]{"HMSET", key, field, value}, fieldvalues));
 		else
 			writer.writeArray("HMSET", key, field, value);
 		return ReturnType.OK.readFrom(reader);
@@ -974,7 +976,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public boolean pfadd(String key, String element, String... elements)
 	{
 		if (elements.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"PFADD", key, element}, elements));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"PFADD", key, element}, elements));
 		else
 			writer.writeArray("PFADD", key, element);
 		return ReturnType.BOOLEAN.readFrom(reader);
@@ -984,7 +986,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public long pfcount(String key, String... keys)
 	{
 		if (keys.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"PFCOUNT",key}, keys));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"PFCOUNT",key}, keys));
 		else
 			writer.writeArray("PFCOUNT", key);
 		return ReturnType.INTEGER.readFrom(reader);
@@ -994,7 +996,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public boolean pfmerge(String destkey, String sourcekey, String... sourcekeys)
 	{
 		if (sourcekeys.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"PFMERGE", destkey, sourcekey}, sourcekeys));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"PFMERGE", destkey, sourcekey}, sourcekeys));
 		else
 			writer.writeArray("PFMERGE", destkey, sourcekey);
 		return ReturnType.OK.readFrom(reader);
@@ -1004,7 +1006,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public ObjectPair<String, String> blpop(long timeout, String key, String... keys)
 	{
 		if (keys.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"BLPOP", key}, keys, new Object[]{timeout}));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"BLPOP", key}, keys, new Object[]{timeout}));
 		else
 			writer.writeArray("BLPOP", key, timeout);
 		String[] resp = ReturnType.ARRAY.readFrom(reader);
@@ -1017,18 +1019,18 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public ObjectPair<String, Long> blpopLong(long timeout, String key, String... keys)
 	{
 		if (keys.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"BLPOP", key}, keys, new Object[]{timeout}));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"BLPOP", key}, keys, new Object[]{timeout}));
 		else
 			writer.writeArray("BLPOP", key, timeout);
 		String[] resp = ReturnType.ARRAY.readFrom(reader);
-		return resp != null ? new ObjectPair<String, Long>(resp[0], Common.parseLong(resp[1])) : null;
+		return resp != null ? new ObjectPair<String, Long>(resp[0], ValueUtils.parseLong(resp[1])) : null;
 	}
 
 	@Override
 	public ObjectPair<String, String> brpop(long timeout, String key, String... keys)
 	{
 		if (keys.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"BRPOP", key}, keys, new Object[]{timeout}));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"BRPOP", key}, keys, new Object[]{timeout}));
 		else
 			writer.writeArray("BRPOP", key, timeout);
 		return ReturnType.STRINGPAIR.readFrom(reader);
@@ -1040,11 +1042,11 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public ObjectPair<String, Long> brpopLong(long timeout, String key, String... keys)
 	{
 		if (keys.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"BRPOP", key}, keys, new Object[]{timeout}));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"BRPOP", key}, keys, new Object[]{timeout}));
 		else
 			writer.writeArray("BRPOP", key, timeout);
 		String[] resp = ReturnType.ARRAY.readFrom(reader);
-		return resp != null ? new ObjectPair<String, Long>(resp[0], Common.parseLong(resp[1])) : null;
+		return resp != null ? new ObjectPair<String, Long>(resp[0], ValueUtils.parseLong(resp[1])) : null;
 	}
 
 	@Override
@@ -1060,7 +1062,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public Long brpoplpushLong(long timeout, String source, String destination)
 	{
 		String out = brpoplpush(timeout, source, destination);
-		return out != null ? Common.parseLong(out) : null;
+		return out != null ? ValueUtils.parseLong(out) : null;
 	}
 
 	@Override
@@ -1076,7 +1078,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public Long lindexLong(String key, long index)
 	{
 		String out = lindex(key, index);
-		return out != null ? Common.parseLong(out) : null;
+		return out != null ? ValueUtils.parseLong(out) : null;
 	}
 
 	@Override
@@ -1113,14 +1115,14 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public Long lpopLong(String key)
 	{
 		String out = lpop(key);
-		return out != null ? Common.parseLong(out) : null;
+		return out != null ? ValueUtils.parseLong(out) : null;
 	}
 
 	@Override
 	public long lpush(String key, String value, String... values)
 	{
 		if (values.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"LPUSH", key, value}, values));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"LPUSH", key, value}, values));
 		else
 			writer.writeArray("LPUSH", key, value);
 		return ReturnType.INTEGER.readFrom(reader);
@@ -1174,7 +1176,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public Long rpopLong(String key)
 	{
 		String out = rpop(key);
-		return out != null ? Common.parseLong(out) : null;
+		return out != null ? ValueUtils.parseLong(out) : null;
 	}
 	
 	@Override
@@ -1190,14 +1192,14 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public Long rpoplpushLong(String source, String destination)
 	{
 		String out = rpoplpush(source, destination);
-		return out != null ? Common.parseLong(out) : null;
+		return out != null ? ValueUtils.parseLong(out) : null;
 	}
 
 	@Override
 	public long rpush(String key, String value, String... values)
 	{
 		if (values.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"RPUSH", key, value}, values));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"RPUSH", key, value}, values));
 		else
 			writer.writeArray("RPUSH", key, value);
 		return ReturnType.INTEGER.readFrom(reader);
@@ -1213,14 +1215,14 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	@Override
 	public RedisObject eval(String scriptContent, String[] keys, Object... args)
 	{
-		writer.writeArray(Common.joinArrays(new Object[]{"EVAL", scriptContent, keys.length}, keys, args));
+		writer.writeArray(ArrayUtils.joinArrays(new Object[]{"EVAL", scriptContent, keys.length}, keys, args));
 		return ReturnType.OBJECT.readFrom(reader);
 	}
 
 	@Override
 	public RedisObject evalsha(String hash, String[] keys, Object... args)
 	{
-		writer.writeArray(Common.joinArrays(new Object[]{"EVALSHA", hash, keys.length}, keys, args));
+		writer.writeArray(ArrayUtils.joinArrays(new Object[]{"EVALSHA", hash, keys.length}, keys, args));
 		return ReturnType.OBJECT.readFrom(reader);
 	}
 
@@ -1228,7 +1230,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public boolean[] scriptExists(String scriptHash, String... scriptHashes)
 	{
 		if (scriptHashes.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"SCRIPT", "EXISTS", scriptHash}, scriptHashes));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"SCRIPT", "EXISTS", scriptHash}, scriptHashes));
 		else
 			writer.writeArray("SCRIPT", "EXISTS", scriptHash);
 		return ReturnType.BOOLEANARRAY.readFrom(reader);
@@ -1266,7 +1268,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	 */
 	public String scriptLoad(File content) throws IOException
 	{
-		return scriptLoad(Common.getTextualContents(content));
+		return scriptLoad(IOUtils.getTextualContents(content));
 	}
 
 	/**
@@ -1282,14 +1284,14 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	 */
 	public String scriptLoad(InputStream content) throws IOException
 	{
-		return scriptLoad(Common.getTextualContents(content));
+		return scriptLoad(IOUtils.getTextualContents(content));
 	}
 
 	@Override
 	public long sadd(String key, String member, String... members)
 	{
 		if (members.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"SADD", key, member}, members));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"SADD", key, member}, members));
 		else
 			writer.writeArray("SADD", key, member);
 		return ReturnType.INTEGER.readFrom(reader);
@@ -1299,7 +1301,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public long sadd(String key, Object member, Object... members)
 	{
 		if (members.length > 0)
-			writer.writeArray(Common.joinArrays(new Object[]{"SADD", key, member}, members));
+			writer.writeArray(ArrayUtils.joinArrays(new Object[]{"SADD", key, member}, members));
 		else
 			writer.writeArray("SADD", key, member);
 		return ReturnType.INTEGER.readFrom(reader);
@@ -1316,7 +1318,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public String[] sdiff(String key, String... keys)
 	{
 		if (keys.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"SDIFF", key}, keys));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"SDIFF", key}, keys));
 		else
 			writer.writeArray("SDIFF", key);
 		return ReturnType.ARRAY.readFrom(reader);
@@ -1326,7 +1328,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public long sdiffstore(String destination, String key, String... keys)
 	{
 		if (keys.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"SDIFFSTORE", destination, key}, keys));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"SDIFFSTORE", destination, key}, keys));
 		else
 			writer.writeArray("SDIFFSTORE", destination, key);
 		return ReturnType.INTEGER.readFrom(reader);
@@ -1336,7 +1338,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public String[] sinter(String key, String... keys)
 	{
 		if (keys.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"SINTER", key}, keys));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"SINTER", key}, keys));
 		else
 			writer.writeArray("SINTER", key);
 		return ReturnType.ARRAY.readFrom(reader);
@@ -1346,7 +1348,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public long sinterstore(String destination, String key, String... keys)
 	{
 		if (keys.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"SINTERSTORE", destination, key}, keys));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"SINTERSTORE", destination, key}, keys));
 		else
 			writer.writeArray("SINTERSTORE", destination, key);
 		return ReturnType.INTEGER.readFrom(reader);
@@ -1393,7 +1395,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public Long spopLong(String key)
 	{
 		String out = spop(key);
-		return out != null ? Common.parseLong(out) : null;
+		return out != null ? ValueUtils.parseLong(out) : null;
 	}
 
 	@Override
@@ -1414,7 +1416,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public long srem(String key, String member, String... members)
 	{
 		if (members.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"SREM", key, member}, members));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"SREM", key, member}, members));
 		else
 			writer.writeArray("SREM", key, member);
 		return ReturnType.INTEGER.readFrom(reader);
@@ -1424,7 +1426,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public long srem(String key, Object member, Object... members)
 	{
 		if (members.length > 0)
-			writer.writeArray(Common.joinArrays(new Object[]{"SREM", key, member}, members));
+			writer.writeArray(ArrayUtils.joinArrays(new Object[]{"SREM", key, member}, members));
 		else
 			writer.writeArray("SREM", key, member);
 		return ReturnType.INTEGER.readFrom(reader);
@@ -1434,7 +1436,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public String[] sunion(String key, String... keys)
 	{
 		if (keys.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"SUNION", key}, keys));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"SUNION", key}, keys));
 		else
 			writer.writeArray("SUNION", key);
 		return ReturnType.ARRAY.readFrom(reader);
@@ -1444,7 +1446,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public long sunionstore(String destination, String key, String... keys)
 	{
 		if (keys.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"SUNIONSTORE", destination, key}, keys));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"SUNIONSTORE", destination, key}, keys));
 		else
 			writer.writeArray("SUNIONSTORE", destination, key);
 		return ReturnType.INTEGER.readFrom(reader);
@@ -1620,7 +1622,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public long zrem(String key, String member, String... members)
 	{
 		if (members.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"ZREM", key, member}, members));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"ZREM", key, member}, members));
 		else
 			writer.writeArray("ZREM", key, member);
 		return ReturnType.INTEGER.readFrom(reader);
@@ -1630,7 +1632,7 @@ public class RedisConnection extends RedisConnectionAbstract implements RedisCon
 	public long zrem(String key, Number member, Number... members)
 	{
 		if (members.length > 0)
-			writer.writeArray(Common.joinArrays(new Object[]{"ZREM", key, member}, members));
+			writer.writeArray(ArrayUtils.joinArrays(new Object[]{"ZREM", key, member}, members));
 		else
 			writer.writeArray("ZREM", key, member);
 		return ReturnType.INTEGER.readFrom(reader);

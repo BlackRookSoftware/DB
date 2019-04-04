@@ -1,5 +1,11 @@
 Database Utilities (C) Black Rook Software, All rights reserved.
 
+Changed in 2.5.0
+================
+
+- Cleaned up Common deprecation from Commons version 2.32.0.
+
+
 Changed in 2.4.0
 ================
 

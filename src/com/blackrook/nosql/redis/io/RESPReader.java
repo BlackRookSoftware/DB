@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013-2014 Black Rook Software
+ * Copyright (c) 2013-2019 Black Rook Software
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser Public License v2.1
  * which accompanies this distribution, and is available at
@@ -10,8 +10,8 @@ package com.blackrook.nosql.redis.io;
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.blackrook.commons.Common;
 import com.blackrook.commons.list.DataList;
+import com.blackrook.commons.util.ValueUtils;
 import com.blackrook.nosql.redis.data.RedisObject;
 import com.blackrook.nosql.redis.exception.RedisException;
 import com.blackrook.nosql.redis.exception.RedisParseException;
@@ -149,7 +149,7 @@ public class RESPReader
 				throw new RedisException(resp.substring(1));
 			// is integer
 			else if (resp.startsWith(":"))
-				return Common.parseLong(resp.substring(1));
+				return ValueUtils.parseLong(resp.substring(1));
 			// is null
 			else if (resp.equals("$-1"))
 				return null;
@@ -190,7 +190,7 @@ public class RESPReader
 			else if (resp.startsWith("$"))
 			{
 				String lstr = resp.substring(1);
-				int len = Common.parseInt(lstr);
+				int len = ValueUtils.parseInt(lstr);
 				
 				if (len == -1)
 					return null;
@@ -244,7 +244,7 @@ public class RESPReader
 			// is array
 			else if (resp.startsWith("*"))
 			{
-				int len = Common.parseInt(resp.substring(1));
+				int len = ValueUtils.parseInt(resp.substring(1));
 				if (len == -1)
 					return null;
 
@@ -283,7 +283,7 @@ public class RESPReader
 				return RedisObject.createError(resp.substring(1));
 			// is integer?
 			else if (resp.startsWith(":")) 
-				return RedisObject.create(Common.parseLong(resp.substring(1)));
+				return RedisObject.create(ValueUtils.parseLong(resp.substring(1)));
 			// is simple string?
 			else if (resp.startsWith("+")) 
 				return RedisObject.create(resp.substring(1));
@@ -291,7 +291,7 @@ public class RESPReader
 			else if (resp.startsWith("$"))
 			{
 				String lstr = resp.substring(1);
-				int len = Common.parseInt(lstr);
+				int len = ValueUtils.parseInt(lstr);
 				
 				if (len == -1)
 					return RedisObject.NULL;
@@ -310,7 +310,7 @@ public class RESPReader
 			// is array
 			else if (resp.startsWith("*"))
 			{
-				int len = Common.parseInt(resp.substring(1));
+				int len = ValueUtils.parseInt(resp.substring(1));
 				if (len == -1)
 					return RedisObject.NULL_ARRAY;
 
@@ -351,7 +351,7 @@ public class RESPReader
 			else if (resp.startsWith("$"))
 			{
 				String lstr = resp.substring(1);
-				int len = Common.parseInt(lstr);
+				int len = ValueUtils.parseInt(lstr);
 				
 				if (len == -1)
 					return "$-1" + CRLF;
@@ -370,7 +370,7 @@ public class RESPReader
 			// is array
 			else if (resp.startsWith("*"))
 			{
-				int len = Common.parseInt(resp.substring(1));
+				int len = ValueUtils.parseInt(resp.substring(1));
 				if (len == -1)
 					return "*-1" + CRLF;
 

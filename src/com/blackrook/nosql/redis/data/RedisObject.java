@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013-2014 Black Rook Software
+ * Copyright (c) 2013-2019 Black Rook Software
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser Public License v2.1
  * which accompanies this distribution, and is available at
@@ -10,7 +10,7 @@ package com.blackrook.nosql.redis.data;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
-import com.blackrook.commons.Common;
+import com.blackrook.commons.util.ValueUtils;
 
 /**
  * An object, received or sent to the Redis Server.
@@ -298,7 +298,7 @@ public final class RedisObject
 			case INTEGER:
 				return (Long)value;
 			case STRING:
-				return Common.parseLong((String)value, 0L);
+				return ValueUtils.parseLong((String)value, 0L);
 			case ARRAY:
 			case ERROR:
 			default:
@@ -324,7 +324,7 @@ public final class RedisObject
 			case INTEGER:
 				return ((Long)value).doubleValue();
 			case STRING:
-				return Common.parseDouble((String)value, 0.0);
+				return ValueUtils.parseDouble((String)value, 0.0);
 			case ARRAY:
 			case ERROR:
 			default:

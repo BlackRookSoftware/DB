@@ -1,12 +1,12 @@
 # Black Rook Database Utilities
 
-Copyright (c) 2013-2014 Black Rook Software. All rights reserved.  
+Copyright (c) 2013-2019 Black Rook Software. All rights reserved.  
 [http://blackrooksoftware.com/projects.htm?name=db](http://blackrooksoftware.com/projects.htm?name=db)  
 [https://github.com/BlackRookSoftware/DB](https://github.com/BlackRookSoftware/DB)
 
 ### Required Libraries
 
-Black Rook Commons 2.31.4+  
+Black Rook Commons 2.32.0+  
 [https://github.com/BlackRookSoftware/Common](https://github.com/BlackRookSoftware/Common)
 
 ### Required Java Modules

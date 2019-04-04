@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013-2014 Black Rook Software
+ * Copyright (c) 2013-2019 Black Rook Software
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser Public License v2.1
  * which accompanies this distribution, and is available at
@@ -10,9 +10,9 @@ package com.blackrook.nosql.redis;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
-import com.blackrook.commons.Common;
 import com.blackrook.commons.Counter;
 import com.blackrook.commons.linkedlist.Queue;
+import com.blackrook.commons.util.ThreadUtils;
 import com.blackrook.nosql.redis.event.RedisMonitorEvent;
 import com.blackrook.nosql.redis.event.RedisMonitorListener;
 import com.blackrook.nosql.redis.event.RedisSubscriptionListener;
@@ -102,7 +102,7 @@ public class RedisMonitorConnection extends RedisConnectionAbstract
 		
 		addListener(listeners);
 		(this.monitorThread = new MonitorThread()).start();
-		while (!monitorThread.isAlive()) Common.sleep(0, 250000);
+		while (!monitorThread.isAlive()) ThreadUtils.sleep(0, 250000);
 	}
 
 	/**

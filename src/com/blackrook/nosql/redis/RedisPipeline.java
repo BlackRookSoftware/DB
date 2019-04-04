@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013-2014 Black Rook Software
+ * Copyright (c) 2013-2019 Black Rook Software
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser Public License v2.1
  * which accompanies this distribution, and is available at
@@ -12,9 +12,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 
-import com.blackrook.commons.Common;
 import com.blackrook.commons.ObjectPair;
 import com.blackrook.commons.list.List;
+import com.blackrook.commons.util.ArrayUtils;
+import com.blackrook.commons.util.IOUtils;
 import com.blackrook.nosql.redis.commands.RedisDeferredCommands;
 import com.blackrook.nosql.redis.data.RedisObject;
 import com.blackrook.nosql.redis.enums.Aggregation;
@@ -87,7 +88,7 @@ public class RedisPipeline implements RedisDeferredCommands
 	public void del(String key, String... keys)
 	{
 		if (keys.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"DEL", key}, keys));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"DEL", key}, keys));
 		else
 			writer.writeArray("DEL", key);
 		queued++;
@@ -280,7 +281,7 @@ public class RedisPipeline implements RedisDeferredCommands
 	public void bitop(BitwiseOperation operation, String destkey, String key, String... keys)
 	{
 		if (keys.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"BITOP", operation.name(), destkey, key}, keys));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"BITOP", operation.name(), destkey, key}, keys));
 		else
 			writer.writeArray("BITOP", operation.name(), destkey, key);
 		queued++;
@@ -382,7 +383,7 @@ public class RedisPipeline implements RedisDeferredCommands
 	public void mget(String key, String... keys)
 	{
 		if (keys.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"MGET", key}, keys));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"MGET", key}, keys));
 		else
 			writer.writeArray("MGET", key);
 		queued++;
@@ -392,7 +393,7 @@ public class RedisPipeline implements RedisDeferredCommands
 	public void mset(String key, String value, String... keyValues)
 	{
 		if (keyValues.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"MSET", key, value}, keyValues));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"MSET", key, value}, keyValues));
 		else
 			writer.writeArray("MSET", key, value);
 		queued++;
@@ -424,7 +425,7 @@ public class RedisPipeline implements RedisDeferredCommands
 	public void msetnx(String key, String value, String... keyValues)
 	{
 		if (keyValues.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"MSETNX", key, value}, keyValues));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"MSETNX", key, value}, keyValues));
 		else
 			writer.writeArray("MSETNX", key, value);
 		queued++;
@@ -512,7 +513,7 @@ public class RedisPipeline implements RedisDeferredCommands
 	public void hdel(String key, String field, String... fields)
 	{
 		if (fields.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"HDEL", key, field}, fields));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"HDEL", key, field}, fields));
 		else
 			writer.writeArray("HDEL", key, field);
 		queued++;
@@ -571,7 +572,7 @@ public class RedisPipeline implements RedisDeferredCommands
 	public void hmget(String key, String field, String... fields)
 	{
 		if (fields.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"HMGET", key, field}, fields));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"HMGET", key, field}, fields));
 		else
 			writer.writeArray("HMGET", key, field);
 		queued++;
@@ -581,7 +582,7 @@ public class RedisPipeline implements RedisDeferredCommands
 	public void hmset(String key, String field, String value, String... fieldvalues)
 	{
 		if (fieldvalues.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"HMSET", key, field, value}, fieldvalues));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"HMSET", key, field, value}, fieldvalues));
 		else
 			writer.writeArray("HMSET", key, field, value);
 		queued++;
@@ -600,7 +601,7 @@ public class RedisPipeline implements RedisDeferredCommands
 	public void hmset(String key, Object field, Object value, Object... fieldvalues)
 	{
 		if (fieldvalues.length > 0)
-			writer.writeArray(Common.joinArrays(new Object[]{"HMSET", key, field, value}, fieldvalues));
+			writer.writeArray(ArrayUtils.joinArrays(new Object[]{"HMSET", key, field, value}, fieldvalues));
 		else
 			writer.writeArray("HMSET", key, field, value);
 		queued++;
@@ -674,7 +675,7 @@ public class RedisPipeline implements RedisDeferredCommands
 	public void blpop(long timeout, String key, String... keys)
 	{
 		if (keys.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"BLPOP", key}, keys, new Object[]{timeout}));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"BLPOP", key}, keys, new Object[]{timeout}));
 		else
 			writer.writeArray("BLPOP", key, timeout);
 		queued++;
@@ -684,7 +685,7 @@ public class RedisPipeline implements RedisDeferredCommands
 	public void brpop(long timeout, String key, String... keys)
 	{
 		if (keys.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"BRPOP", key}, keys, new Object[]{timeout}));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"BRPOP", key}, keys, new Object[]{timeout}));
 		else
 			writer.writeArray("BRPOP", key, timeout);
 		queued++;
@@ -736,7 +737,7 @@ public class RedisPipeline implements RedisDeferredCommands
 	public void lpush(String key, String value, String... values)
 	{
 		if (values.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"LPUSH", key, value}, values));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"LPUSH", key, value}, values));
 		else
 			writer.writeArray("LPUSH", key, value);
 		queued++;
@@ -795,7 +796,7 @@ public class RedisPipeline implements RedisDeferredCommands
 	public void rpush(String key, String value, String... values)
 	{
 		if (values.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"RPUSH", key, value}, values));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"RPUSH", key, value}, values));
 		else
 			writer.writeArray("RPUSH", key, value);
 		queued++;
@@ -811,14 +812,14 @@ public class RedisPipeline implements RedisDeferredCommands
 	@Override
 	public void eval(String scriptContent, String[] keys, Object... args)
 	{
-		writer.writeArray(Common.joinArrays(new Object[]{"EVAL", scriptContent, keys.length}, keys, args));
+		writer.writeArray(ArrayUtils.joinArrays(new Object[]{"EVAL", scriptContent, keys.length}, keys, args));
 		queued++;
 	}
 
 	@Override
 	public void evalsha(String hash, String[] keys, Object... args)
 	{
-		writer.writeArray(Common.joinArrays(new Object[]{"EVALSHA", hash, keys.length}, keys, args));
+		writer.writeArray(ArrayUtils.joinArrays(new Object[]{"EVALSHA", hash, keys.length}, keys, args));
 		queued++;
 	}
 
@@ -826,7 +827,7 @@ public class RedisPipeline implements RedisDeferredCommands
 	public void scriptExists(String scriptHash, String... scriptHashes)
 	{
 		if (scriptHashes.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"SCRIPT", "EXISTS", scriptHash}, scriptHashes));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"SCRIPT", "EXISTS", scriptHash}, scriptHashes));
 		else
 			writer.writeArray("SCRIPT", "EXISTS", scriptHash);
 		queued++;
@@ -863,7 +864,7 @@ public class RedisPipeline implements RedisDeferredCommands
 	 */
 	public void scriptLoad(File content) throws IOException
 	{
-		scriptLoad(Common.getTextualContents(content));
+		scriptLoad(IOUtils.getTextualContents(content));
 	}
 
 	/**
@@ -878,14 +879,14 @@ public class RedisPipeline implements RedisDeferredCommands
 	 */
 	public void scriptLoad(InputStream content) throws IOException
 	{
-		scriptLoad(Common.getTextualContents(content));
+		scriptLoad(IOUtils.getTextualContents(content));
 	}
 
 	@Override
 	public void sadd(String key, String member, String... members)
 	{
 		if (members.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"SADD", key, member}, members));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"SADD", key, member}, members));
 		else
 			writer.writeArray("SADD", key, member);
 		queued++;
@@ -903,7 +904,7 @@ public class RedisPipeline implements RedisDeferredCommands
 	public void sadd(String key, Object member, Object... members)
 	{
 		if (members.length > 0)
-			writer.writeArray(Common.joinArrays(new Object[]{"SADD", key, member}, members));
+			writer.writeArray(ArrayUtils.joinArrays(new Object[]{"SADD", key, member}, members));
 		else
 			writer.writeArray("SADD", key, member);
 		queued++;
@@ -920,7 +921,7 @@ public class RedisPipeline implements RedisDeferredCommands
 	public void sdiff(String key, String... keys)
 	{
 		if (keys.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"SDIFF", key}, keys));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"SDIFF", key}, keys));
 		else
 			writer.writeArray("SDIFF", key);
 		queued++;
@@ -930,7 +931,7 @@ public class RedisPipeline implements RedisDeferredCommands
 	public void sdiffstore(String destination, String key, String... keys)
 	{
 		if (keys.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"SDIFFSTORE", destination, key}, keys));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"SDIFFSTORE", destination, key}, keys));
 		else
 			writer.writeArray("SDIFFSTORE", destination, key);
 		queued++;
@@ -940,7 +941,7 @@ public class RedisPipeline implements RedisDeferredCommands
 	public void sinter(String key, String... keys)
 	{
 		if (keys.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"SINTER", key}, keys));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"SINTER", key}, keys));
 		else
 			writer.writeArray("SINTER", key);
 		queued++;
@@ -950,7 +951,7 @@ public class RedisPipeline implements RedisDeferredCommands
 	public void sinterstore(String destination, String key, String... keys)
 	{
 		if (keys.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"SINTERSTORE", destination, key}, keys));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"SINTERSTORE", destination, key}, keys));
 		else
 			writer.writeArray("SINTERSTORE", destination, key);
 		queued++;
@@ -1009,7 +1010,7 @@ public class RedisPipeline implements RedisDeferredCommands
 	public void srem(String key, String member, String... members)
 	{
 		if (members.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"SREM", key, member}, members));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"SREM", key, member}, members));
 		else
 			writer.writeArray("SREM", key, member);
 		queued++;
@@ -1019,7 +1020,7 @@ public class RedisPipeline implements RedisDeferredCommands
 	public void srem(String key, Object member, Object... members)
 	{
 		if (members.length > 0)
-			writer.writeArray(Common.joinArrays(new Object[]{"SREM", key, member}, members));
+			writer.writeArray(ArrayUtils.joinArrays(new Object[]{"SREM", key, member}, members));
 		else
 			writer.writeArray("SREM", key, member);
 		queued++;
@@ -1029,7 +1030,7 @@ public class RedisPipeline implements RedisDeferredCommands
 	public void sunion(String key, String... keys)
 	{
 		if (keys.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"SUNION", key}, keys));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"SUNION", key}, keys));
 		else
 			writer.writeArray("SUNION", key);
 		queued++;
@@ -1039,7 +1040,7 @@ public class RedisPipeline implements RedisDeferredCommands
 	public void sunionstore(String destination, String key, String... keys)
 	{
 		if (keys.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"SUNIONSTORE", destination, key}, keys));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"SUNIONSTORE", destination, key}, keys));
 		else
 			writer.writeArray("SUNIONSTORE", destination, key);
 		queued++;
@@ -1177,7 +1178,7 @@ public class RedisPipeline implements RedisDeferredCommands
 	public void zrem(String key, String member, String... members)
 	{
 		if (members.length > 0)
-			writer.writeArray(Common.joinArrays(new String[]{"ZREM", key, member}, members));
+			writer.writeArray(ArrayUtils.joinArrays(new String[]{"ZREM", key, member}, members));
 		else
 			writer.writeArray("ZREM", key, member);
 		queued++;
@@ -1187,7 +1188,7 @@ public class RedisPipeline implements RedisDeferredCommands
 	public void zrem(String key, Number member, Number... members)
 	{
 		if (members.length > 0)
-			writer.writeArray(Common.joinArrays(new Object[]{"ZREM", key, member}, members));
+			writer.writeArray(ArrayUtils.joinArrays(new Object[]{"ZREM", key, member}, members));
 		else
 			writer.writeArray("ZREM", key, member);
 		queued++;

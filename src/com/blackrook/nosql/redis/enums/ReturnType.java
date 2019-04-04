@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013-2014 Black Rook Software
+ * Copyright (c) 2013-2019 Black Rook Software
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser Public License v2.1
  * which accompanies this distribution, and is available at
@@ -7,8 +7,8 @@
  ******************************************************************************/
 package com.blackrook.nosql.redis.enums;
 
-import com.blackrook.commons.Common;
 import com.blackrook.commons.ObjectPair;
+import com.blackrook.commons.util.ValueUtils;
 import com.blackrook.nosql.redis.data.RedisObject;
 import com.blackrook.nosql.redis.io.RESPReader;
 
@@ -57,7 +57,7 @@ public class ReturnType<C extends Object>
 			String[] ret = ReturnType.ARRAY.readFrom(reader);
 			boolean[] out = new boolean[ret.length];
 			for (int i = 0; i < ret.length; i++)
-				out[i] = Common.parseLong(ret[i]) != 0;
+				out[i] = ValueUtils.parseLong(ret[i]) != 0;
 			return out;
 		}
 	};
@@ -77,7 +77,7 @@ public class ReturnType<C extends Object>
 		public Double readFrom(RESPReader reader)
 		{
 			String out = reader.readString();
-			return out != null ? Common.parseDouble(out) : null;
+			return out != null ? ValueUtils.parseDouble(out) : null;
 		}
 	};
 	

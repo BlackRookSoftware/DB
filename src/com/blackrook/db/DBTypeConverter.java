@@ -1,3 +1,10 @@
+/*******************************************************************************
+ * Copyright (c) 2013-2019 Black Rook Software
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser Public License v2.1
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
+ ******************************************************************************/
 package com.blackrook.db;
 
 import java.io.ByteArrayOutputStream;
@@ -14,10 +21,10 @@ import java.util.Date;
 import java.util.Map;
 
 import com.blackrook.commons.AbstractMap;
-import com.blackrook.commons.Common;
 import com.blackrook.commons.ObjectPair;
 import com.blackrook.commons.Reflect;
 import com.blackrook.commons.TypeConverter;
+import com.blackrook.commons.util.IOUtils;
 
 /**
  * Type converter class for converting types, built from Commons {@link TypeConverter}, 
@@ -164,7 +171,7 @@ public class DBTypeConverter extends TypeConverter
 		} catch (IOException e) {
 			return null;
 		} finally {
-			Common.close(reader);
+			IOUtils.close(reader);
 		}
 	
 		char[] out = new char[sw.getBuffer().length()];
@@ -191,7 +198,7 @@ public class DBTypeConverter extends TypeConverter
 		} catch (IOException e) {
 			return null;
 		} finally {
-			Common.close(in);
+			IOUtils.close(in);
 		}
 		
 		return convertArray(memberName, bos.toByteArray(), targetType);

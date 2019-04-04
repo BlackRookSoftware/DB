@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013-2014 Black Rook Software
+ * Copyright (c) 2013-2019 Black Rook Software
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser Public License v2.1
  * which accompanies this distribution, and is available at
@@ -19,9 +19,10 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
 
-import com.blackrook.commons.Common;
 import com.blackrook.commons.Reflect;
 import com.blackrook.commons.hash.CaseInsensitiveHashMap;
+import com.blackrook.commons.util.IOUtils;
+import com.blackrook.commons.util.ValueUtils;
 
 /**
  * SQLRow object. 
@@ -55,7 +56,7 @@ public class SQLRow extends CaseInsensitiveHashMap<Object>
 	/**
 	 * Returns the boolean value of this column.
 	 * Can convert from Booleans, Numbers, and Strings.
-	 * @see Common#parseBoolean(String)
+	 * @see ValueUtils#parseBoolean(String)
 	 */
 	public boolean getBoolean(String columnName)
 	{
@@ -67,7 +68,7 @@ public class SQLRow extends CaseInsensitiveHashMap<Object>
 		else if (obj instanceof Number)
 			return ((Number)obj).doubleValue() != 0.0f;
 		else if (obj instanceof String)
-			return Common.parseBoolean((String)obj);
+			return ValueUtils.parseBoolean((String)obj);
 		return false;
 	}
 	
@@ -75,7 +76,7 @@ public class SQLRow extends CaseInsensitiveHashMap<Object>
 	 * Returns the byte value of this column.
 	 * Can convert from Booleans, Numbers, and Strings.
 	 * Booleans convert to 1 if true, 0 if false.
-	 * @see Common#parseByte(String)
+	 * @see ValueUtils#parseByte(String)
 	 */
 	public byte getByte(String columnName)
 	{
@@ -87,7 +88,7 @@ public class SQLRow extends CaseInsensitiveHashMap<Object>
 		else if (obj instanceof Number)
 			return ((Number)obj).byteValue();
 		else if (obj instanceof String)
-			return Common.parseByte((String)obj);
+			return ValueUtils.parseByte((String)obj);
 		return (byte)0;
 	}
 	
@@ -117,8 +118,8 @@ public class SQLRow extends CaseInsensitiveHashMap<Object>
 				return null;
 			} catch (IOException e) {
 				return null;
-				} finally {
-				Common.close(in);
+			} finally {
+				IOUtils.close(in);
 			}
 			
 			return bos.toByteArray();
@@ -130,7 +131,7 @@ public class SQLRow extends CaseInsensitiveHashMap<Object>
 	 * Returns the short value of this column.
 	 * Can convert from Booleans, Numbers, and Strings.
 	 * Booleans convert to 1 if true, 0 if false.
-	 * @see Common#parseShort(String)
+	 * @see ValueUtils#parseShort(String)
 	 */
 	public short getShort(String columnName)
 	{
@@ -142,7 +143,7 @@ public class SQLRow extends CaseInsensitiveHashMap<Object>
 		else if (obj instanceof Number)
 			return ((Number)obj).shortValue();
 		else if (obj instanceof String)
-			return Common.parseShort((String)obj);
+			return ValueUtils.parseShort((String)obj);
 		return (short)0;
 	}
 	
@@ -150,7 +151,7 @@ public class SQLRow extends CaseInsensitiveHashMap<Object>
 	 * Returns the integer value of this column.
 	 * Can convert from Booleans, Numbers, and Strings.
 	 * Booleans convert to 1 if true, 0 if false.
-	 * @see Common#parseInt(String)
+	 * @see ValueUtils#parseInt(String)
 	 */
 	public int getInt(String columnName)
 	{
@@ -162,7 +163,7 @@ public class SQLRow extends CaseInsensitiveHashMap<Object>
 		else if (obj instanceof Number)
 			return ((Number)obj).intValue();
 		else if (obj instanceof String)
-			return Common.parseInt((String)obj);
+			return ValueUtils.parseInt((String)obj);
 		return 0;
 	}
 	
@@ -170,7 +171,7 @@ public class SQLRow extends CaseInsensitiveHashMap<Object>
 	 * Returns the float value of this column.
 	 * Can convert from Booleans, Numbers, and Strings.
 	 * Booleans convert to 1 if true, 0 if false.
-	 * @see Common#parseFloat(String)
+	 * @see ValueUtils#parseFloat(String)
 	 */
 	public float getFloat(String columnName)
 	{
@@ -182,7 +183,7 @@ public class SQLRow extends CaseInsensitiveHashMap<Object>
 		else if (obj instanceof Number)
 			return ((Number)obj).floatValue();
 		else if (obj instanceof String)
-			return Common.parseFloat((String)obj);
+			return ValueUtils.parseFloat((String)obj);
 		return 0f;
 	}
 	
@@ -191,7 +192,7 @@ public class SQLRow extends CaseInsensitiveHashMap<Object>
 	 * Can convert from Booleans, Numbers, Strings, and Dates/Timestamps.
 	 * Booleans convert to 1 if true, 0 if false.
 	 * Dates and Timestamps convert to milliseconds since the Epoch.
-	 * @see Common#parseLong(String)
+	 * @see ValueUtils#parseLong(String)
 	 */
 	public long getLong(String columnName)
 	{
@@ -203,7 +204,7 @@ public class SQLRow extends CaseInsensitiveHashMap<Object>
 		else if (obj instanceof Number)
 			return ((Number)obj).longValue();
 		else if (obj instanceof String)
-			return Common.parseLong((String)obj);
+			return ValueUtils.parseLong((String)obj);
 		else if (obj instanceof Date)
 			return ((Date)obj).getTime();
 		return 0L;
@@ -213,7 +214,7 @@ public class SQLRow extends CaseInsensitiveHashMap<Object>
 	 * Returns the double value of this column.
 	 * Can convert from Booleans, Numbers, and Strings.
 	 * Booleans convert to 1 if true, 0 if false.
-	 * @see Common#parseDouble(String)
+	 * @see ValueUtils#parseDouble(String)
 	 */
 	public double getDouble(String columnName)
 	{
@@ -225,7 +226,7 @@ public class SQLRow extends CaseInsensitiveHashMap<Object>
 		else if (obj instanceof Number)
 			return ((Number)obj).doubleValue();
 		else if (obj instanceof String)
-			return Common.parseDouble((String)obj);
+			return ValueUtils.parseDouble((String)obj);
 		return 0.0;
 	}
 	
@@ -267,8 +268,8 @@ public class SQLRow extends CaseInsensitiveHashMap<Object>
 				return null;
 			} catch (IOException e) {
 				return null;
-				} finally {
-				Common.close(reader);
+			} finally {
+				IOUtils.close(reader);
 			}
 			
 			return sw.toString();
@@ -289,8 +290,8 @@ public class SQLRow extends CaseInsensitiveHashMap<Object>
 				return null;
 			} catch (IOException e) {
 				return null;
-				} finally {
-				Common.close(in);
+			} finally {
+				IOUtils.close(in);
 			}
 			
 			return new String(bos.toByteArray());

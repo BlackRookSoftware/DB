@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013-2014 Black Rook Software
+ * Copyright (c) 2013-2019 Black Rook Software
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser Public License v2.1
  * which accompanies this distribution, and is available at
@@ -12,9 +12,11 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.UnknownHostException;
 
-import com.blackrook.commons.Common;
 import com.blackrook.commons.hash.HashMap;
 import com.blackrook.commons.list.List;
+import com.blackrook.commons.util.ArrayUtils;
+import com.blackrook.commons.util.IOUtils;
+import com.blackrook.commons.util.ValueUtils;
 import com.blackrook.nosql.redis.commands.RedisConnectionCommands;
 import com.blackrook.nosql.redis.commands.RedisServerCommands;
 import com.blackrook.nosql.redis.data.RedisObject;
@@ -204,7 +206,7 @@ public class RedisServerConnection extends RedisConnectionAbstract implements Re
 		} catch (IOException e) {
 			throw new RedisParseException("Could not parse INFO from info call.");
 		} finally {
-			Common.close(br);
+			IOUtils.close(br);
 		}
 		
 		return out;
@@ -288,7 +290,7 @@ public class RedisServerConnection extends RedisConnectionAbstract implements Re
 	@Override
 	public RedisObject pubsub(String subcommand, String... arguments)
 	{
-		writer.writeArray(Common.joinArrays(new String[]{"PUBSUB", subcommand}, arguments));
+		writer.writeArray(ArrayUtils.joinArrays(new String[]{"PUBSUB", subcommand}, arguments));
 		return ReturnType.OBJECT.readFrom(reader);
 	}
 
@@ -302,7 +304,7 @@ public class RedisServerConnection extends RedisConnectionAbstract implements Re
 	@Override
 	public String[] pubsubNumsub(String... arguments)
 	{
-		writer.writeArray(Common.joinArrays(new String[]{"PUBSUB", "NUMSUB"}, arguments));
+		writer.writeArray(ArrayUtils.joinArrays(new String[]{"PUBSUB", "NUMSUB"}, arguments));
 		return ReturnType.ARRAY.readFrom(reader);
 	}
 
@@ -328,7 +330,7 @@ public class RedisServerConnection extends RedisConnectionAbstract implements Re
 		if (obj.isError())
 			throw new RedisException(obj.asString());
 		else
-			Common.close(this);
+			IOUtils.close(this);
 	}
 
 	@Override
@@ -378,7 +380,7 @@ public class RedisServerConnection extends RedisConnectionAbstract implements Re
 	{
 		writer.writeArray("TIME");
 		String[] out = ReturnType.ARRAY.readFrom(reader);
-		return new long[]{Common.parseLong(out[0]), Common.parseLong(out[1])};
+		return new long[]{ValueUtils.parseLong(out[0]), ValueUtils.parseLong(out[1])};
 	}
 
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013-2014 Black Rook Software
+ * Copyright (c) 2013-2019 Black Rook Software
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser Public License v2.1
  * which accompanies this distribution, and is available at
@@ -10,9 +10,11 @@ package com.blackrook.nosql.redis;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
-import com.blackrook.commons.Common;
 import com.blackrook.commons.Counter;
 import com.blackrook.commons.linkedlist.Queue;
+import com.blackrook.commons.util.ArrayUtils;
+import com.blackrook.commons.util.ThreadUtils;
+import com.blackrook.commons.util.ValueUtils;
 import com.blackrook.nosql.redis.commands.RedisPubSubCommands;
 import com.blackrook.nosql.redis.event.RedisSubscriptionListener;
 import com.blackrook.nosql.redis.exception.RedisException;
@@ -108,7 +110,7 @@ public class RedisPubSubConnection extends RedisConnectionAbstract implements Re
 		this.counter = new Counter();
 		addListener(listeners);
 		(this.subcriptionThread = new SubcriptionThread()).start();
-		while (!subcriptionThread.isAlive()) Common.sleep(0, 250000);
+		while (!subcriptionThread.isAlive()) ThreadUtils.sleep(0, 250000);
 	}
 	
 	/**
@@ -135,25 +137,25 @@ public class RedisPubSubConnection extends RedisConnectionAbstract implements Re
 	@Override
 	public void subscribe(String... channels)
 	{
-		writer.writeArray(Common.joinArrays(COMMAND_SUBSCRIBE, channels));
+		writer.writeArray(ArrayUtils.joinArrays(COMMAND_SUBSCRIBE, channels));
 	}
 
 	@Override
 	public void unsubscribe(String... channels)
 	{
-		writer.writeArray(Common.joinArrays(COMMAND_UNSUBSCRIBE, channels));
+		writer.writeArray(ArrayUtils.joinArrays(COMMAND_UNSUBSCRIBE, channels));
 	}
 
 	@Override
 	public void psubscribe(String... patterns)
 	{
-		writer.writeArray(Common.joinArrays(COMMAND_PSUBSCRIBE, patterns));
+		writer.writeArray(ArrayUtils.joinArrays(COMMAND_PSUBSCRIBE, patterns));
 	}
 
 	@Override
 	public void punsubscribe(String... patterns) 
 	{
-		writer.writeArray(Common.joinArrays(COMMAND_PUNSUBSCRIBE, patterns));
+		writer.writeArray(ArrayUtils.joinArrays(COMMAND_PUNSUBSCRIBE, patterns));
 	}
 	
 	/**
@@ -244,13 +246,13 @@ public class RedisPubSubConnection extends RedisConnectionAbstract implements Re
 					return;
 				
 				if (response[0].equals("subscribe"))
-					fireOnSubscribe(response[1], Common.parseLong(response[2]));
+					fireOnSubscribe(response[1], ValueUtils.parseLong(response[2]));
 				else if (response[0].equals("unsubscribe"))
-					fireOnUnsubscribe(response[1], Common.parseLong(response[2]));
+					fireOnUnsubscribe(response[1], ValueUtils.parseLong(response[2]));
 				else if (response[0].equals("psubscribe"))
-					fireOnPatternSubscribe(response[1], Common.parseLong(response[2]));
+					fireOnPatternSubscribe(response[1], ValueUtils.parseLong(response[2]));
 				else if (response[0].equals("punsubscribe"))
-					fireOnPatternUnsubscribe(response[1], Common.parseLong(response[2]));
+					fireOnPatternUnsubscribe(response[1], ValueUtils.parseLong(response[2]));
 				else if (response[0].equals("message"))
 					fireOnMessageReceive(response[1], response[2]);
 				else if (response[0].equals("pmessage"))

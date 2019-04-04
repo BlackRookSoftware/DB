@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013-2014 Black Rook Software
+ * Copyright (c) 2013-2019 Black Rook Software
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser Public License v2.1
  * which accompanies this distribution, and is available at
@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import com.blackrook.commons.Common;
+import com.blackrook.commons.util.IOUtils;
 import com.blackrook.nosql.redis.exception.RedisException;
 import com.blackrook.nosql.redis.io.RESPReader;
 import com.blackrook.nosql.redis.io.RESPWriter;
@@ -120,7 +120,7 @@ public class RedisConnectionAbstract implements AutoCloseable
 		if (socket == null)
 			return;
 		
-		Common.close(socket);
+		IOUtils.close(socket);
 		this.reader = null;
 		this.writer = null;
 		this.socket = null;
